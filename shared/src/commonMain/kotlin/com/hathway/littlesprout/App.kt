@@ -13,6 +13,7 @@ import com.hathway.littlesprout.presentation.alphabet.AlphabetScreen
 import com.hathway.littlesprout.presentation.alphabet.AlphabetViewModel
 import com.hathway.littlesprout.presentation.dashboard.DashboardScreen
 import com.hathway.littlesprout.presentation.dashboard.DashboardViewModel
+import com.hathway.littlesprout.presentation.numbers.NumberDetailScreen
 import com.hathway.littlesprout.presentation.numbers.NumbersScreen
 import com.hathway.littlesprout.presentation.numbers.NumbersViewModel
 import com.hathway.littlesprout.presentation.onboarding.OnboardingScreen
@@ -25,6 +26,7 @@ import com.hathway.littlesprout.presentation.splash.SplashViewModel
 fun App() {
     MaterialTheme {
         var currentScreen by remember { mutableStateOf<Screen>(Screen.Splash) }
+        val numbersViewModel: NumbersViewModel = viewModel { NumbersViewModel() }
 
         when (currentScreen) {
             is Screen.Splash -> {
@@ -67,10 +69,25 @@ fun App() {
                 )
             }
             is Screen.Number -> {
-                val viewModel: NumbersViewModel = viewModel { NumbersViewModel() }
                 NumbersScreen(
-                    viewModel = viewModel,
+                    viewModel = numbersViewModel,
                     onBackClick = {
+                        currentScreen = Screen.Main
+                    },
+                    onNumberClick = { index ->
+                        numbersViewModel.selectNumber(index)
+                        currentScreen = Screen.NumberDetail
+                    }
+                )
+            }
+            is Screen.NumberDetail -> {
+                NumberDetailScreen(
+                    viewModel = numbersViewModel,
+                    onBackClick = {
+                        currentScreen = Screen.Number
+                    },
+                    onHomeClick = {
+                        numbersViewModel.clearSelection()
                         currentScreen = Screen.Main
                     }
                 )

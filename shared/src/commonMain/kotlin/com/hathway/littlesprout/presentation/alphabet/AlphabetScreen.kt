@@ -18,8 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import littlesprout.shared.generated.resources.Res
-import littlesprout.shared.generated.resources.img_alphabet_bg
+import littlesprout.shared.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -51,9 +50,11 @@ fun AlphabetScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onBackClick) {
-                    Text("←", fontSize = 24.sp, color = Color.Blue)
-                }
+                Image(
+                    painter = painterResource(Res.drawable.img_back_button),
+                    contentDescription = "Back",
+                    modifier = Modifier.size(48.dp).clickable { onBackClick() }
+                )
                 Text(
                     text = "Alphabets",
                     fontSize = 22.sp,
@@ -128,30 +129,24 @@ fun AlphabetScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         // Previous Button
-                        Surface(
+                        Image(
+                            painter = painterResource(Res.drawable.img_sweep_left),
+                            contentDescription = "Previous",
                             modifier = Modifier
                                 .size(56.dp)
                                 .clickable(enabled = currentIndex > 0) { viewModel.previousItem() },
-                            shape = CircleShape,
-                            color = if (currentIndex > 0) Color(0xFF90CAF9) else Color.LightGray
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Text("←", fontSize = 24.sp, color = Color.White)
-                            }
-                        }
+                            alpha = if (currentIndex > 0) 1f else 0.5f
+                        )
 
                         // Next Button
-                        Surface(
+                        Image(
+                            painter = painterResource(Res.drawable.img_sweep_right),
+                            contentDescription = "Next",
                             modifier = Modifier
                                 .size(56.dp)
                                 .clickable(enabled = currentIndex < items.size - 1) { viewModel.nextItem() },
-                            shape = CircleShape,
-                            color = if (currentIndex < items.size - 1) Color(0xFF90CAF9) else Color.LightGray
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Text("→", fontSize = 24.sp, color = Color.White)
-                            }
-                        }
+                            alpha = if (currentIndex < items.size - 1) 1f else 0.5f
+                        )
                     }
                 }
             }
