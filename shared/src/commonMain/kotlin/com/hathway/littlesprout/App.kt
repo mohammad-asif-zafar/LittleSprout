@@ -1,48 +1,79 @@
 package com.hathway.littlesprout
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.resources.painterResource
-
-import littlesprout.shared.generated.resources.Res
-import littlesprout.shared.generated.resources.compose_multiplatform
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.hathway.littlesprout.navigation.Screen
+import com.hathway.littlesprout.presentation.alphabet.AlphabetScreen
+import com.hathway.littlesprout.presentation.alphabet.AlphabetViewModel
+import com.hathway.littlesprout.presentation.dashboard.DashboardScreen
+import com.hathway.littlesprout.presentation.dashboard.DashboardViewModel
+import com.hathway.littlesprout.presentation.numbers.NumbersScreen
+import com.hathway.littlesprout.presentation.numbers.NumbersViewModel
+import com.hathway.littlesprout.presentation.onboarding.OnboardingScreen
+import com.hathway.littlesprout.presentation.onboarding.OnboardingViewModel
+import com.hathway.littlesprout.presentation.splash.SplashScreen
+import com.hathway.littlesprout.presentation.splash.SplashViewModel
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
+        var currentScreen by remember { mutableStateOf<Screen>(Screen.Splash) }
+
+        when (currentScreen) {
+            is Screen.Splash -> {
+                val viewModel: SplashViewModel = viewModel { SplashViewModel() }
+                SplashScreen(
+                    viewModel = viewModel,
+                    onSplashFinished = {
+                        currentScreen = Screen.Onboarding
+                    }
+                )
             }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
+            is Screen.Onboarding -> {
+                val viewModel: OnboardingViewModel = viewModel { OnboardingViewModel() }
+                OnboardingScreen(
+                    viewModel = viewModel,
+                    onOnboardingFinished = {
+                        currentScreen = Screen.Main
+                    }
+                )
+            }
+            is Screen.Main -> {
+                val viewModel: DashboardViewModel = viewModel { DashboardViewModel() }
+                DashboardScreen(
+                    viewModel = viewModel,
+                    onAlphabetClick = {
+                        currentScreen = Screen.Alphabet
+                    },
+                    onNumbersClick = {
+                        currentScreen = Screen.Number
+                    }
+                )
+            }
+            is Screen.Alphabet -> {
+                val viewModel: AlphabetViewModel = viewModel { AlphabetViewModel() }
+                AlphabetScreen(
+                    viewModel = viewModel,
+                    onBackClick = {
+                        currentScreen = Screen.Main
+                    }
+                )
+            }
+            is Screen.Number -> {
+                val viewModel: NumbersViewModel = viewModel { NumbersViewModel() }
+                NumbersScreen(
+                    viewModel = viewModel,
+                    onBackClick = {
+                        currentScreen = Screen.Main
+                    }
+                )
             }
         }
     }
