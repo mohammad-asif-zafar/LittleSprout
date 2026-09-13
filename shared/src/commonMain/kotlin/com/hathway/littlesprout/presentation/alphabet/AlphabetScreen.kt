@@ -28,27 +28,3 @@ fun AlphabetScreen(
         onNextClick = { viewModel.nextItem() })
 }
 
-
-// 3. THE PREVIEW FUNCTION
-@Preview
-@Composable
-fun AlphabetScreenPreview() {
-    MaterialTheme {
-        // Supplying static mock data so the Layout Engine renders immediately without actual architecture errors
-        val mockItem = AlphabetItem(
-            letter = "Aa",
-            letterImage = Res.drawable.aa,
-            objectImage = Res.drawable.img_apple,
-            description = "A for Apple",
-            audio = "a_apple"
-        )
-
-        AlphabetContent(
-            currentItem = mockItem,
-            isPreviousEnabled = false, // Emulate first card logic
-            isNextEnabled = true,
-            onBackClick = {},
-            onPreviousClick = {},
-            onNextClick = {})
-    }
-}

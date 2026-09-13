@@ -30,11 +30,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hathway.littlesprout.domain.model.AlphabetItem
 import littlesprout.shared.generated.resources.Res
+import littlesprout.shared.generated.resources.aa
 import littlesprout.shared.generated.resources.img_alphabet_bg
+import littlesprout.shared.generated.resources.img_apple
 import org.jetbrains.compose.resources.painterResource
 
 // 2. STATELESS CONTENT: Contains only UI rendering logic (Easy to Preview!)
@@ -160,5 +163,30 @@ fun AlphabetContent(
                 }
             }
         }
+    }
+}
+
+
+// 3. THE PREVIEW FUNCTION
+@Preview
+@Composable
+fun AlphabetScreenPreview() {
+    MaterialTheme {
+        // Supplying static mock data so the Layout Engine renders immediately without actual architecture errors
+        val mockItem = AlphabetItem(
+            letter = "Aa",
+            letterImage = Res.drawable.aa,
+            objectImage = Res.drawable.img_apple,
+            description = "A for Apple",
+            audio = "a_apple"
+        )
+
+        AlphabetContent(
+            currentItem = mockItem,
+            isPreviousEnabled = false, // Emulate first card logic
+            isNextEnabled = true,
+            onBackClick = {},
+            onPreviousClick = {},
+            onNextClick = {})
     }
 }
