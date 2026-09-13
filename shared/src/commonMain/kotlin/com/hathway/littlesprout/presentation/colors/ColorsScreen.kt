@@ -1,4 +1,4 @@
-package com.hathway.littlesprout.presentation.numbers
+package com.hathway.littlesprout.presentation.colors
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,20 +26,19 @@ import littlesprout.shared.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun NumberDetailScreen(
-    viewModel: NumbersViewModel,
+fun ColorsScreen(
+    viewModel: ColorsViewModel,
     onBackClick: () -> Unit,
     onHomeClick: () -> Unit
 ) {
-    val numbers by viewModel.numbers.collectAsState()
-    val selectedIndex by viewModel.selectedNumberIndex.collectAsState()
-    
-    val currentItem = selectedIndex?.let { numbers[it] } ?: return
+    val colors by viewModel.colors.collectAsState()
+    val currentIndex by viewModel.currentIndex.collectAsState()
+    val currentItem = colors[currentIndex]
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // 1. Background Image (The sky/hills with bear at bottom right)
+        // 1. Background Image
         Image(
-            painter = painterResource(Res.drawable.img_number_item),
+            painter = painterResource(Res.drawable.img_color_bg),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillBounds
@@ -63,13 +62,13 @@ fun NumberDetailScreen(
                 )
                 
                 Text(
-                    text = "Numbers",
+                    text = "Colors",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1565C0)
                 )
 
-                // Home Button (White circle matching design style)
+                // Home Button
                 Surface(
                     modifier = Modifier.size(56.dp).clickable { onHomeClick() },
                     shape = CircleShape,
@@ -97,50 +96,32 @@ fun NumberDetailScreen(
                 ) {
                     Spacer(modifier = Modifier.height(40.dp))
 
-                    // 3D Number Card (from grid)
+                    // Color Splash Image
                     Image(
-                        painter = painterResource(currentItem.gridImage),
+                        painter = painterResource(currentItem.colorImage),
                         contentDescription = null,
-                        modifier = Modifier.size(140.dp),
+                        modifier = Modifier.size(240.dp),
                         contentScale = ContentScale.Fit
                     )
                     
-                    Text(
-                        text = currentItem.name,
-                        fontSize = 48.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF1565C0)
-                    )
-
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Hand/Fingers Icon
-                    Image(
-                        painter = painterResource(currentItem.detailImage),
-                        contentDescription = null,
-                        modifier = Modifier.size(180.dp),
-                        contentScale = ContentScale.Fit
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // Descriptive Text (e.g., "One finger")
+                    // Color Name with first letter colored
                     val annotatedString = buildAnnotatedString {
-                        withStyle(style = SpanStyle(color = Color(0xFFFF5252), fontWeight = FontWeight.Bold)) {
-                            append(currentItem.name)
+                        withStyle(style = SpanStyle(color = Color(currentItem.colorCode), fontWeight = FontWeight.ExtraBold)) {
+                            append(currentItem.name.take(1))
                         }
-                        withStyle(style = SpanStyle(color = Color(0xFF1565C0), fontWeight = FontWeight.Bold)) {
-                            append(" finger")
-                            if (currentItem.value != 1) append("s")
+                        withStyle(style = SpanStyle(color = Color(0xFF1565C0), fontWeight = FontWeight.ExtraBold)) {
+                            append(currentItem.name.drop(1))
                         }
                     }
-                    Text(text = annotatedString, fontSize = 28.sp)
+                    Text(text = annotatedString, fontSize = 48.sp)
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // Sound Button (Blue circle with white speaker)
+                    // Sound Button
                     Surface(
-                        modifier = Modifier.size(88.dp).clickable { /* Play Number Sound */ },
+                        modifier = Modifier.size(88.dp).clickable { /* Play Color Sound */ },
                         shape = CircleShape,
                         color = Color(0xFF42A5F5),
                         shadowElevation = 8.dp
@@ -157,19 +138,19 @@ fun NumberDetailScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    if (selectedIndex!! > 0) {
+                    if (currentIndex > 0) {
                         Image(
                             painter = painterResource(Res.drawable.img_sweep_left),
                             contentDescription = "Previous",
-                            modifier = Modifier.size(64.dp).clickable { viewModel.previousNumber() }
+                            modifier = Modifier.size(64.dp).clickable { viewModel.previousColor() }
                         )
                     } else { Spacer(modifier = Modifier.size(64.dp)) }
 
-                    if (selectedIndex!! < numbers.size - 1) {
+                    if (currentIndex < colors.size - 1) {
                         Image(
                             painter = painterResource(Res.drawable.img_sweep_right),
                             contentDescription = "Next",
-                            modifier = Modifier.size(64.dp).clickable { viewModel.nextNumber() }
+                            modifier = Modifier.size(64.dp).clickable { viewModel.nextColor() }
                         )
                     } else { Spacer(modifier = Modifier.size(64.dp)) }
                 }

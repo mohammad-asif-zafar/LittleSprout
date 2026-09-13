@@ -11,6 +11,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hathway.littlesprout.navigation.Screen
 import com.hathway.littlesprout.presentation.alphabet.AlphabetScreen
 import com.hathway.littlesprout.presentation.alphabet.AlphabetViewModel
+import com.hathway.littlesprout.presentation.colors.ColorsScreen
+import com.hathway.littlesprout.presentation.colors.ColorsViewModel
 import com.hathway.littlesprout.presentation.dashboard.DashboardScreen
 import com.hathway.littlesprout.presentation.dashboard.DashboardViewModel
 import com.hathway.littlesprout.presentation.numbers.NumberDetailScreen
@@ -56,6 +58,9 @@ fun App() {
                     },
                     onNumbersClick = {
                         currentScreen = Screen.Number
+                    },
+                    onColorsClick = {
+                        currentScreen = Screen.Colors
                     }
                 )
             }
@@ -88,6 +93,18 @@ fun App() {
                     },
                     onHomeClick = {
                         numbersViewModel.clearSelection()
+                        currentScreen = Screen.Main
+                    }
+                )
+            }
+            is Screen.Colors -> {
+                val viewModel: ColorsViewModel = viewModel { ColorsViewModel() }
+                ColorsScreen(
+                    viewModel = viewModel,
+                    onBackClick = {
+                        currentScreen = Screen.Main
+                    },
+                    onHomeClick = {
                         currentScreen = Screen.Main
                     }
                 )

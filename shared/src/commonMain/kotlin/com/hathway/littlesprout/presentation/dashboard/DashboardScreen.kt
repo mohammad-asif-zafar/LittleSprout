@@ -27,7 +27,8 @@ import org.jetbrains.compose.resources.painterResource
 fun DashboardScreen(
     viewModel: DashboardViewModel,
     onAlphabetClick: () -> Unit,
-    onNumbersClick: () -> Unit
+    onNumbersClick: () -> Unit,
+    onColorsClick: () -> Unit
 ) {
     val items by viewModel.items.collectAsState()
 
@@ -105,6 +106,7 @@ fun DashboardScreen(
                             when (item.title) {
                                 "Alphabet" -> onAlphabetClick()
                                 "Numbers" -> onNumbersClick()
+                                "Colors" -> onColorsClick()
                             }
                         }
                     }

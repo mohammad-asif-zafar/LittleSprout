@@ -7,4 +7,5 @@ sealed class Screen {
     object Alphabet : Screen()
     object Number : Screen()
     object NumberDetail : Screen()
+    object Colors : Screen()
 }
