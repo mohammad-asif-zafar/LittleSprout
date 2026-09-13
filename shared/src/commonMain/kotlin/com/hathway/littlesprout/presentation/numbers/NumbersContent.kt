@@ -76,41 +76,27 @@ fun NumbersContent(
                     painter = painterResource(Res.drawable.img_back_button),
                     contentDescription = "Back",
                     modifier = Modifier.size(56.dp).clickable { onBackClick() })
-
-                // Title Layer
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "Numbers",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1565C0)
-                    )
-                    Text(
-                        text = "Let's learn numbers!", fontSize = 16.sp, color = Color(0xFF1565C0)
-                    )
-                }
-
-                // Music Button
+                // Home
                 Surface(
                     modifier = Modifier.size(56.dp).clickable { onMusicToggleClick() },
                     shape = CircleShape,
-                    color = Color(0xFFFF5252),
+                    color = Color(0xFF19A6B3),
                     shadowElevation = 4.dp
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text("🎵", fontSize = 24.sp, color = Color.White)
+                        Text("🏠", fontSize = 24.sp, color = Color.White)
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(180.dp)) // Aligns to background art empty spacing
+            Spacer(modifier = Modifier.height(120.dp)) // Aligns to background art empty spacing
 
             // Number Grid layout
             LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
+                columns = GridCells.Fixed(3),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
                 itemsIndexed(numbers) { index, numberItem ->

@@ -8,4 +8,6 @@ sealed class Screen {
     object Number : Screen()
     object NumberDetail : Screen()
     object Colors : Screen()
+    object Shapes : Screen()
+    object Animals : Screen()
 }

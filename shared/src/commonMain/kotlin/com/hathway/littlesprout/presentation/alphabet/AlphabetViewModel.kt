@@ -32,161 +32,161 @@ class AlphabetViewModel : ViewModel() {
             ),
             AlphabetItem(
                 letter = "Dd",
-                letterImage = Res.drawable.img_duck,
+                letterImage = Res.drawable.img_dd,
                 objectImage = Res.drawable.img_duck,
                 description = "D for Duck",
                 audio = "d_duck"
             ),
             AlphabetItem(
                 letter = "Ee",
-                letterImage = Res.drawable.img_elephant,
+                letterImage = Res.drawable.ee,
                 objectImage = Res.drawable.img_elephant,
                 description = "E for Elephant",
                 audio = "e_elephant"
             ),
             AlphabetItem(
                 letter = "Ff",
-                letterImage = Res.drawable.img_duck,
-                objectImage = Res.drawable.img_duck,
+                letterImage = Res.drawable.ff,
+                objectImage = Res.drawable.img_fish,
                 description = "F for Fish",
                 audio = "f_fish"
             ),
             AlphabetItem(
                 letter = "Gg",
-                letterImage = Res.drawable.img_giraffe,
+                letterImage = Res.drawable.gg,
                 objectImage = Res.drawable.img_giraffe,
                 description = "G for Giraffe",
                 audio = "g_giraffe"
             ),
             AlphabetItem(
                 letter = "Hh",
-                letterImage = Res.drawable.img_hat,
+                letterImage = Res.drawable.hh,
                 objectImage = Res.drawable.img_hat,
                 description = "H for Hat",
                 audio = "h_hat"
             ),
             AlphabetItem(
                 letter = "Ii",
-                letterImage = Res.drawable.img_igloo,
+                letterImage = Res.drawable.ii,
                 objectImage = Res.drawable.img_igloo,
                 description = "I for Igloo",
                 audio = "i_igloo"
             ),
             AlphabetItem(
                 letter = "Jj",
-                letterImage = Res.drawable.img_jam,
+                letterImage = Res.drawable.jj,
                 objectImage = Res.drawable.img_jam,
                 description = "J for Jam",
                 audio = "j_jam"
             ),
             AlphabetItem(
                 letter = "Kk",
-                letterImage = Res.drawable.img_kite,
+                letterImage = Res.drawable.kk,
                 objectImage = Res.drawable.img_kite,
                 description = "K for Kite",
                 audio = "k_kite"
             ),
             AlphabetItem(
                 letter = "Ll",
-                letterImage = Res.drawable.img_lion,
+                letterImage = Res.drawable.ll,
                 objectImage = Res.drawable.img_lion,
                 description = "L for Lion",
                 audio = "l_lion"
             ),
             AlphabetItem(
                 letter = "Mm",
-                letterImage = Res.drawable.img_monkey,
+                letterImage = Res.drawable.mm,
                 objectImage = Res.drawable.img_monkey,
                 description = "M for Monkey",
                 audio = "m_monkey"
             ),
             AlphabetItem(
                 letter = "Nn",
-                letterImage = Res.drawable.img_nurse,
+                letterImage = Res.drawable.nn,
                 objectImage = Res.drawable.img_nurse,
                 description = "N for Nurse",
                 audio = "n_nurse"
             ),
             AlphabetItem(
                 letter = "Oo",
-                letterImage = Res.drawable.img_octopus,
+                letterImage = Res.drawable.oo,
                 objectImage = Res.drawable.img_octopus,
                 description = "O for Octopus",
                 audio = "o_octopus"
             ),
             AlphabetItem(
                 letter = "Pp",
-                letterImage = Res.drawable.img_panda,
+                letterImage = Res.drawable.pp,
                 objectImage = Res.drawable.img_panda,
                 description = "P for Panda",
                 audio = "p_panda"
             ),
             AlphabetItem(
                 letter = "Qq",
-                letterImage = Res.drawable.img_queen,
+                letterImage = Res.drawable.qq,
                 objectImage = Res.drawable.img_queen,
                 description = "Q for Queen",
                 audio = "q_queen"
             ),
             AlphabetItem(
                 letter = "Rr",
-                letterImage = Res.drawable.img_rainbow,
+                letterImage = Res.drawable.rr,
                 objectImage = Res.drawable.img_rainbow,
                 description = "R for Rainbow",
                 audio = "r_rainbow"
             ),
             AlphabetItem(
                 letter = "Ss",
-                letterImage = Res.drawable.img_sun,
+                letterImage = Res.drawable.ss,
                 objectImage = Res.drawable.img_sun,
                 description = "S for Sun",
                 audio = "s_sun"
             ),
             AlphabetItem(
                 letter = "Tt",
-                letterImage = Res.drawable.img_tiger,
+                letterImage = Res.drawable.tt,
                 objectImage = Res.drawable.img_tiger,
                 description = "T for Tiger",
                 audio = "t_tiger"
             ),
             AlphabetItem(
                 letter = "Uu",
-                letterImage = Res.drawable.img_umbrella,
+                letterImage = Res.drawable.uu,
                 objectImage = Res.drawable.img_umbrella,
                 description = "U for Umbrella",
                 audio = "u_umbrella"
             ),
             AlphabetItem(
                 letter = "Vv",
-                letterImage = Res.drawable.img_van,
+                letterImage = Res.drawable.vv,
                 objectImage = Res.drawable.img_van,
                 description = "V for Van",
                 audio = "v_van"
             ),
             AlphabetItem(
                 letter = "Ww",
-                letterImage = Res.drawable.img_whale,
+                letterImage = Res.drawable.ww,
                 objectImage = Res.drawable.img_whale,
                 description = "W for Whale",
                 audio = "w_whale"
             ),
             AlphabetItem(
                 letter = "Xx",
-                letterImage = Res.drawable.img_xylophone,
+                letterImage = Res.drawable.xx,
                 objectImage = Res.drawable.img_xylophone,
                 description = "X for Xylophone",
                 audio = "x_xylophone"
             ),
             AlphabetItem(
                 letter = "Yy",
-                letterImage = Res.drawable.img_yak,
+                letterImage = Res.drawable.yy,
                 objectImage = Res.drawable.img_yak,
                 description = "Y for Yak",
                 audio = "y_yak"
             ),
             AlphabetItem(
                 letter = "Zz",
-                letterImage = Res.drawable.img_zebra,
+                letterImage = Res.drawable.zz,
                 objectImage = Res.drawable.img_zebra,
                 description = "Z for Zebra",
                 audio = "z_zebra"

@@ -22,6 +22,10 @@ import com.hathway.littlesprout.presentation.onboarding.OnboardingScreen
 import com.hathway.littlesprout.presentation.onboarding.OnboardingViewModel
 import com.hathway.littlesprout.presentation.splash.SplashScreen
 import com.hathway.littlesprout.presentation.splash.SplashViewModel
+import com.hathway.littlesprout.presentation.shapes.ShapesScreen
+import com.hathway.littlesprout.presentation.shapes.ShapesViewModel
+import com.hathway.littlesprout.presentation.animals.AnimalsScreen
+import com.hathway.littlesprout.presentation.animals.AnimalsViewModel
 
 @Composable
 @Preview
@@ -34,80 +38,85 @@ fun App() {
             is Screen.Splash -> {
                 val viewModel: SplashViewModel = viewModel { SplashViewModel() }
                 SplashScreen(
-                    viewModel = viewModel,
-                    onSplashFinished = {
+                    viewModel = viewModel, onSplashFinished = {
                         currentScreen = Screen.Onboarding
-                    }
-                )
+                    })
             }
+
             is Screen.Onboarding -> {
                 val viewModel: OnboardingViewModel = viewModel { OnboardingViewModel() }
                 OnboardingScreen(
-                    viewModel = viewModel,
-                    onOnboardingFinished = {
+                    viewModel = viewModel, onOnboardingFinished = {
                         currentScreen = Screen.Main
-                    }
-                )
+                    })
             }
+
             is Screen.Main -> {
                 val viewModel: DashboardViewModel = viewModel { DashboardViewModel() }
-                DashboardScreen(
-                    viewModel = viewModel,
-                    onAlphabetClick = {
-                        currentScreen = Screen.Alphabet
-                    },
-                    onNumbersClick = {
-                        currentScreen = Screen.Number
-                    },
-                    onColorsClick = {
-                        currentScreen = Screen.Colors
-                    }
-                )
+                DashboardScreen(viewModel = viewModel, onAlphabetClick = {
+                    currentScreen = Screen.Alphabet
+                }, onNumbersClick = {
+                    currentScreen = Screen.Number
+                }, onColorsClick = {
+                    currentScreen = Screen.Colors
+                }, onShapesClick = {
+                    currentScreen = Screen.Shapes
+                }, onAnimalsClick = {
+                    currentScreen = Screen.Animals
+                })
             }
+
             is Screen.Alphabet -> {
                 val viewModel: AlphabetViewModel = viewModel { AlphabetViewModel() }
                 AlphabetScreen(
-                    viewModel = viewModel,
-                    onBackClick = {
+                    viewModel = viewModel, onBackClick = {
                         currentScreen = Screen.Main
-                    }
-                )
+                    })
             }
+
             is Screen.Number -> {
-                NumbersScreen(
-                    viewModel = numbersViewModel,
-                    onBackClick = {
-                        currentScreen = Screen.Main
-                    },
-                    onNumberClick = { index ->
-                        numbersViewModel.selectNumber(index)
-                        currentScreen = Screen.NumberDetail
-                    }
-                )
+                NumbersScreen(viewModel = numbersViewModel, onBackClick = {
+                    currentScreen = Screen.Main
+                }, onNumberClick = { index ->
+                    numbersViewModel.selectNumber(index)
+                    currentScreen = Screen.NumberDetail
+                })
             }
+
             is Screen.NumberDetail -> {
-                NumberDetailScreen(
-                    viewModel = numbersViewModel,
-                    onBackClick = {
-                        currentScreen = Screen.Number
-                    },
-                    onHomeClick = {
-                        numbersViewModel.clearSelection()
-                        currentScreen = Screen.Main
-                    }
-                )
+                NumberDetailScreen(viewModel = numbersViewModel, onBackClick = {
+                    currentScreen = Screen.Number
+                }, onHomeClick = {
+                    numbersViewModel.clearSelection()
+                    currentScreen = Screen.Main
+                })
             }
+
             is Screen.Colors -> {
                 val viewModel: ColorsViewModel = viewModel { ColorsViewModel() }
-                ColorsScreen(
-                    viewModel = viewModel,
-                    onBackClick = {
-                        currentScreen = Screen.Main
-                    },
-                    onHomeClick = {
-                        currentScreen = Screen.Main
-                    }
-                )
+                ColorsScreen(viewModel = viewModel, onBackClick = {
+                    currentScreen = Screen.Main
+                }, onHomeClick = {
+                    currentScreen = Screen.Main
+                })
+            }
+
+            is Screen.Shapes -> {
+                val viewModel: ShapesViewModel = viewModel { ShapesViewModel() }
+                ShapesScreen(viewModel = viewModel, onBackClick = {
+                    currentScreen = Screen.Main
+                }, onHomeClick = {
+                    currentScreen = Screen.Main
+                })
+            }
+
+            is Screen.Animals -> {
+                val viewModel: AnimalsViewModel = viewModel { AnimalsViewModel() }
+                AnimalsScreen(viewModel = viewModel, onBackClick = {
+                    currentScreen = Screen.Main
+                }, onHomeClick = {
+                    currentScreen = Screen.Main
+                })
             }
         }
     }

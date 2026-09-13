@@ -12,15 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +35,9 @@ import littlesprout.shared.generated.resources.Res
 import littlesprout.shared.generated.resources.aa
 import littlesprout.shared.generated.resources.img_alphabet_bg
 import littlesprout.shared.generated.resources.img_apple
+import littlesprout.shared.generated.resources.img_back_button
+import littlesprout.shared.generated.resources.img_sweep_left
+import littlesprout.shared.generated.resources.img_sweep_right
 import org.jetbrains.compose.resources.painterResource
 
 // 2. STATELESS CONTENT: Contains only UI rendering logic (Easy to Preview!)
@@ -67,12 +67,10 @@ fun AlphabetContent(
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
             ) {
-                IconButton(
-                    onClick = onBackClick,
-                    modifier = Modifier.clip(CircleShape).background(Color.White.copy(alpha = 0.8f))
-                ) {
-                    Text("⬅️", fontSize = 20.sp)
-                }
+                Image(
+                    painter = painterResource(Res.drawable.img_back_button),
+                    contentDescription = "Back",
+                    modifier = Modifier.size(56.dp).clickable { onBackClick() })
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -134,32 +132,24 @@ fun AlphabetContent(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(
-                    onClick = onPreviousClick,
-                    enabled = isPreviousEnabled,
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        disabledContainerColor = Color.LightGray.copy(alpha = 0.5f)
-                    ),
-                    modifier = Modifier.weight(1f).height(56.dp)
-                ) {
-                    Text("Previous", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                if (isPreviousEnabled) {
+                    Image(
+                        painter = painterResource(Res.drawable.img_sweep_left),
+                        contentDescription = "Previous",
+                        modifier = Modifier.size(64.dp).clickable { onPreviousClick() })
+                } else {
+                    Spacer(modifier = Modifier.size(64.dp))
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                Button(
-                    onClick = onNextClick,
-                    enabled = isNextEnabled,
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        disabledContainerColor = Color.LightGray.copy(alpha = 0.5f)
-                    ),
-                    modifier = Modifier.weight(1f).height(56.dp)
-                ) {
-                    Text("Next", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                if (isNextEnabled) {
+                    Image(
+                        painter = painterResource(Res.drawable.img_sweep_right),
+                        contentDescription = "Next",
+                        modifier = Modifier.size(64.dp).clickable { onNextClick() })
+                } else {
+                    Spacer(modifier = Modifier.size(64.dp))
                 }
             }
         }
