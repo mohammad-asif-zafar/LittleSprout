@@ -30,15 +30,15 @@ fun DashboardScreen(
     onNumbersClick: () -> Unit,
     onColorsClick: () -> Unit,
     onShapesClick: () -> Unit,
-    onAnimalsClick: () -> Unit
+    onAnimalsClick: () -> Unit,
+    onSongsClick: () -> Unit
 ) {
     val items by viewModel.items.collectAsState()
 
     Scaffold(
         bottomBar = {
             BottomNavigationBar()
-        },
-        containerColor = Color.Transparent
+        }, containerColor = Color.Transparent
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             // 1. Background Image
@@ -51,15 +51,11 @@ fun DashboardScreen(
 
             // 2. Dashboard Content
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .statusBarsPadding()
+                modifier = Modifier.fillMaxSize().padding(paddingValues).statusBarsPadding()
             ) {
                 // Header
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -76,11 +72,8 @@ fun DashboardScreen(
                 Image(
                     painter = painterResource(Res.drawable.hello_little_sprout),
                     contentDescription = "Welcome Banner",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .clickable { /* Banner Click */ },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                        .clip(RoundedCornerShape(20.dp)).clickable { /* Banner Click */ },
                     contentScale = ContentScale.FillWidth
                 )
 
@@ -102,6 +95,7 @@ fun DashboardScreen(
                                 "Colors" -> onColorsClick()
                                 "Shapes" -> onShapesClick()
                                 "Animals" -> onAnimalsClick()
+                                "Songs" -> onSongsClick()
                             }
                         }
                     }
@@ -109,9 +103,7 @@ fun DashboardScreen(
 
                 // Today's Goal
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
+                    modifier = Modifier.fillMaxWidth().padding(16.dp)
                         .clickable { /* Goal Click */ },
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4).copy(alpha = 0.9f)),
                     shape = RoundedCornerShape(20.dp),
@@ -154,7 +146,7 @@ fun DashboardScreen(
                         }
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
@@ -165,16 +157,12 @@ fun DashboardScreen(
 fun DashboardGridItem(item: DashboardItem, onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clip(RoundedCornerShape(16.dp))
-            .clickable { onClick() }
-    ) {
+        modifier = Modifier.fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(16.dp))
+            .clickable { onClick() }) {
         Image(
             painter = painterResource(item.icon),
             contentDescription = item.title,
-            modifier = Modifier
-                .aspectRatio(1f)
-                .fillMaxWidth(),
+            modifier = Modifier.aspectRatio(1f).fillMaxWidth(),
             contentScale = ContentScale.Fit
         )
     }
@@ -183,8 +171,7 @@ fun DashboardGridItem(item: DashboardItem, onClick: () -> Unit) {
 @Composable
 fun BottomNavigationBar() {
     NavigationBar(
-        containerColor = Color.White.copy(alpha = 0.95f),
-        tonalElevation = 8.dp
+        containerColor = Color.White.copy(alpha = 0.95f), tonalElevation = 8.dp
     ) {
         NavigationBarItem(
             icon = { Text("🏠", fontSize = 20.sp) },
@@ -201,19 +188,16 @@ fun BottomNavigationBar() {
             icon = { Text("📊", fontSize = 20.sp) },
             label = { Text("Progress", fontSize = 11.sp) },
             selected = false,
-            onClick = {}
-        )
+            onClick = {})
         NavigationBarItem(
             icon = { Text("👨‍👩‍👧", fontSize = 20.sp) },
             label = { Text("For Parents", fontSize = 11.sp) },
             selected = false,
-            onClick = {}
-        )
+            onClick = {})
         NavigationBarItem(
             icon = { Text("👤", fontSize = 20.sp) },
             label = { Text("Profile", fontSize = 11.sp) },
             selected = false,
-            onClick = {}
-        )
+            onClick = {})
     }
 }

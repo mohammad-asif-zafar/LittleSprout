@@ -26,6 +26,8 @@ import com.hathway.littlesprout.presentation.shapes.ShapesScreen
 import com.hathway.littlesprout.presentation.shapes.ShapesViewModel
 import com.hathway.littlesprout.presentation.animals.AnimalsScreen
 import com.hathway.littlesprout.presentation.animals.AnimalsViewModel
+import com.hathway.littlesprout.presentation.music.MusicScreen
+import com.hathway.littlesprout.presentation.music.MusicViewModel
 
 @Composable
 @Preview
@@ -53,17 +55,27 @@ fun App() {
 
             is Screen.Main -> {
                 val viewModel: DashboardViewModel = viewModel { DashboardViewModel() }
-                DashboardScreen(viewModel = viewModel, onAlphabetClick = {
-                    currentScreen = Screen.Alphabet
-                }, onNumbersClick = {
-                    currentScreen = Screen.Number
-                }, onColorsClick = {
-                    currentScreen = Screen.Colors
-                }, onShapesClick = {
-                    currentScreen = Screen.Shapes
-                }, onAnimalsClick = {
-                    currentScreen = Screen.Animals
-                })
+                DashboardScreen(
+                    viewModel = viewModel, 
+                    onAlphabetClick = {
+                        currentScreen = Screen.Alphabet
+                    }, 
+                    onNumbersClick = {
+                        currentScreen = Screen.Number
+                    }, 
+                    onColorsClick = {
+                        currentScreen = Screen.Colors
+                    }, 
+                    onShapesClick = {
+                        currentScreen = Screen.Shapes
+                    }, 
+                    onAnimalsClick = {
+                        currentScreen = Screen.Animals
+                    },
+                    onSongsClick = {
+                        currentScreen = Screen.Music
+                    }
+                )
             }
 
             is Screen.Alphabet -> {
@@ -117,6 +129,19 @@ fun App() {
                 }, onHomeClick = {
                     currentScreen = Screen.Main
                 })
+            }
+
+            is Screen.Music -> {
+                val viewModel: MusicViewModel = viewModel { MusicViewModel() }
+                MusicScreen(
+                    viewModel = viewModel, 
+                    onBackClick = {
+                        currentScreen = Screen.Main
+                    }, 
+                    onItemClick = { type ->
+                        // Future music detail implementation
+                    }
+                )
             }
         }
     }

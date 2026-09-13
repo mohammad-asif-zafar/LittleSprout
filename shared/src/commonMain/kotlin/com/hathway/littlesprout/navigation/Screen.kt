@@ -10,4 +10,5 @@ sealed class Screen {
     object Colors : Screen()
     object Shapes : Screen()
     object Animals : Screen()
+    object Music : Screen()
 }
