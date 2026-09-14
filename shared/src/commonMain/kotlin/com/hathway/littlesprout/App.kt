@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.hathway.littlesprout.domain.model.MusicType
 import com.hathway.littlesprout.navigation.Screen
 import com.hathway.littlesprout.presentation.alphabet.AlphabetScreen
 import com.hathway.littlesprout.presentation.alphabet.AlphabetViewModel
@@ -28,6 +29,8 @@ import com.hathway.littlesprout.presentation.animals.AnimalsScreen
 import com.hathway.littlesprout.presentation.animals.AnimalsViewModel
 import com.hathway.littlesprout.presentation.music.MusicScreen
 import com.hathway.littlesprout.presentation.music.MusicViewModel
+import com.hathway.littlesprout.presentation.music.SongListScreen
+import com.hathway.littlesprout.presentation.music.MusicPlayerScreen
 
 @Composable
 @Preview
@@ -35,6 +38,7 @@ fun App() {
     MaterialTheme {
         var currentScreen by remember { mutableStateOf<Screen>(Screen.Splash) }
         val numbersViewModel: NumbersViewModel = viewModel { NumbersViewModel() }
+        val musicViewModel: MusicViewModel = viewModel { MusicViewModel() }
 
         when (currentScreen) {
             is Screen.Splash -> {
@@ -132,14 +136,38 @@ fun App() {
             }
 
             is Screen.Music -> {
-                val viewModel: MusicViewModel = viewModel { MusicViewModel() }
                 MusicScreen(
-                    viewModel = viewModel, 
+                    viewModel = musicViewModel, 
                     onBackClick = {
                         currentScreen = Screen.Main
                     }, 
                     onItemClick = { type ->
-                        // Future music detail implementation
+                        if (type == MusicType.SING_ALONG) {
+                            currentScreen = Screen.SongList
+                        }
+                    }
+                )
+            }
+
+            is Screen.SongList -> {
+                SongListScreen(
+                    viewModel = musicViewModel,
+                    onBackClick = {
+                        currentScreen = Screen.Music
+                    },
+                    onSongClick = { song ->
+                        currentScreen = Screen.MusicPlayer(song)
+                    }
+                )
+            }
+
+            is Screen.MusicPlayer -> {
+                val screen = currentScreen as Screen.MusicPlayer
+                MusicPlayerScreen(
+                    viewModel = musicViewModel,
+                    song = screen.song,
+                    onBackClick = {
+                        currentScreen = Screen.SongList
                     }
                 )
             }

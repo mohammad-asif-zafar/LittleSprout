@@ -11,4 +11,6 @@ sealed class Screen {
     object Shapes : Screen()
     object Animals : Screen()
     object Music : Screen()
+    object SongList : Screen()
+    data class MusicPlayer(val song: com.hathway.littlesprout.domain.model.SongItem) : Screen()
 }
