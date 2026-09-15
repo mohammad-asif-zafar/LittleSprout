@@ -6,6 +6,9 @@ interface AudioPlayer {
     fun resume()
     fun stop()
     fun isPlaying(): Boolean
+    fun getDuration(): Long
+    fun getCurrentPosition(): Long
+    fun seekTo(position: Long)
 }
 
 expect fun getAudioPlayer(): AudioPlayer

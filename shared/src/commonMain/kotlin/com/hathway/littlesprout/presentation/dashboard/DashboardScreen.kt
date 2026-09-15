@@ -31,7 +31,8 @@ fun DashboardScreen(
     onColorsClick: () -> Unit,
     onShapesClick: () -> Unit,
     onAnimalsClick: () -> Unit,
-    onSongsClick: () -> Unit
+    onSongsClick: () -> Unit,
+    onFruitsClick: () -> Unit
 ) {
     val items by viewModel.items.collectAsState()
 
@@ -96,6 +97,7 @@ fun DashboardScreen(
                                 "Shapes" -> onShapesClick()
                                 "Animals" -> onAnimalsClick()
                                 "Songs" -> onSongsClick()
+                                "Fruits" -> onFruitsClick()
                             }
                         }
                     }

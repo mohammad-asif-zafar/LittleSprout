@@ -15,7 +15,9 @@ class DashboardViewModel : ViewModel() {
             DashboardItem("Numbers", Res.drawable.img_number),
             DashboardItem("Colors", Res.drawable.img_colors),
             DashboardItem("Shapes", Res.drawable.img_shapes),
-            DashboardItem("Songs", Res.drawable.img_songs)
+            DashboardItem("Songs", Res.drawable.img_songs),
+            DashboardItem("Birds", Res.drawable.bird_parrot),
+            DashboardItem("Fruits", Res.drawable.icon_fruits)
         )
     )
     val items = _items.asStateFlow()

@@ -13,7 +13,6 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
         stop()
         
         try {
-            // Find the file in assets recursively starting from composeResources
             val path = findAssetPath(context, "composeResources", fileName) 
                 ?: findAssetPath(context, "", fileName)
                 ?: fileName
@@ -52,7 +51,6 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
             if (asset == targetFileName) {
                 return fullPath
             }
-            // Check if it lists anything, it's likely a directory
             val subAssets = context.assets.list(fullPath)
             if (!subAssets.isNullOrEmpty()) {
                 val found = findAssetPath(context, fullPath, targetFileName)
@@ -92,6 +90,18 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
     }
 
     override fun isPlaying(): Boolean = try { mediaPlayer?.isPlaying ?: false } catch (e: Exception) { false }
+
+    override fun getDuration(): Long = try { mediaPlayer?.duration?.toLong() ?: 0L } catch (e: Exception) { 0L }
+
+    override fun getCurrentPosition(): Long = try { mediaPlayer?.currentPosition?.toLong() ?: 0L } catch (e: Exception) { 0L }
+
+    override fun seekTo(position: Long) {
+        try {
+            mediaPlayer?.seekTo(position.toInt())
+        } catch (e: Exception) {
+            Log.e("AudioPlayer", "Seek error", e)
+        }
+    }
 }
 
 @SuppressLint("StaticFieldLeak")
