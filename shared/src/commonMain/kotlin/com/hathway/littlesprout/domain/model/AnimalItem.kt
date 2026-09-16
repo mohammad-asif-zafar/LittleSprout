@@ -5,5 +5,5 @@ import org.jetbrains.compose.resources.DrawableResource
 data class AnimalItem(
     val name: String,
     val image: DrawableResource,
-    val soundRes: String? = null
+    val audio: String? = null
 )
