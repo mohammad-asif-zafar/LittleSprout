@@ -7,6 +7,6 @@ data class CommonItem(
     val letterImage: DrawableResource,
     val objectImage: DrawableResource,
     val description: String,
-    val soundRes: String? = null, // For future sound implementation
+    val soundRes: String? = null,
     val audio: String? = null
 )

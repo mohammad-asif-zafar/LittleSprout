@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.hathway.littlesprout.domain.model.NumberItem
 import com.hathway.littlesprout.presentation.numbers.number_components.NumberGridItem
 import littlesprout.shared.generated.resources.Res
+import littlesprout.shared.generated.resources.icon_home
 import littlesprout.shared.generated.resources.img_back_button
 import littlesprout.shared.generated.resources.img_four
 import littlesprout.shared.generated.resources.img_hand_four
@@ -76,17 +77,13 @@ fun NumbersContent(
                     painter = painterResource(Res.drawable.img_back_button),
                     contentDescription = "Back",
                     modifier = Modifier.size(56.dp).clickable { onBackClick() })
-                // Home
-                Surface(
-                    modifier = Modifier.size(56.dp).clickable { onMusicToggleClick() },
-                    shape = CircleShape,
-                    color = Color(0xFF19A6B3),
-                    shadowElevation = 4.dp
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text("🏠", fontSize = 24.sp, color = Color.White)
-                    }
-                }
+                /*// Home
+                Image(
+                    painter = painterResource(Res.drawable.icon_home), // Assumes standard layout asset naming
+                    contentDescription = "Home",
+                    modifier = Modifier.size(56.dp).clickable { onMusicToggleClick() } // Keeps your custom callback execution intact
+                )*/
+
             }
 
             Spacer(modifier = Modifier.height(120.dp)) // Aligns to background art empty spacing

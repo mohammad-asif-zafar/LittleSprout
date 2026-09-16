@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hathway.littlesprout.domain.model.ShapeItem
 import littlesprout.shared.generated.resources.Res
+import littlesprout.shared.generated.resources.icon_speaker
 import littlesprout.shared.generated.resources.img_back_button
 import littlesprout.shared.generated.resources.img_shape_bg
 import littlesprout.shared.generated.resources.img_sweep_left
@@ -39,7 +40,6 @@ import littlesprout.shared.generated.resources.img_sweep_right
 import littlesprout.shared.generated.resources.shape_circle
 import org.jetbrains.compose.resources.painterResource
 
-// 2. STATELESS CONTENT: Pure drawing logic layer optimized for instant IDE Previews
 @Composable
 fun ShapesContent(
     currentItem: ShapeItem,
@@ -64,42 +64,50 @@ fun ShapesContent(
         Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
             // Top Bar
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 35.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp), // Normalized vertical padding from 35.dp
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Back Button
+                // Back Button (Left Corner)
                 Image(
                     painter = painterResource(Res.drawable.img_back_button),
                     contentDescription = "Back",
-                    modifier = Modifier.size(56.dp).clickable { onBackClick() })
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clickable { onBackClick() }
+                )
 
-
-                // Home Button
-                Surface(
-                    modifier = Modifier.size(56.dp).clickable { onHomeClick() },
-                    shape = CircleShape,
-                    color = Color.White,
-                    shadowElevation = 2.dp
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text("🏠", fontSize = 24.sp, color = Color(0xFF1565C0))
-                    }
-                }
+                // FIXED: Replaced the Home button with the Speaker Icon in the Top Right Corner
+                Image(
+                    painter = painterResource(Res.drawable.icon_speaker),
+                    contentDescription = "Play Audio",
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clickable { onPlaySoundClick() }
+                )
             }
 
-            // Main White Card
-            Box(
-                modifier = Modifier.weight(1f).fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 16.dp).clip(RoundedCornerShape(40.dp))
-                    .background(Color.White)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
+            // Main White Card Container
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .clip(RoundedCornerShape(40.dp))
+                    .background(Color.White.copy(alpha = 0.9f))
+            ) {
+                // Core Card Content Layout (Clean with no inner float layers)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
                     // Shape Image
                     Image(
                         painter = painterResource(currentItem.shapeImage),
@@ -112,7 +120,8 @@ fun ShapesContent(
 
                     // Shape Name Bubble
                     Surface(
-                        color = Color(0xFFFFF9C4), shape = RoundedCornerShape(24.dp)
+                        color = Color(0xFFFFF9C4),
+                        shape = RoundedCornerShape(24.dp)
                     ) {
                         Text(
                             text = currentItem.name,
@@ -122,53 +131,33 @@ fun ShapesContent(
                             modifier = Modifier.padding(horizontal = 40.dp, vertical = 8.dp)
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(32.dp))
-
-                    // Sound Button
-                    Surface(
-                        modifier = Modifier.size(88.dp).clickable { onPlaySoundClick() },
-                        shape = CircleShape,
-                        color = Color(0xFF4CAF50),
-                        shadowElevation = 8.dp
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text("🔊", fontSize = 44.sp, color = Color.White)
-                        }
-                    }
-                }
-
-                // Left/Right Navigation Arrows
-                Row(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    if (currentIndex > 0) {
-                        Image(
-                            painter = painterResource(Res.drawable.img_sweep_left),
-                            contentDescription = "Previous",
-                            modifier = Modifier.size(64.dp).clickable { onPreviousClick() })
-                    } else {
-                        Spacer(modifier = Modifier.size(64.dp))
-                    }
-
-                    if (currentIndex < totalItemsCount - 1) {
-                        Image(
-                            painter = painterResource(Res.drawable.img_sweep_right),
-                            contentDescription = "Next",
-                            modifier = Modifier.size(64.dp).clickable { onNextClick() })
-                    } else {
-                        Spacer(modifier = Modifier.size(64.dp))
-                    }
                 }
             }
 
-            // Bottom Badge
-            Box(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
-                contentAlignment = Alignment.Center
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // MOVED: Bottom Navigation and Badge Row (Outside the main white card)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                // Left Arrow
+                if (currentIndex > 0) {
+                    Image(
+                        painter = painterResource(Res.drawable.img_sweep_left),
+                        contentDescription = "Previous",
+                        modifier = Modifier
+                            .size(72.dp)
+                            .clickable { onPreviousClick() }
+                    )
+                } else {
+                    Spacer(modifier = Modifier.size(72.dp))
+                }
+
+                // Center Bottom Badge
                 Surface(
                     modifier = Modifier.height(56.dp),
                     shape = RoundedCornerShape(28.dp),
@@ -189,10 +178,26 @@ fun ShapesContent(
                         Text("⭐", fontSize = 24.sp)
                     }
                 }
+
+                // Right Arrow
+                if (currentIndex < totalItemsCount - 1) {
+                    Image(
+                        painter = painterResource(Res.drawable.img_sweep_right),
+                        contentDescription = "Next",
+                        modifier = Modifier
+                            .size(72.dp)
+                            .clickable { onNextClick() }
+                    )
+                } else {
+                    Spacer(modifier = Modifier.size(72.dp))
+                }
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
+
 
 // 3. THE PREVIEW FUNCTION
 @Preview

@@ -5,8 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,143 +30,169 @@ fun CommonContent(
     onNextClick: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background Image
+        // 1. Full Screen Background Image (Scenic background)
         Image(
-            painter = painterResource(Res.drawable.img_alphabet_bg),
+            painter = painterResource(Res.drawable.common_bg),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillBounds
         )
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxSize().statusBarsPadding().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Top Bar with Back Button
+            // 2. Top Bar (Back Button and Speaker)
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                // Back Button (Yellow circle with white arrow)
                 Image(
                     painter = painterResource(Res.drawable.img_back_button),
                     contentDescription = "Back",
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clickable { onBackClick() }
-                )
+                    modifier = Modifier.size(64.dp) // Slightly scaled down from 80.dp to save top bar space
+                        .clickable { onBackClick() })
+
+                // Speaker Icon (Blue circle with white speaker)
+                Image(
+                    painter = painterResource(Res.drawable.icon_speaker),
+                    contentDescription = "Play Audio",
+                    modifier = Modifier.size(72.dp) // Slightly scaled down from 90.dp to save top bar space
+                        .clickable { /* Audio callback logic */ })
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Main Flashcard Container
-            Card(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp),
-                shape = RoundedCornerShape(32.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.95f)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            // 3. Main Flashcard Container (REPLACED height(600.dp) WITH weight(1f))
+            Box(
+                modifier = Modifier.weight(1f) // Automatically fills all remaining center screen real estate
+                    .fillMaxWidth(0.98f), contentAlignment = Alignment.Center
             ) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    // 1. Speaker Icon (Top Right Corner inside Card)
-                    Image(
-                        painter = painterResource(Res.drawable.icon_speaker),
-                        contentDescription = "Play Audio",
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(24.dp)
-                            .size(48.dp)
-                            .clickable { /* Audio callback logic */ }
-                    )
+                // Card Background Image (Thick yellow border card)
+                Image(
+                    painter = painterResource(Res.drawable.common_card_bg),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.FillBounds
+                )
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    // Object Image (Middle - e.g., Parrot)
+                    Box(
+                        modifier = Modifier.weight(1f).fillMaxWidth(0.95f).padding(top = 16.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        // Aligns content in the middle
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        // 2. Image (Middle of the Card)
                         Image(
                             painter = painterResource(currentItem.objectImage),
                             contentDescription = currentItem.description,
-                            modifier = Modifier
-                                .fillMaxWidth(0.8f)
-                                .height(250.dp)
-                                .clip(RoundedCornerShape(16.dp)),
+                            modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Fit
                         )
+                    }
 
-                        Spacer(modifier = Modifier.weight(0.5f))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                        // 3. Text (Bottom of the Card)
-                        Text(
-                            text = currentItem.description,
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFF1B5E20),
-                            modifier = Modifier.padding(bottom = 24.dp)
+                    Box(
+                        modifier = Modifier.fillMaxWidth().height(80.dp).padding(bottom = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ColoredText(
+                            text = currentItem.description.uppercase()
                         )
-                        
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp)) // Defined spacing before bottom buttons
 
-            // Navigation Controls (Previous / Next)
+            // 4. Bottom Navigation (Previous and Next Buttons)
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Previous Button
                 if (isPreviousEnabled) {
                     Image(
                         painter = painterResource(Res.drawable.img_sweep_left),
                         contentDescription = "Previous",
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clickable { onPreviousClick() }
-                    )
+                        modifier = Modifier.size(85.dp) // Optimized down from 100.dp to ensure visibility across devices
+                            .clickable { onPreviousClick() })
                 } else {
-                    Spacer(modifier = Modifier.size(64.dp))
+                    Spacer(modifier = Modifier.size(85.dp))
                 }
 
+                // Next Button
                 if (isNextEnabled) {
                     Image(
                         painter = painterResource(Res.drawable.img_sweep_right),
                         contentDescription = "Next",
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clickable { onNextClick() }
-                    )
+                        modifier = Modifier.size(85.dp) // Optimized down from 100.dp to ensure visibility across devices
+                            .clickable { onNextClick() })
                 } else {
-                    Spacer(modifier = Modifier.size(64.dp))
+                    Spacer(modifier = Modifier.size(85.dp))
                 }
             }
         }
     }
 }
 
+
+@Composable
+fun ColoredText(text: String, modifier: Modifier = Modifier) {
+    // Dynamic text size reduction for longer words to prevent bubble blowouts
+    val computedFontSize = when {
+        text.length > 8 -> 34.sp
+        text.length > 5 -> 44.sp
+        else -> 54.sp
+    }
+
+    // Light yellow bubble background
+    Box(
+        modifier = modifier.clip(RoundedCornerShape(32.dp))
+            .background(Color(0xFFFFF9C4).copy(alpha = 0.9f))
+            .padding(horizontal = 32.dp, vertical = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            val colors = listOf(
+                Color(0xFFE91E63), // Red
+                Color(0xFFFFC107), // Yellow
+                Color(0xFF2196F3)  // Blue
+            )
+
+            text.forEachIndexed { index, char ->
+                Text(
+                    text = char.toString(),
+                    fontSize = computedFontSize,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = colors[index % colors.size],
+                    letterSpacing = 2.sp
+                )
+            }
+        }
+    }
+}
+
+
 @Preview
 @Composable
-fun AlphabetScreenPreview() {
+fun CommonContentPreview() {
     MaterialTheme {
         val mockItem = CommonItem(
-            letter = "Aa",
+            letter = "Pp",
             letterImage = Res.drawable.bird_hornbill,
-            objectImage = Res.drawable.img_apple,
-            description = "Apple",
-            audio = "a_apple"
+            objectImage = Res.drawable.bird_hornbill,
+            description = "Parrot",
+            audio = "parrot"
         )
 
         CommonContent(
@@ -177,7 +201,6 @@ fun AlphabetScreenPreview() {
             isNextEnabled = true,
             onBackClick = {},
             onPreviousClick = {},
-            onNextClick = {}
-        )
+            onNextClick = {})
     }
 }

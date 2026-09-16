@@ -2,6 +2,7 @@ package com.hathway.littlesprout
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +34,7 @@ import com.hathway.littlesprout.presentation.music.MusicScreen
 import com.hathway.littlesprout.presentation.music.MusicViewModel
 import com.hathway.littlesprout.presentation.music.SongListScreen
 import com.hathway.littlesprout.presentation.music.MusicPlayerScreen
+import com.hathway.littlesprout.presentation.util.CategoryConstants
 
 @Composable
 @Preview
@@ -61,7 +63,9 @@ fun App() {
 
             is Screen.Main -> {
                 val viewModel: DashboardViewModel = viewModel { DashboardViewModel() }
-                DashboardScreen(viewModel = viewModel, onAlphabetClick = {
+                DashboardScreen(viewModel = viewModel, onAnimalsClick = {
+                    currentScreen = Screen.Animals
+                }, onAlphabetClick = {
                     currentScreen = Screen.Alphabet
                 }, onNumbersClick = {
                     currentScreen = Screen.Number
@@ -69,12 +73,29 @@ fun App() {
                     currentScreen = Screen.Colors
                 }, onShapesClick = {
                     currentScreen = Screen.Shapes
-                }, onAnimalsClick = {
-                    currentScreen = Screen.Animals
-                }, onSongsClick = {
+                }, onMusicClick = {
                     currentScreen = Screen.Music
+                }, onBirdsClick = {
+                    currentScreen = Screen.Birds
                 }, onFruitsClick = {
                     currentScreen = Screen.Fruits
+                }, onVehicleClick = {
+                    currentScreen = Screen.Vehicle
+                }, onBannerClick = {
+                    /* Handle Banner Click */
+                }, onGoalClick = {
+                    /* Handle Goal Click */
+                }, onLetsGoClick = {
+                    /* Handle Let's Go Click */
+                })
+            }
+
+            is Screen.Animals -> {
+                val viewModel: AnimalsViewModel = viewModel { AnimalsViewModel() }
+                AnimalsScreen(viewModel = viewModel, onBackClick = {
+                    currentScreen = Screen.Main
+                }, onHomeClick = {
+                    currentScreen = Screen.Main
                 })
             }
 
@@ -86,29 +107,12 @@ fun App() {
                     })
             }
 
-            is Screen.Fruits -> {
-                val viewModel: CommonViewModel = viewModel { CommonViewModel() }
-                CommonItemScreen(
-                    viewModel = viewModel, onBackClick = {
-                        currentScreen = Screen.Main
-                    })
-            }
-
             is Screen.Number -> {
                 NumbersScreen(viewModel = numbersViewModel, onBackClick = {
                     currentScreen = Screen.Main
                 }, onNumberClick = { index ->
                     numbersViewModel.selectNumber(index)
                     currentScreen = Screen.NumberDetail
-                })
-            }
-
-            is Screen.NumberDetail -> {
-                NumberDetailScreen(viewModel = numbersViewModel, onBackClick = {
-                    currentScreen = Screen.Number
-                }, onHomeClick = {
-                    numbersViewModel.clearSelection()
-                    currentScreen = Screen.Main
                 })
             }
 
@@ -130,15 +134,6 @@ fun App() {
                 })
             }
 
-            is Screen.Animals -> {
-                val viewModel: AnimalsViewModel = viewModel { AnimalsViewModel() }
-                AnimalsScreen(viewModel = viewModel, onBackClick = {
-                    currentScreen = Screen.Main
-                }, onHomeClick = {
-                    currentScreen = Screen.Main
-                })
-            }
-
             is Screen.Music -> {
                 MusicScreen(viewModel = musicViewModel, onBackClick = {
                     currentScreen = Screen.Main
@@ -146,6 +141,55 @@ fun App() {
                     if (type == MusicType.SING_ALONG) {
                         currentScreen = Screen.SongList
                     }
+                })
+            }
+
+            is Screen.Birds -> {
+                val viewModelBirds: CommonViewModel = viewModel { CommonViewModel() }
+                val items by viewModelBirds.birdList.collectAsState()
+                val currentIndex by viewModelBirds.currentBirdIndex.collectAsState()
+
+                CommonItemScreen(
+                    items = items,
+                    currentIndex = currentIndex,
+                    onPreviousClick = { viewModelBirds.previousItem(CategoryConstants.BIRDS) },
+                    onNextClick = { viewModelBirds.nextItem(CategoryConstants.BIRDS) },
+                    onBackClick = { currentScreen = Screen.Main })
+            }
+
+            is Screen.Fruits -> {
+                val viewModelFruits: CommonViewModel = viewModel { CommonViewModel() }
+                val items by viewModelFruits.fruitsList.collectAsState()
+                val currentIndex by viewModelFruits.currentFruitIndex.collectAsState()
+
+                CommonItemScreen(
+                    items = items,
+                    currentIndex = currentIndex,
+                    onPreviousClick = { viewModelFruits.previousItem(CategoryConstants.FRUITS) },
+                    onNextClick = { viewModelFruits.nextItem(CategoryConstants.FRUITS) },
+                    onBackClick = { currentScreen = Screen.Main })
+            }
+
+            // Fixed: Now accurately collecting vehicleList and currentVehicleIndex streams
+            is Screen.Vehicle -> {
+                val viewModelVehicle: CommonViewModel = viewModel { CommonViewModel() }
+                val items by viewModelVehicle.vehicleList.collectAsState()
+                val currentIndex by viewModelVehicle.currentVehicleIndex.collectAsState()
+
+                CommonItemScreen(
+                    items = items,
+                    currentIndex = currentIndex,
+                    onPreviousClick = { viewModelVehicle.previousItem(CategoryConstants.VEHICLE) },
+                    onNextClick = { viewModelVehicle.nextItem(CategoryConstants.VEHICLE) },
+                    onBackClick = { currentScreen = Screen.Main })
+            }
+
+            is Screen.NumberDetail -> {
+                NumberDetailScreen(viewModel = numbersViewModel, onBackClick = {
+                    currentScreen = Screen.Number
+                }, onHomeClick = {
+                    numbersViewModel.clearSelection()
+                    currentScreen = Screen.Main
                 })
             }
 

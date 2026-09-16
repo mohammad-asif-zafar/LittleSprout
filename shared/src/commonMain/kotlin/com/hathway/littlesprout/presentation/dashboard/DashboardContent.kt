@@ -2,15 +2,32 @@ package com.hathway.littlesprout.presentation.dashboard
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,16 +39,34 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hathway.littlesprout.domain.model.DashboardItem
 import com.hathway.littlesprout.navigation.BottomNavigationBar
-import littlesprout.shared.generated.resources.*
+import com.hathway.littlesprout.presentation.util.CategoryConstants
+import littlesprout.shared.generated.resources.Res
+import littlesprout.shared.generated.resources.hello_little_sprout
+import littlesprout.shared.generated.resources.icon_animals
+import littlesprout.shared.generated.resources.icon_birds
+import littlesprout.shared.generated.resources.icon_fruits
+import littlesprout.shared.generated.resources.icon_vehicle
+import littlesprout.shared.generated.resources.img_alphabet
+import littlesprout.shared.generated.resources.img_colors
+import littlesprout.shared.generated.resources.img_dashboard_bg
+import littlesprout.shared.generated.resources.img_number
+import littlesprout.shared.generated.resources.img_shapes
+import littlesprout.shared.generated.resources.img_songs
+import littlesprout.shared.generated.resources.little_sprout
 import org.jetbrains.compose.resources.painterResource
 
-// 2. STATELESS CONTENT: Independent layout drawing block (Clean IDE rendering!)
 @Composable
 fun DashboardContent(
     items: List<DashboardItem>,
+    onAnimalsClick: () -> Unit,
     onAlphabetClick: () -> Unit,
     onNumbersClick: () -> Unit,
     onColorsClick: () -> Unit,
+    onShapesClick: () -> Unit,
+    onMusicClick: () -> Unit,
+    onFruitsClick: () -> Unit,
+    onBirdsClick: () -> Unit,
+    onVehicleClick: () -> Unit,
     onBannerClick: () -> Unit,
     onGoalClick: () -> Unit,
     onLetsGoClick: () -> Unit
@@ -42,7 +77,7 @@ fun DashboardContent(
         }, containerColor = Color.Transparent
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
-            // Background Image: Sky and Clouds
+            // 1. Background Image
             Image(
                 painter = painterResource(Res.drawable.img_dashboard_bg),
                 contentDescription = null,
@@ -54,7 +89,7 @@ fun DashboardContent(
             Column(
                 modifier = Modifier.fillMaxSize().padding(paddingValues).statusBarsPadding()
             ) {
-                // Header: Logo
+                // Header
                 Row(
                     modifier = Modifier.fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 12.dp),
@@ -69,7 +104,7 @@ fun DashboardContent(
                     )
                 }
 
-                // Banner: Hello Little Explorer
+                // Banner
                 Image(
                     painter = painterResource(Res.drawable.hello_little_sprout),
                     contentDescription = "Welcome Banner",
@@ -80,7 +115,7 @@ fun DashboardContent(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Category Grid: 3-column grid
+                // Grid
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -91,60 +126,83 @@ fun DashboardContent(
                     items(items) { item ->
                         DashboardGridItem(item) {
                             when (item.title) {
-                                "Alphabet" -> onAlphabetClick()
-                                "Numbers" -> onNumbersClick()
-                                "Colors" -> onColorsClick()
+                                CategoryConstants.ALPHABET -> onAlphabetClick()
+                                CategoryConstants.NUMBERS  -> onNumbersClick()
+                                CategoryConstants.COLORS   -> onColorsClick()
+                                CategoryConstants.SHAPES   -> onShapesClick()
+                                CategoryConstants.ANIMALS  -> onAnimalsClick()
+                                CategoryConstants.BIRDS    -> onBirdsClick()
+                                CategoryConstants.SONGS    -> onMusicClick()
+                                CategoryConstants.FRUITS   -> onFruitsClick()
+                                CategoryConstants.VEHICLE  -> onVehicleClick() // Newly registered click listener
                             }
                         }
+
                     }
                 }
 
-                // Today's Goal Section
+                // Today's Goal (Ultra-Compact Version)
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp).clickable { onGoalClick() },
+                    modifier = Modifier.fillMaxWidth().padding(
+                        horizontal = 16.dp, vertical = 5.dp
+                    ) // Scaled vertical gap up slightly
+                        .clickable { onGoalClick() },
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4).copy(alpha = 0.9f)),
-                    shape = RoundedCornerShape(20.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    shape = RoundedCornerShape(15.dp), // Increased from 12.dp to 15.dp
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
                     Row(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(
+                            horizontal = 12.dp, vertical = 8.dp
+                        ), // Increased padding by ~25%
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Surface(
-                            modifier = Modifier.size(44.dp),
+                            modifier = Modifier.size(35.dp), // Increased from 28.dp to 35.dp
                             color = Color.White,
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(10.dp) // Increased from 8.dp to 10.dp
                         ) {
                             Box(contentAlignment = Alignment.Center) {
-                                Text("⭐", fontSize = 24.sp)
+                                Text("⭐", fontSize = 18.sp) // Increased from 14.sp to 18.sp
                             }
                         }
-                        Spacer(modifier = Modifier.width(16.dp))
+
+                        Spacer(modifier = Modifier.width(12.dp)) // Increased from 10.dp to 12.dp
+
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = "Today's Goal",
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp,
+                                fontSize = 15.sp, // Increased from 12.sp to 15.sp
                                 color = Color(0xFF333333)
                             )
                             Text(
                                 text = "Play, explore and learn something new!",
-                                fontSize = 12.sp,
-                                color = Color(0xFF555555)
+                                fontSize = 12.sp, // Increased from 10.sp to 12.sp
+                                color = Color(0xFF555555),
+                                maxLines = 1
                             )
                         }
+
+                        Spacer(modifier = Modifier.width(8.dp)) // Increased from 6.dp to 8.dp
+
                         Button(
                             onClick = onLetsGoClick,
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-                            shape = RoundedCornerShape(12.dp),
-                            contentPadding = PaddingValues(horizontal = 16.dp)
+                            shape = RoundedCornerShape(10.dp), // Increased from 8.dp to 10.dp
+                            contentPadding = PaddingValues(horizontal = 12.dp), // Increased button side margins
+                            modifier = Modifier.height(32.dp) // Increased height from 26.dp to 32.dp
                         ) {
-                            Text("Let's Go!", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Text(
+                                text = "Let's Go!",
+                                fontSize = 12.sp, // Increased from 10.sp to 12.sp
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
             }
         }
     }
@@ -156,21 +214,31 @@ fun DashboardScreenPreview() {
     MaterialTheme {
         // Generating static category entries assuming icon property holds resource references
         val mockItems = listOf(
-            DashboardItem("Animals", Res.drawable.img_animal),
-            DashboardItem("Alphabet", Res.drawable.img_alphabet),
-            DashboardItem("Numbers", Res.drawable.img_number),
-            DashboardItem("Colors", Res.drawable.img_colors),
-            DashboardItem("Shapes", Res.drawable.img_shapes),
-            DashboardItem("Songs", Res.drawable.img_songs)
+            DashboardItem(CategoryConstants.ANIMALS, Res.drawable.icon_animals),
+            DashboardItem(CategoryConstants.ALPHABET, Res.drawable.img_alphabet),
+            DashboardItem(CategoryConstants.NUMBERS, Res.drawable.img_number),
+            DashboardItem( CategoryConstants.COLORS , Res.drawable.img_colors), // Alternative structure if needed
+            DashboardItem(CategoryConstants.COLORS, Res.drawable.img_colors),
+            DashboardItem(CategoryConstants.SHAPES, Res.drawable.img_shapes),
+            DashboardItem(CategoryConstants.SONGS, Res.drawable.img_songs),
+            DashboardItem(CategoryConstants.BIRDS, Res.drawable.icon_birds),
+            DashboardItem(CategoryConstants.FRUITS, Res.drawable.icon_fruits),
+            DashboardItem(CategoryConstants.VEHICLE, Res.drawable.icon_vehicle) // Fixed: Changed title from "Fruits" to CategoryConstants.VEHICLE
         )
 
         DashboardContent(
             items = mockItems,
-            onAlphabetClick = {},
-            onNumbersClick = {},
-            onColorsClick = {},
-            onBannerClick = {},
-            onGoalClick = {},
+            onAlphabetClick = { },
+            onNumbersClick = { },
+            onColorsClick = { },
+            onShapesClick = { },
+            onAnimalsClick = { },
+            onBirdsClick = { },
+            onMusicClick = { },
+            onFruitsClick = { },
+            onBannerClick = { },
+            onGoalClick = { },
+            onVehicleClick = {},
             onLetsGoClick = {})
     }
 }

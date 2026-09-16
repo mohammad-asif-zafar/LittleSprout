@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.hathway.littlesprout.domain.model.AlphabetItem
 import littlesprout.shared.generated.resources.Res
 import littlesprout.shared.generated.resources.aa
+import littlesprout.shared.generated.resources.icon_speaker
 import littlesprout.shared.generated.resources.img_alphabet_bg
 import littlesprout.shared.generated.resources.img_apple
 import littlesprout.shared.generated.resources.img_back_button
@@ -40,7 +41,6 @@ import littlesprout.shared.generated.resources.img_sweep_left
 import littlesprout.shared.generated.resources.img_sweep_right
 import org.jetbrains.compose.resources.painterResource
 
-// 2. STATELESS CONTENT: Contains only UI rendering logic (Easy to Preview!)
 @Composable
 fun AlphabetContent(
     currentItem: AlphabetItem,
@@ -63,21 +63,27 @@ fun AlphabetContent(
             modifier = Modifier.fillMaxSize().statusBarsPadding().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Top Bar with Back Button
             Row(
-                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
                     painter = painterResource(Res.drawable.img_back_button),
                     contentDescription = "Back",
                     modifier = Modifier.size(56.dp).clickable { onBackClick() })
+                Image(
+                    painter = painterResource(Res.drawable.icon_speaker),
+                    contentDescription = "Play Audio",
+                    modifier = Modifier.size(56.dp) // Adjusted to 56.dp to match back button height seamlessly
+                        .clickable { /* Audio callback logic */ })
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Main Flashcard Container
             Card(
-                modifier = Modifier.weight(1f).fillMaxWidth().padding(vertical = 12.dp),
+                modifier = Modifier.weight(1f).fillMaxWidth().padding(vertical = 4.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -128,7 +134,7 @@ fun AlphabetContent(
 
             // Navigation Controls (Previous / Next)
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -136,20 +142,20 @@ fun AlphabetContent(
                     Image(
                         painter = painterResource(Res.drawable.img_sweep_left),
                         contentDescription = "Previous",
-                        modifier = Modifier.size(64.dp).clickable { onPreviousClick() })
+                        modifier = Modifier.size(72.dp) // Adjusted from 64.dp for improved tap targets
+                            .clickable { onPreviousClick() })
                 } else {
-                    Spacer(modifier = Modifier.size(64.dp))
+                    Spacer(modifier = Modifier.size(72.dp))
                 }
-
-                Spacer(modifier = Modifier.width(16.dp))
 
                 if (isNextEnabled) {
                     Image(
                         painter = painterResource(Res.drawable.img_sweep_right),
                         contentDescription = "Next",
-                        modifier = Modifier.size(64.dp).clickable { onNextClick() })
+                        modifier = Modifier.size(72.dp) // Adjusted from 64.dp for improved tap targets
+                            .clickable { onNextClick() })
                 } else {
-                    Spacer(modifier = Modifier.size(64.dp))
+                    Spacer(modifier = Modifier.size(72.dp))
                 }
             }
         }

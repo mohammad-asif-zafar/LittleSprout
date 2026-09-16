@@ -5,20 +5,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 
-// 1. STATEFUL WRAPPER: Used by your App navigation
 @Composable
 fun CommonItemScreen(
-    viewModel: CommonViewModel, onBackClick: () -> Unit
+    items: List<CommonItem>,
+    currentIndex: Int,
+    onPreviousClick: () -> Unit,
+    onNextClick: () -> Unit,
+    onBackClick: () -> Unit
 ) {
-    val itemsBirds by viewModel.birdList.collectAsState()
-    val currentBirdIIndex by viewModel.currentBirdIIndex.collectAsState()
-    val currentBirdsItem = itemsBirds.getOrNull(currentBirdIIndex) ?: return
+    val currentItem = items.getOrNull(currentIndex) ?: return
 
     CommonContent(
-        currentItem = currentBirdsItem,
-        isPreviousEnabled = currentBirdIIndex > 0,
-        isNextEnabled = currentBirdIIndex < itemsBirds.size - 1,
+        currentItem = currentItem,
+        isPreviousEnabled = currentIndex > 0,
+        isNextEnabled = currentIndex < items.size - 1,
         onBackClick = onBackClick,
-        onPreviousClick = { viewModel.previousBirdIItem() },
-        onNextClick = { viewModel.nextBirdItem() })
+        onPreviousClick = onPreviousClick,
+        onNextClick = onNextClick
+    )
 }
