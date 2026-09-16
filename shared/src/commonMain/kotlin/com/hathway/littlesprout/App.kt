@@ -148,40 +148,60 @@ fun App() {
                 val viewModelBirds: CommonViewModel = viewModel { CommonViewModel() }
                 val items by viewModelBirds.birdList.collectAsState()
                 val currentIndex by viewModelBirds.currentBirdIndex.collectAsState()
+                val isPlaying by viewModelBirds.isPlaying.collectAsState()
+
+                androidx.compose.runtime.LaunchedEffect(Unit) {
+                    viewModelBirds.playInitialAudio(CategoryConstants.BIRDS)
+                }
 
                 CommonItemScreen(
                     items = items,
                     currentIndex = currentIndex,
+                    isPlaying = isPlaying,
                     onPreviousClick = { viewModelBirds.previousItem(CategoryConstants.BIRDS) },
                     onNextClick = { viewModelBirds.nextItem(CategoryConstants.BIRDS) },
-                    onBackClick = { currentScreen = Screen.Main })
+                    onBackClick = { currentScreen = Screen.Main },
+                    onPlaySoundClick = { audioFile -> viewModelBirds.toggleAudioPlayback(audioFile) })
             }
 
             is Screen.Fruits -> {
                 val viewModelFruits: CommonViewModel = viewModel { CommonViewModel() }
                 val items by viewModelFruits.fruitsList.collectAsState()
                 val currentIndex by viewModelFruits.currentFruitIndex.collectAsState()
+                val isPlaying by viewModelFruits.isPlaying.collectAsState()
+
+                androidx.compose.runtime.LaunchedEffect(Unit) {
+                    viewModelFruits.playInitialAudio(CategoryConstants.FRUITS)
+                }
 
                 CommonItemScreen(
                     items = items,
                     currentIndex = currentIndex,
+                    isPlaying = isPlaying,
                     onPreviousClick = { viewModelFruits.previousItem(CategoryConstants.FRUITS) },
                     onNextClick = { viewModelFruits.nextItem(CategoryConstants.FRUITS) },
-                    onBackClick = { currentScreen = Screen.Main })
+                    onBackClick = { currentScreen = Screen.Main },
+                    onPlaySoundClick = { audioFile -> viewModelFruits.toggleAudioPlayback(audioFile) })
             }
 
-            // Fixed: Now accurately collecting vehicleList and currentVehicleIndex streams
             is Screen.Vehicle -> {
                 val viewModelVehicle: CommonViewModel = viewModel { CommonViewModel() }
                 val items by viewModelVehicle.vehicleList.collectAsState()
                 val currentIndex by viewModelVehicle.currentVehicleIndex.collectAsState()
+                val isPlaying by viewModelVehicle.isPlaying.collectAsState()
+
+                androidx.compose.runtime.LaunchedEffect(Unit) {
+                    viewModelVehicle.playInitialAudio(CategoryConstants.VEHICLE)
+                }
 
                 CommonItemScreen(
                     items = items,
                     currentIndex = currentIndex,
+                    isPlaying = isPlaying,
                     onPreviousClick = { viewModelVehicle.previousItem(CategoryConstants.VEHICLE) },
                     onNextClick = { viewModelVehicle.nextItem(CategoryConstants.VEHICLE) },
-                    onBackClick = { currentScreen = Screen.Main })
+                    onBackClick = { currentScreen = Screen.Main },
+                    onPlaySoundClick = { audioFile -> viewModelVehicle.toggleAudioPlayback(audioFile) })
             }
 
             is Screen.NumberDetail -> {

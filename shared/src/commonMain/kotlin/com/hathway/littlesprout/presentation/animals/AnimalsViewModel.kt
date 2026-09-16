@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hathway.littlesprout.domain.model.AnimalItem
 import com.hathway.littlesprout.presentation.music.getAudioPlayer
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -33,10 +32,21 @@ class AnimalsViewModel : ViewModel() {
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying = _isPlaying.asStateFlow()
 
+    init {
+        // Preload animal sounds
+        audioPlayer.preload(_animals.value.mapNotNull { it.audio })
+        audioPlayer.onPlaybackComplete {
+            _isPlaying.value = false
+        }
+        // Play the first animal sound on launch
+        playAnimalSound()
+    }
+
     fun nextAnimal() {
         stopAudio()
         if (_currentIndex.value < _animals.value.size - 1) {
             _currentIndex.value++
+            playAnimalSound()
         }
     }
 
@@ -44,6 +54,7 @@ class AnimalsViewModel : ViewModel() {
         stopAudio()
         if (_currentIndex.value > 0) {
             _currentIndex.value--
+            playAnimalSound()
         }
     }
 
@@ -55,20 +66,8 @@ class AnimalsViewModel : ViewModel() {
 
         val currentAnimal = _animals.value.getOrNull(_currentIndex.value)
         currentAnimal?.audio?.let { audioFile ->
-            viewModelScope.launch {
-                try {
-                    audioPlayer.play(audioFile)
-                    _isPlaying.value = true
-                    
-                    // Poll for completion
-                    while (audioPlayer.isPlaying()) {
-                        delay(200)
-                    }
-                    _isPlaying.value = false
-                } catch (e: Exception) {
-                    _isPlaying.value = false
-                }
-            }
+            _isPlaying.value = true
+            audioPlayer.play(audioFile)
         }
     }
 
@@ -79,6 +78,9 @@ class AnimalsViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
+        // We don't release here if the audioPlayer is shared/app-scoped, 
+        // but since getAudioPlayer() currently returns a new instance (refactored to return shared SoundPool on Android though),
+        // we follow the prompt: "Separate stop playback from destroy audio engine".
         stopAudio()
     }
 }

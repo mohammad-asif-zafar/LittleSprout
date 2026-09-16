@@ -1,62 +1,18 @@
 package com.hathway.littlesprout.presentation.common_components
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.hathway.littlesprout.presentation.music.getAudioPlayer
 import com.hathway.littlesprout.presentation.util.CategoryConstants
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import littlesprout.shared.generated.resources.Res
-import littlesprout.shared.generated.resources.bird_Eagle
-import littlesprout.shared.generated.resources.bird_Flamingo
-import littlesprout.shared.generated.resources.bird_Hen
-import littlesprout.shared.generated.resources.bird_Kingfisher
-import littlesprout.shared.generated.resources.bird_Macaw
-import littlesprout.shared.generated.resources.bird_Ostrich
-import littlesprout.shared.generated.resources.bird_Peacock
-import littlesprout.shared.generated.resources.bird_Penguin
-import littlesprout.shared.generated.resources.bird_Rooster
-import littlesprout.shared.generated.resources.bird_Seagull
-import littlesprout.shared.generated.resources.bird_Sparrow
-import littlesprout.shared.generated.resources.bird_Woodpecker
-import littlesprout.shared.generated.resources.bird_crow
-import littlesprout.shared.generated.resources.bird_duck
-import littlesprout.shared.generated.resources.bird_hornbill
-import littlesprout.shared.generated.resources.bird_owl
-import littlesprout.shared.generated.resources.bird_parrot
-import littlesprout.shared.generated.resources.fruit_Cherry
-import littlesprout.shared.generated.resources.fruit_Citrus
-import littlesprout.shared.generated.resources.fruit_Dragon
-import littlesprout.shared.generated.resources.fruit_Grapes
-import littlesprout.shared.generated.resources.fruit_Limes
-import littlesprout.shared.generated.resources.fruit_Oranges
-import littlesprout.shared.generated.resources.fruit_Peach
-import littlesprout.shared.generated.resources.fruit_Pineapple
-import littlesprout.shared.generated.resources.fruit_Strawberry
-import littlesprout.shared.generated.resources.fruit_Watermelon
-import littlesprout.shared.generated.resources.fruit_kiwi
-import littlesprout.shared.generated.resources.fruits_Banana
-import littlesprout.shared.generated.resources.img_apple
-import littlesprout.shared.generated.resources.vehicle_Helicopter
-import littlesprout.shared.generated.resources.vehicle_Tractor
-import littlesprout.shared.generated.resources.vehicle_Train
-import littlesprout.shared.generated.resources.vehicle_Tram
-import littlesprout.shared.generated.resources.vehicle_Truck
-import littlesprout.shared.generated.resources.vehicle_Van
-import littlesprout.shared.generated.resources.vehicle_airplane
-import littlesprout.shared.generated.resources.vehicle_ambulance
-import littlesprout.shared.generated.resources.vehicle_autorickshaw
-import littlesprout.shared.generated.resources.vehicle_bicycle
-import littlesprout.shared.generated.resources.vehicle_boat
-import littlesprout.shared.generated.resources.vehicle_bullock_cart
-import littlesprout.shared.generated.resources.vehicle_bus
-import littlesprout.shared.generated.resources.vehicle_car
-import littlesprout.shared.generated.resources.vehicle_fire_Truck
-import littlesprout.shared.generated.resources.vehicle_jeep
-import littlesprout.shared.generated.resources.vehicle_motor_bike
-import littlesprout.shared.generated.resources.vehicle_scooter
-import littlesprout.shared.generated.resources.vehicle_ship
-import littlesprout.shared.generated.resources.vehicle_yacht
+import kotlinx.coroutines.launch
+import littlesprout.shared.generated.resources.*
 
 class CommonViewModel : ViewModel() {
+
     private val _birdList = MutableStateFlow(
         listOf(
             CommonItem(
@@ -70,7 +26,7 @@ class CommonViewModel : ViewModel() {
                 letterImage = Res.drawable.bird_crow,
                 objectImage = Res.drawable.bird_crow,
                 description = "Crow",
-                audio = "bird_crow.mp3"
+                audio = "audio_crow.mp3"
             ), CommonItem(
                 letter = "3",
                 letterImage = Res.drawable.bird_parrot,
@@ -163,8 +119,8 @@ class CommonViewModel : ViewModel() {
                 audio = "audio_sparrow.mp3"
             )
         )
-
     )
+
     private val _fruitsList = MutableStateFlow(
         listOf(
             CommonItem(
@@ -172,7 +128,7 @@ class CommonViewModel : ViewModel() {
                 letterImage = Res.drawable.img_apple,
                 objectImage = Res.drawable.img_apple,
                 description = "Apple",
-                audio = "audio_apple.mp3"
+                audio = "a_apple.mp3"
             ), CommonItem(
                 letter = "2",
                 letterImage = Res.drawable.fruits_Banana,
@@ -184,25 +140,23 @@ class CommonViewModel : ViewModel() {
                 letterImage = Res.drawable.fruit_Watermelon,
                 objectImage = Res.drawable.fruit_Watermelon,
                 description = "Watermelon",
-                audio = "audio__watermelon.mp3"
+                audio = "audio_watermelon.mp3"
             ), CommonItem(
                 letter = "4",
                 letterImage = Res.drawable.fruit_Pineapple,
                 objectImage = Res.drawable.fruit_Pineapple,
                 description = "Pineapple",
-                audio = "audio__pineapple.mp3"
+                audio = "audio_pineapple.mp3"
             ), CommonItem(
                 letter = "5",
                 letterImage = Res.drawable.fruit_kiwi,
                 objectImage = Res.drawable.fruit_kiwi,
                 description = "Kiwi",
-                audio = "audio__kiwi.mp3"
+                audio = "audio_kiwi.mp3"
             ), CommonItem(
-                letter = "6",
-                letterImage = Res.drawable.bird_parrot, // Fallback asset
+                letter = "6", letterImage = Res.drawable.bird_parrot, // Fallback asset
                 objectImage = Res.drawable.bird_parrot, // Fallback asset
-                description = "Orange",
-                audio = "audio_orange.mp3"
+                description = "Orange", audio = "audio_orange.mp3"
             ), CommonItem(
                 letter = "7",
                 letterImage = Res.drawable.fruit_Oranges,
@@ -381,6 +335,12 @@ class CommonViewModel : ViewModel() {
         )
     )
 
+    private val audioPlayer = getAudioPlayer()
+    private var playbackJob: Job? = null
+
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying = _isPlaying.asStateFlow()
+
     // Separate Data Streams for All 8 items
     val alphabetList = MutableStateFlow<List<CommonItem>>(emptyList()).asStateFlow()
     val numbersList = MutableStateFlow<List<CommonItem>>(emptyList()).asStateFlow()
@@ -412,7 +372,37 @@ class CommonViewModel : ViewModel() {
     val currentFruitIndex = _currentFruitIndex.asStateFlow()
     val currentVehicleIndex = _currentVehicleIndex.asStateFlow()
 
+    init {
+        // Preload sounds for all categories in this ViewModel
+        audioPlayer.preload(_birdList.value.mapNotNull { it.audio })
+        audioPlayer.preload(_fruitsList.value.mapNotNull { it.audio })
+        audioPlayer.preload(_vehiclesList.value.mapNotNull { it.audio })
+        
+        audioPlayer.onPlaybackComplete {
+            _isPlaying.value = false
+        }
+    }
+
+    fun playInitialAudio(category: String) {
+        playCurrentItemAudio(category)
+    }
+
+    private fun playCurrentItemAudio(category: String) {
+        val audioFile = when (category) {
+            CategoryConstants.BIRDS -> birdList.value.getOrNull(_currentBirdIndex.value)?.audio
+            CategoryConstants.FRUITS -> fruitsList.value.getOrNull(_currentFruitIndex.value)?.audio
+            CategoryConstants.VEHICLE -> vehicleList.value.getOrNull(_currentVehicleIndex.value)?.audio
+            // Add other categories if they have audio
+            else -> null
+        }
+        audioFile?.let { 
+            _isPlaying.value = true
+            audioPlayer.play(it) 
+        }
+    }
+
     fun nextItem(category: String) {
+        stopAudio()
         when (category) {
             CategoryConstants.ALPHABET -> if (currentAlphabetIndex.value < alphabetList.value.size - 1) currentAlphabetIndex.value++
             CategoryConstants.NUMBERS -> if (currentNumbersIndex.value < numbersList.value.size - 1) currentNumbersIndex.value++
@@ -424,9 +414,11 @@ class CommonViewModel : ViewModel() {
             CategoryConstants.FRUITS -> if (_currentFruitIndex.value < fruitsList.value.size - 1) _currentFruitIndex.value++
             CategoryConstants.VEHICLE -> if (_currentVehicleIndex.value < vehicleList.value.size - 1) _currentVehicleIndex.value++
         }
+        playCurrentItemAudio(category)
     }
 
     fun previousItem(category: String) {
+        stopAudio()
         when (category) {
             CategoryConstants.ALPHABET -> if (currentAlphabetIndex.value > 0) currentAlphabetIndex.value--
             CategoryConstants.NUMBERS -> if (currentNumbersIndex.value > 0) currentNumbersIndex.value--
@@ -438,6 +430,34 @@ class CommonViewModel : ViewModel() {
             CategoryConstants.FRUITS -> if (_currentFruitIndex.value > 0) _currentFruitIndex.value--
             CategoryConstants.VEHICLE -> if (_currentVehicleIndex.value > 0) _currentVehicleIndex.value--
         }
+        playCurrentItemAudio(category)
     }
 
+    fun stopAudio() {
+        playbackJob?.cancel()
+        playbackJob = null
+        try {
+            audioPlayer.stop()
+        } catch (e: Exception) {
+            // Suppress platform engine clear exceptions safely during item transitions
+        }
+        _isPlaying.value = false
+    }
+
+    // FIXED: Generic toggle for all categories matching CommonContent string signature
+    fun toggleAudioPlayback(audioFile: String) {
+        if (_isPlaying.value) {
+            stopAudio()
+            return
+        }
+
+        _isPlaying.value = true
+        audioPlayer.play(audioFile)
+    }
+
+
+    override fun onCleared() {
+        super.onCleared()
+        stopAudio()
+    }
 }

@@ -2,105 +2,255 @@ package com.hathway.littlesprout.presentation.music
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.media.MediaMetadataRetriever
+import android.media.SoundPool
 import android.util.Log
+import kotlinx.coroutines.*
 
 class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
-    private var mediaPlayer: MediaPlayer? = null
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    override fun play(fileName: String) {
-        Log.d("AudioPlayer", "Requested to play: $fileName")
-        stop()
-        
-        try {
-            val path = findAssetPath(context, "composeResources", fileName) 
-                ?: findAssetPath(context, "", fileName)
-                ?: fileName
-            
-            Log.d("AudioPlayer", "Resolved asset path: $path")
-            
-            val descriptor = try {
-                context.assets.openFd(path)
-            } catch (e: Exception) {
-                Log.e("AudioPlayer", "Failed to openFd for $path: ${e.message}")
-                null
-            }
-
-            if (descriptor != null) {
-                mediaPlayer = MediaPlayer().apply {
-                    setDataSource(descriptor.fileDescriptor, descriptor.startOffset, descriptor.length)
-                    descriptor.close()
-                    setVolume(1.0f, 1.0f)
-                    prepare()
-                    start()
+    companion object {
+        private const val MAX_STREAMS = 10
+        private val soundPool: SoundPool by lazy {
+            val attributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+            SoundPool.Builder()
+                .setMaxStreams(MAX_STREAMS)
+                .setAudioAttributes(attributes)
+                .build().apply {
+                    setOnLoadCompleteListener { _, sampleId, status ->
+                        Log.d("AudioPlayer", "SoundPool load complete: id=$sampleId, status=$status")
+                    }
                 }
-                Log.i("AudioPlayer", "Playing started: $path")
-            } else {
-                Log.e("AudioPlayer", "Could not find asset: $fileName in any known location")
-            }
-            
-        } catch (e: Exception) {
-            Log.e("AudioPlayer", "Fatal error in play()", e)
         }
+
+        private val soundMap = mutableMapOf<String, Int>()
+        private val durationMap = mutableMapOf<String, Long>()
+        private val pathCache = mutableMapOf<String, String>()
+    }
+
+    private var mediaPlayer: MediaPlayer? = null
+    private var currentStreamId: Int = 0
+    private var currentPlayingFile: String? = null
+    private var completionCallback: (() -> Unit)? = null
+    private var playbackJob: Job? = null
+
+    override fun preload(fileName: String) {
+        if (fileName.isBlank() || soundMap.containsKey(fileName)) return
+
+        scope.launch(Dispatchers.IO) {
+            val path = resolvePath(fileName)
+            if (path == null) {
+                Log.e("AudioPlayer", "Preload failed: could not resolve path for $fileName")
+                return@launch
+            }
+            try {
+                val descriptor = context.assets.openFd(path)
+                val soundId = soundPool.load(descriptor, 1)
+                soundMap[fileName] = soundId
+
+                // Get duration for completion callback estimation
+                val retriever = MediaMetadataRetriever()
+                retriever.setDataSource(descriptor.fileDescriptor, descriptor.startOffset, descriptor.length)
+                val durationStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                durationMap[fileName] = durationStr?.toLong() ?: 0L
+                retriever.release()
+                descriptor.close()
+                Log.d("AudioPlayer", "Preloaded SoundPool: $fileName (path=$path, duration=${durationMap[fileName]}ms)")
+            } catch (e: Exception) {
+                Log.e("AudioPlayer", "Failed to preload SoundPool: $fileName at path $path", e)
+            }
+        }
+    }
+
+    override fun preload(fileNames: List<String>) {
+        fileNames.forEach { preload(it) }
+    }
+
+    override fun play(fileName: String, interruptCurrent: Boolean) {
+        if (fileName.isBlank()) return
+        Log.d("AudioPlayer", "Play requested: $fileName")
+
+        if (interruptCurrent) {
+            stop()
+        }
+
+        val soundId = soundMap[fileName]
+        if (soundId != null) {
+            // Play via SoundPool (Short Audio)
+            Log.d("AudioPlayer", "Attempting SoundPool play: $fileName (soundId=$soundId)")
+            currentStreamId = soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+            if (currentStreamId != 0) {
+                currentPlayingFile = fileName
+                val duration = durationMap[fileName] ?: 0L
+                startCompletionTimer(duration)
+                Log.d("AudioPlayer", "SoundPool play successful, streamId=$currentStreamId")
+            } else {
+                Log.w("AudioPlayer", "SoundPool returned 0 for $fileName - falling back to MediaPlayer")
+                playViaMediaPlayer(fileName)
+            }
+        } else {
+            // Fallback to MediaPlayer
+            playViaMediaPlayer(fileName)
+        }
+    }
+
+    private fun playViaMediaPlayer(fileName: String) {
+        scope.launch(Dispatchers.IO) {
+            val path = resolvePath(fileName)
+            if (path == null) {
+                Log.e("AudioPlayer", "Could not resolve path for: $fileName")
+                return@launch
+            }
+            withContext(Dispatchers.Main) {
+                try {
+                    val descriptor = context.assets.openFd(path)
+                    
+                    if (mediaPlayer == null) {
+                        mediaPlayer = MediaPlayer()
+                    } else {
+                        mediaPlayer?.reset()
+                    }
+
+                    mediaPlayer?.apply {
+                        setDataSource(descriptor.fileDescriptor, descriptor.startOffset, descriptor.length)
+                        descriptor.close()
+                        
+                        setVolume(1.0f, 1.0f)
+                        setOnCompletionListener {
+                            currentPlayingFile = null
+                            completionCallback?.invoke()
+                        }
+                        prepare()
+                        start()
+                    }
+                    currentPlayingFile = fileName
+                    Log.d("AudioPlayer", "Playing via MediaPlayer: $path")
+                } catch (e: Exception) {
+                    Log.e("AudioPlayer", "MediaPlayer failed for $fileName", e)
+                }
+            }
+        }
+    }
+
+    private fun startCompletionTimer(duration: Long) {
+        playbackJob?.cancel()
+        if (duration > 0) {
+            playbackJob = scope.launch {
+                delay(duration)
+                currentPlayingFile = null
+                completionCallback?.invoke()
+            }
+        }
+    }
+
+    override fun stop() {
+        // Stop SoundPool
+        if (currentStreamId != 0) {
+            soundPool.stop(currentStreamId)
+            currentStreamId = 0
+        }
+        // Stop MediaPlayer
+        try {
+            mediaPlayer?.let {
+                if (it.isPlaying) it.stop()
+            }
+        } catch (e: Exception) {}
+
+        playbackJob?.cancel()
+        currentPlayingFile = null
+    }
+
+    override fun pause() {
+        if (currentStreamId != 0) soundPool.pause(currentStreamId)
+        try {
+            if (mediaPlayer?.isPlaying == true) mediaPlayer?.pause()
+        } catch (e: Exception) {}
+    }
+
+    override fun resume() {
+        if (currentStreamId != 0) soundPool.resume(currentStreamId)
+        try {
+            mediaPlayer?.start()
+        } catch (e: Exception) {}
+    }
+
+    override fun isPlaying(): Boolean {
+        return currentPlayingFile != null || (mediaPlayer?.isPlaying ?: false)
+    }
+
+    override fun getDuration(): Long {
+        if (soundMap.containsKey(currentPlayingFile)) {
+            return durationMap[currentPlayingFile] ?: 0L
+        }
+        return try { mediaPlayer?.duration?.toLong() ?: 0L } catch (e: Exception) { 0L }
+    }
+
+    override fun getCurrentPosition(): Long {
+        return try { mediaPlayer?.currentPosition?.toLong() ?: 0L } catch (e: Exception) { 0L }
+    }
+
+    override fun seekTo(position: Long) {
+        try {
+            mediaPlayer?.seekTo(position.toInt())
+        } catch (e: Exception) {}
+    }
+
+    override fun onPlaybackComplete(callback: () -> Unit) {
+        this.completionCallback = callback
+    }
+
+    override fun release() {
+        stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
+        // We don't release the static soundPool as it's shared across the app
+    }
+
+    private fun resolvePath(fileName: String): String? {
+        pathCache[fileName]?.let { return it }
+
+        Log.d("AudioPlayer", "Resolving path for: $fileName")
+        val targetedPaths = listOf(
+            "composeResources/littlesprout.shared.generated.resources/files/$fileName",
+            "composeResources/com.hathway.littlesprout.shared.generated.resources/files/$fileName",
+            "files/$fileName"
+        )
+
+        for (path in targetedPaths) {
+            try {
+                context.assets.open(path).use { it.close() }
+                Log.d("AudioPlayer", "Found asset at targeted path: $path")
+                pathCache[fileName] = path
+                return path
+            } catch (e: Exception) {
+                // Not at this path
+            }
+        }
+
+        val found = findAssetPath(context, "composeResources", fileName) ?: findAssetPath(context, "", fileName)
+        if (found != null) {
+            pathCache[fileName] = found
+        }
+        return found
     }
 
     private fun findAssetPath(context: Context, root: String, targetFileName: String): String? {
         val assets = context.assets.list(root) ?: return null
         for (asset in assets) {
             val fullPath = if (root.isEmpty()) asset else "$root/$asset"
-            if (asset == targetFileName) {
-                return fullPath
-            }
-            val subAssets = context.assets.list(fullPath)
-            if (!subAssets.isNullOrEmpty()) {
+            if (asset == targetFileName) return fullPath
+            if (!asset.contains(".")) {
                 val found = findAssetPath(context, fullPath, targetFileName)
                 if (found != null) return found
             }
         }
         return null
-    }
-
-    override fun pause() {
-        try {
-            mediaPlayer?.let { if (it.isPlaying) it.pause() }
-        } catch (e: Exception) {
-            Log.e("AudioPlayer", "Pause error", e)
-        }
-    }
-
-    override fun resume() {
-        try {
-            mediaPlayer?.start()
-        } catch (e: Exception) {
-            Log.e("AudioPlayer", "Resume error", e)
-        }
-    }
-
-    override fun stop() {
-        try {
-            mediaPlayer?.apply {
-                if (isPlaying) stop()
-                release()
-            }
-        } catch (e: Exception) {
-            Log.e("AudioPlayer", "Stop error", e)
-        } finally {
-            mediaPlayer = null
-        }
-    }
-
-    override fun isPlaying(): Boolean = try { mediaPlayer?.isPlaying ?: false } catch (e: Exception) { false }
-
-    override fun getDuration(): Long = try { mediaPlayer?.duration?.toLong() ?: 0L } catch (e: Exception) { 0L }
-
-    override fun getCurrentPosition(): Long = try { mediaPlayer?.currentPosition?.toLong() ?: 0L } catch (e: Exception) { 0L }
-
-    override fun seekTo(position: Long) {
-        try {
-            mediaPlayer?.seekTo(position.toInt())
-        } catch (e: Exception) {
-            Log.e("AudioPlayer", "Seek error", e)
-        }
     }
 }
 
@@ -109,4 +259,4 @@ object AudioPlayerFactory {
     lateinit var context: Context
 }
 
-actual fun getAudioPlayer(): AudioPlayer = AndroidAudioPlayer(AudioPlayerFactory.context)
+actual fun getAudioPlayer(): AudioPlayer = AndroidAudioPlayer(AudioPlayerFactory.context.applicationContext)

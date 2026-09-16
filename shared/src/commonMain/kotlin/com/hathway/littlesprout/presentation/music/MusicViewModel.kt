@@ -47,6 +47,11 @@ class MusicViewModel : ViewModel() {
     val totalDuration = _totalDuration.asStateFlow()
 
     init {
+        audioPlayer.onPlaybackComplete {
+            _isPlaying.value = false
+            _playbackProgress.value = 0f
+            _currentTime.value = "00:00"
+        }
         startProgressTracker()
     }
 

@@ -33,7 +33,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -55,9 +58,11 @@ fun CommonContent(
     currentItem: CommonItem,
     isPreviousEnabled: Boolean,
     isNextEnabled: Boolean,
+    isPlaying: Boolean, // Added to track current audio playback state
     onBackClick: () -> Unit,
     onPreviousClick: () -> Unit,
-    onNextClick: () -> Unit
+    onNextClick: () -> Unit,
+    onPlaySoundClick: (String) -> Unit // Exposes the item string context on click
 ) {
     // Tracks swipe drag offset accumulation to determine child page changes
     var swipeOffset by remember { mutableStateOf(0f) }
@@ -115,14 +120,32 @@ fun CommonContent(
                         .clickable { onBackClick() }
                 )
 
-                // Speaker Icon (Blue circle with white speaker)
-                Image(
-                    painter = painterResource(Res.drawable.icon_speaker),
-                    contentDescription = "Play Audio",
+                // FIXED: Speaker Icon with dynamic Canvas red slash logic on top layer
+                Box(
                     modifier = Modifier
-                        .size(72.dp)
-                        .clickable { /* Audio callback logic */ }
-                )
+                        .size(64.dp) // Proportional uniform sizing matching back action
+                        .clickable { currentItem.audio?.let { onPlaySoundClick(it) } } // Passes the string out
+                        .drawWithContent {
+                            drawContent()
+                            if (!isPlaying) {
+                                // Draws an anti-aliased crosswise diagonal cancellation bar
+                                drawLine(
+                                    color = Color.Red,
+                                    start = Offset(size.width * 0.25f, size.height * 0.25f),
+                                    end = Offset(size.width * 0.75f, size.height * 0.75f),
+                                    strokeWidth = 4.dp.toPx(),
+                                    cap = StrokeCap.Round
+                                )
+                            }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.icon_speaker),
+                        contentDescription = if (isPlaying) "Stop Audio" else "Play Audio",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -234,6 +257,7 @@ fun CommonContent(
 }
 
 
+
 @Composable
 fun ColoredText(text: String, modifier: Modifier = Modifier) {
     // Dynamic text size reduction for longer words to prevent bubble blowouts
@@ -291,6 +315,9 @@ fun CommonContentPreview() {
             isNextEnabled = true,
             onBackClick = {},
             onPreviousClick = {},
-            onNextClick = {})
+            onNextClick = {},
+            isPlaying = false,
+            onPlaySoundClick = {},
+        )
     }
 }
