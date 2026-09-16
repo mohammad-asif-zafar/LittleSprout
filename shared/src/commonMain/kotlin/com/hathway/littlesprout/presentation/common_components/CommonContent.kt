@@ -1,23 +1,53 @@
 package com.hathway.littlesprout.presentation.common_components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import littlesprout.shared.generated.resources.*
+import littlesprout.shared.generated.resources.Res
+import littlesprout.shared.generated.resources.bird_hornbill
+import littlesprout.shared.generated.resources.common_bg
+import littlesprout.shared.generated.resources.common_card_bg
+import littlesprout.shared.generated.resources.icon_speaker
+import littlesprout.shared.generated.resources.img_back_button
+import littlesprout.shared.generated.resources.img_sweep_left
+import littlesprout.shared.generated.resources.img_sweep_right
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -29,8 +59,31 @@ fun CommonContent(
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        // 1. Full Screen Background Image (Scenic background)
+    // Tracks swipe drag offset accumulation to determine child page changes
+    var swipeOffset by remember { mutableStateOf(0f) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            // 1. SWIPE GESTURES BLOCK: Horizontal swipes to navigate securely
+            .pointerInput(currentItem) { // Keyed to currentItem to refresh swipe states cleanly on change
+                detectHorizontalDragGestures(
+                    onDragEnd = {
+                        if (swipeOffset > 150f && isPreviousEnabled) {
+                            onPreviousClick()
+                        } else if (swipeOffset < -150f && isNextEnabled) {
+                            onNextClick()
+                        }
+                        swipeOffset = 0f // Clear current state threshold
+                    },
+                    onHorizontalDrag = { change, dragAmount ->
+                        change.consume()
+                        swipeOffset += dragAmount
+                    }
+                )
+            }
+    ) {
+        // Full Screen Background Image (Scenic background)
         Image(
             painter = painterResource(Res.drawable.common_bg),
             contentDescription = null,
@@ -39,12 +92,17 @@ fun CommonContent(
         )
 
         Column(
-            modifier = Modifier.fillMaxSize().statusBarsPadding().padding(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 2. Top Bar (Back Button and Speaker)
+            // Top Bar (Back Button and Speaker)
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -52,25 +110,31 @@ fun CommonContent(
                 Image(
                     painter = painterResource(Res.drawable.img_back_button),
                     contentDescription = "Back",
-                    modifier = Modifier.size(64.dp) // Slightly scaled down from 80.dp to save top bar space
-                        .clickable { onBackClick() })
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clickable { onBackClick() }
+                )
 
                 // Speaker Icon (Blue circle with white speaker)
                 Image(
                     painter = painterResource(Res.drawable.icon_speaker),
                     contentDescription = "Play Audio",
-                    modifier = Modifier.size(72.dp) // Slightly scaled down from 90.dp to save top bar space
-                        .clickable { /* Audio callback logic */ })
+                    modifier = Modifier
+                        .size(72.dp)
+                        .clickable { /* Audio callback logic */ }
+                )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 3. Main Flashcard Container (REPLACED height(600.dp) WITH weight(1f))
+            // Main Flashcard Container Frame
             Box(
-                modifier = Modifier.weight(1f) // Automatically fills all remaining center screen real estate
-                    .fillMaxWidth(0.98f), contentAlignment = Alignment.Center
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(0.98f),
+                contentAlignment = Alignment.Center
             ) {
-                // Card Background Image (Thick yellow border card)
+                // Card Background Image (Thick yellow border card stays fixed)
                 Image(
                     painter = painterResource(Res.drawable.common_card_bg),
                     contentDescription = null,
@@ -78,42 +142,64 @@ fun CommonContent(
                     contentScale = ContentScale.FillBounds
                 )
 
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    // Object Image (Middle - e.g., Parrot)
-                    Box(
-                        modifier = Modifier.weight(1f).fillMaxWidth(0.95f).padding(top = 16.dp),
-                        contentAlignment = Alignment.Center
+                // 2. ENTRANCE ANIMATION WRAPPER: Animates elements inside the container dynamically
+                AnimatedContent(
+                    targetState = currentItem,
+                    transitionSpec = {
+                        (fadeIn(animationSpec = tween(400)) + scaleIn(initialScale = 0.88f, animationSpec = tween(400))) togetherWith
+                                (fadeOut(animationSpec = tween(300)) + scaleOut(targetScale = 0.95f, animationSpec = tween(300)))
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { targetItem ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Image(
-                            painter = painterResource(currentItem.objectImage),
-                            contentDescription = currentItem.description,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Fit
-                        )
-                    }
+                        // Object Image (Middle - e.g., Parrot)
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(0.95f)
+                                .padding(top = 16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(targetItem.objectImage),
+                                contentDescription = targetItem.description,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                    Box(
-                        modifier = Modifier.fillMaxWidth().height(80.dp).padding(bottom = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ColoredText(
-                            text = currentItem.description.uppercase()
-                        )
+                        // Text Area Baseline Container
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(80.dp)
+                                .padding(bottom = 8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ColoredText(
+                                text = targetItem.description.uppercase()
+                            )
+                        }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp)) // Defined spacing before bottom buttons
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // 4. Bottom Navigation (Previous and Next Buttons)
+            // Bottom Navigation (Previous and Next Buttons)
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -122,8 +208,10 @@ fun CommonContent(
                     Image(
                         painter = painterResource(Res.drawable.img_sweep_left),
                         contentDescription = "Previous",
-                        modifier = Modifier.size(85.dp) // Optimized down from 100.dp to ensure visibility across devices
-                            .clickable { onPreviousClick() })
+                        modifier = Modifier
+                            .size(85.dp)
+                            .clickable { onPreviousClick() }
+                    )
                 } else {
                     Spacer(modifier = Modifier.size(85.dp))
                 }
@@ -133,8 +221,10 @@ fun CommonContent(
                     Image(
                         painter = painterResource(Res.drawable.img_sweep_right),
                         contentDescription = "Next",
-                        modifier = Modifier.size(85.dp) // Optimized down from 100.dp to ensure visibility across devices
-                            .clickable { onNextClick() })
+                        modifier = Modifier
+                            .size(85.dp)
+                            .clickable { onNextClick() }
+                    )
                 } else {
                     Spacer(modifier = Modifier.size(85.dp))
                 }

@@ -64,105 +64,106 @@ class CommonViewModel : ViewModel() {
                 letterImage = Res.drawable.bird_hornbill,
                 objectImage = Res.drawable.bird_hornbill,
                 description = "Hornbill",
-                audio = "bird_hornbill"
+                audio = "audio_hornbill.mp3"
             ), CommonItem(
                 letter = "2",
                 letterImage = Res.drawable.bird_crow,
                 objectImage = Res.drawable.bird_crow,
                 description = "Crow",
-                audio = "bird_crow"
+                audio = "bird_crow.mp3"
             ), CommonItem(
                 letter = "3",
                 letterImage = Res.drawable.bird_parrot,
                 objectImage = Res.drawable.bird_parrot,
                 description = "Parrot",
-                audio = "Parrot"
+                audio = "audio_parrot.mp3"
             ), CommonItem(
                 letter = "4",
                 letterImage = Res.drawable.bird_Flamingo,
                 objectImage = Res.drawable.bird_Flamingo,
                 description = "Flamingo",
-                audio = "Flamingo"
+                audio = "audio_flamingo.mp3"
             ), CommonItem(
                 letter = "5",
                 letterImage = Res.drawable.bird_Woodpecker,
                 objectImage = Res.drawable.bird_Woodpecker,
                 description = "Woodpecker",
-                audio = "Woodpecker"
+                audio = "audio_woodpecker.mp3"
             ), CommonItem(
                 letter = "6",
                 letterImage = Res.drawable.bird_Kingfisher,
                 objectImage = Res.drawable.bird_Kingfisher,
                 description = "Kingfisher",
-                audio = "Kingfisher"
+                audio = "audio_kingfisher.mp3"
             ), CommonItem(
                 letter = "7",
                 letterImage = Res.drawable.bird_Hen,
                 objectImage = Res.drawable.bird_Hen,
                 description = "Hen",
-                audio = "Hen"
+                audio = "audio_hen.mp3"
             ), CommonItem(
                 letter = "8",
                 letterImage = Res.drawable.bird_duck,
                 objectImage = Res.drawable.bird_duck,
                 description = "Duck",
-                audio = "Duck"
+                audio = "audio_duck.mp3"
             ), CommonItem(
                 letter = "9",
                 letterImage = Res.drawable.bird_Peacock,
                 objectImage = Res.drawable.bird_Peacock,
                 description = "Peacock",
-                audio = "Peacock"
+                audio = "audio_peacock.mp3"
             ), CommonItem(
                 letter = "10",
                 letterImage = Res.drawable.bird_owl,
                 objectImage = Res.drawable.bird_owl,
                 description = "Owl",
-                audio = "Owl"
+                audio = "audio_owl.mp3"
             ), CommonItem(
                 letter = "11",
                 letterImage = Res.drawable.bird_Penguin,
                 objectImage = Res.drawable.bird_Penguin,
                 description = "Penguin",
-                audio = "Penguin"
+                audio = "audio_penguin.mp3"
             ), CommonItem(
                 letter = "12",
                 letterImage = Res.drawable.bird_Rooster,
                 objectImage = Res.drawable.bird_Rooster,
                 description = "Rooster",
-                audio = "Rooster"
+                audio = "audio_rooster.mp3"
             ), CommonItem(
                 letter = "13",
                 letterImage = Res.drawable.bird_Seagull,
                 objectImage = Res.drawable.bird_Seagull,
                 description = "Seagull",
-                audio = "Seagull"
+                audio = "audio_seagull.mp3"
             ), CommonItem(
                 letter = "14",
                 letterImage = Res.drawable.bird_Eagle,
                 objectImage = Res.drawable.bird_Eagle,
                 description = "Eagle",
-                audio = "Eagle"
+                audio = "audio_eagle.mp3"
             ), CommonItem(
                 letter = "15",
                 letterImage = Res.drawable.bird_Macaw,
                 objectImage = Res.drawable.bird_Macaw,
                 description = "Macaw",
-                audio = "Macaw"
+                audio = "audio_macaw.mp3"
             ), CommonItem(
                 letter = "16",
                 letterImage = Res.drawable.bird_Ostrich,
                 objectImage = Res.drawable.bird_Ostrich,
                 description = "Ostrich",
-                audio = "Ostrich"
+                audio = "audio_ostrich.mp3"
             ), CommonItem(
                 letter = "17",
                 letterImage = Res.drawable.bird_Sparrow,
                 objectImage = Res.drawable.bird_Sparrow,
                 description = "Sparrow",
-                audio = "Sparrow"
+                audio = "audio_sparrow.mp3"
             )
         )
+
     )
     private val _fruitsList = MutableStateFlow(
         listOf(
@@ -171,66 +172,89 @@ class CommonViewModel : ViewModel() {
                 letterImage = Res.drawable.img_apple,
                 objectImage = Res.drawable.img_apple,
                 description = "Apple",
-                audio = "Apple"
+                audio = "audio_apple.mp3"
             ), CommonItem(
                 letter = "2",
                 letterImage = Res.drawable.fruits_Banana,
                 objectImage = Res.drawable.fruits_Banana,
                 description = "Banana",
-                audio = "Banana"
+                audio = "audio_banana.mp3"
             ), CommonItem(
                 letter = "3",
                 letterImage = Res.drawable.fruit_Watermelon,
                 objectImage = Res.drawable.fruit_Watermelon,
                 description = "Watermelon",
-                audio = "Watermelon"
+                audio = "audio__watermelon.mp3"
             ), CommonItem(
-                letter = "4", letterImage = Res.drawable.fruit_Pineapple, // Fallback asset
-                objectImage = Res.drawable.fruit_Pineapple, // Fallback asset
-                description = "Pineapple", audio = "Pineapple"
+                letter = "4",
+                letterImage = Res.drawable.fruit_Pineapple,
+                objectImage = Res.drawable.fruit_Pineapple,
+                description = "Pineapple",
+                audio = "audio__pineapple.mp3"
             ), CommonItem(
-                letter = "5", letterImage = Res.drawable.fruit_kiwi, // Fallback asset
-                objectImage = Res.drawable.fruit_kiwi, // Fallback asset
-                description = "Kiwi", audio = "Kiwi"
+                letter = "5",
+                letterImage = Res.drawable.fruit_kiwi,
+                objectImage = Res.drawable.fruit_kiwi,
+                description = "Kiwi",
+                audio = "audio__kiwi.mp3"
             ), CommonItem(
-                letter = "6", letterImage = Res.drawable.bird_parrot, // Fallback asset
+                letter = "6",
+                letterImage = Res.drawable.bird_parrot, // Fallback asset
                 objectImage = Res.drawable.bird_parrot, // Fallback asset
-                description = "Orange", audio = "Orange"
+                description = "Orange",
+                audio = "audio_orange.mp3"
             ), CommonItem(
-                letter = "7", letterImage = Res.drawable.fruit_Oranges, // Fallback asset
-                objectImage = Res.drawable.fruit_Oranges, // Fallback asset
-                description = "Orange", audio = "Orange"
+                letter = "7",
+                letterImage = Res.drawable.fruit_Oranges,
+                objectImage = Res.drawable.fruit_Oranges,
+                description = "Orange",
+                audio = "audio_orange.mp3"
             ), CommonItem(
-                letter = "8", letterImage = Res.drawable.fruit_Strawberry, // Fallback asset
-                objectImage = Res.drawable.fruit_Strawberry, // Fallback asset
-                description = "Strawberry", audio = "Strawberry"
+                letter = "8",
+                letterImage = Res.drawable.fruit_Strawberry,
+                objectImage = Res.drawable.fruit_Strawberry,
+                description = "Strawberry",
+                audio = "audio_strawberry.mp3"
             ), CommonItem(
-                letter = "9", letterImage = Res.drawable.fruit_Dragon, // Fallback asset
-                objectImage = Res.drawable.fruit_Dragon, // Fallback asset
-                description = "Dragon", audio = "Dragon"
+                letter = "9",
+                letterImage = Res.drawable.fruit_Dragon,
+                objectImage = Res.drawable.fruit_Dragon,
+                description = "Dragon",
+                audio = "audio_dragon.mp3"
             ), CommonItem(
-                letter = "10", letterImage = Res.drawable.fruit_Limes, // Fallback asset
-                objectImage = Res.drawable.fruit_Limes, // Fallback asset
-                description = "Limes", audio = "Limes"
+                letter = "10",
+                letterImage = Res.drawable.fruit_Limes,
+                objectImage = Res.drawable.fruit_Limes,
+                description = "Limes",
+                audio = "audio_limes.mp3"
             ), CommonItem(
-                letter = "11", letterImage = Res.drawable.fruit_Cherry, // Fallback asset
-                objectImage = Res.drawable.fruit_Cherry, // Fallback asset
-                description = "Cherry", audio = "Cherry"
+                letter = "11",
+                letterImage = Res.drawable.fruit_Cherry,
+                objectImage = Res.drawable.fruit_Cherry,
+                description = "Cherry",
+                audio = "audio_cherry.mp3"
             ), CommonItem(
-                letter = "12", letterImage = Res.drawable.fruit_Peach, // Fallback asset
-                objectImage = Res.drawable.fruit_Peach, // Fallback asset
-                description = "Peach", audio = "Peach"
+                letter = "12",
+                letterImage = Res.drawable.fruit_Peach,
+                objectImage = Res.drawable.fruit_Peach,
+                description = "Peach",
+                audio = "audio_peach.mp3"
             ), CommonItem(
-                letter = "13", letterImage = Res.drawable.fruit_Citrus, // Fallback asset
-                objectImage = Res.drawable.fruit_Citrus, // Fallback asset
-                description = "Citrus", audio = "Citrus"
+                letter = "13",
+                letterImage = Res.drawable.fruit_Citrus,
+                objectImage = Res.drawable.fruit_Citrus,
+                description = "Citrus",
+                audio = "audio_citrus.mp3"
             ), CommonItem(
-                letter = "14", letterImage = Res.drawable.fruit_Grapes, // Fallback asset
-                objectImage = Res.drawable.fruit_Grapes, // Fallback asset
-                description = "Grapes", audio = "Grapes"
+                letter = "14",
+                letterImage = Res.drawable.fruit_Grapes,
+                objectImage = Res.drawable.fruit_Grapes,
+                description = "Grapes",
+                audio = "audio_grapes.mp3"
             )
         )
     )
+
     private val _vehiclesList = MutableStateFlow(
         listOf(
             CommonItem(
@@ -238,121 +262,121 @@ class CommonViewModel : ViewModel() {
                 letterImage = Res.drawable.vehicle_airplane,
                 objectImage = Res.drawable.vehicle_airplane,
                 description = "Airplane",
-                audio = "Airplane"
+                audio = "audio_airplane.mp3"
             ), CommonItem(
                 letter = "2",
                 letterImage = Res.drawable.vehicle_ambulance,
                 objectImage = Res.drawable.vehicle_ambulance,
                 description = "Ambulance",
-                audio = "Ambulance"
+                audio = "audio_ambulance.mp3"
             ), CommonItem(
                 letter = "3",
                 letterImage = Res.drawable.vehicle_autorickshaw,
                 objectImage = Res.drawable.vehicle_autorickshaw,
                 description = "Autorickshaw",
-                audio = "Autorickshaw"
+                audio = "audio_autorickshaw.mp3"
             ), CommonItem(
                 letter = "4",
                 letterImage = Res.drawable.vehicle_bicycle,
                 objectImage = Res.drawable.vehicle_bicycle,
                 description = "Bicycle",
-                audio = "Bicycle"
+                audio = "audio_bicycle.mp3"
             ), CommonItem(
                 letter = "5",
                 letterImage = Res.drawable.vehicle_boat,
                 objectImage = Res.drawable.vehicle_boat,
                 description = "Boat",
-                audio = "Boat"
+                audio = "audio_boat.mp3"
             ), CommonItem(
                 letter = "6",
                 letterImage = Res.drawable.vehicle_bullock_cart,
                 objectImage = Res.drawable.vehicle_bullock_cart,
                 description = "Bullock",
-                audio = "Bullock"
+                audio = "audio_bullock.mp3"
             ), CommonItem(
                 letter = "7",
                 letterImage = Res.drawable.vehicle_bus,
                 objectImage = Res.drawable.vehicle_bus,
                 description = "Bus",
-                audio = "Bus"
+                audio = "audio_Bus.mp3"
             ), CommonItem(
                 letter = "8",
                 letterImage = Res.drawable.vehicle_car,
                 objectImage = Res.drawable.vehicle_car,
                 description = "Car",
-                audio = "Car"
+                audio = "audio_car.mp3"
             ), CommonItem(
                 letter = "9",
                 letterImage = Res.drawable.vehicle_fire_Truck,
                 objectImage = Res.drawable.vehicle_fire_Truck,
                 description = "Fire Truck",
-                audio = "FireTruck"
+                audio = "audio_firetruck.mp3"
             ), CommonItem(
                 letter = "10",
                 letterImage = Res.drawable.vehicle_Helicopter,
                 objectImage = Res.drawable.vehicle_Helicopter,
                 description = "Helicopter",
-                audio = "Helicopter"
+                audio = "audio_helicopter.mp3"
             ), CommonItem(
                 letter = "11",
                 letterImage = Res.drawable.vehicle_jeep,
                 objectImage = Res.drawable.vehicle_jeep,
                 description = "Jeep",
-                audio = "Jeep"
+                audio = "audio_jeep.mp3"
             ), CommonItem(
                 letter = "12",
                 letterImage = Res.drawable.vehicle_motor_bike,
                 objectImage = Res.drawable.vehicle_motor_bike,
                 description = "Motor Bike",
-                audio = "MotorBike"
+                audio = "audio_motorbike.mp3"
             ), CommonItem(
                 letter = "13",
                 letterImage = Res.drawable.vehicle_scooter,
                 objectImage = Res.drawable.vehicle_scooter,
                 description = "Scooter",
-                audio = "Scooter"
+                audio = "audio_scooter.mp3"
             ), CommonItem(
                 letter = "14",
                 letterImage = Res.drawable.vehicle_ship,
                 objectImage = Res.drawable.vehicle_ship,
                 description = "Ship",
-                audio = "Ship"
+                audio = "audio_ship.mp3"
             ), CommonItem(
                 letter = "15",
                 letterImage = Res.drawable.vehicle_Tractor,
                 objectImage = Res.drawable.vehicle_Tractor,
                 description = "Tractor",
-                audio = "Tractor"
+                audio = "audio_tractor.mp3"
             ), CommonItem(
                 letter = "16",
                 letterImage = Res.drawable.vehicle_Train,
                 objectImage = Res.drawable.vehicle_Train,
                 description = "Train",
-                audio = "Train"
+                audio = "audio_train.mp3"
             ), CommonItem(
                 letter = "17",
                 letterImage = Res.drawable.vehicle_Tram,
                 objectImage = Res.drawable.vehicle_Tram,
                 description = "Tram",
-                audio = "Tram"
+                audio = "audio_tram.mp3"
             ), CommonItem(
                 letter = "18",
                 letterImage = Res.drawable.vehicle_Truck,
                 objectImage = Res.drawable.vehicle_Truck,
                 description = "Truck",
-                audio = "Truck"
+                audio = "audio_truck.mp3"
             ), CommonItem(
                 letter = "19",
                 letterImage = Res.drawable.vehicle_Van,
                 objectImage = Res.drawable.vehicle_Van,
                 description = "Van",
-                audio = "Van"
+                audio = "audio_van.mp3"
             ), CommonItem(
                 letter = "20",
                 letterImage = Res.drawable.vehicle_yacht,
                 objectImage = Res.drawable.vehicle_yacht,
                 description = "Yacht",
-                audio = "Yacht"
+                audio = "audio_yacht.mp3"
             )
         )
     )
