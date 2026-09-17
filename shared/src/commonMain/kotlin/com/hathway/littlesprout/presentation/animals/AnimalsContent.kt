@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import com.hathway.littlesprout.domain.model.AnimalItem
 import littlesprout.shared.generated.resources.Res
 import littlesprout.shared.generated.resources.animal_bg
+import littlesprout.shared.generated.resources.icon_repeat
 import littlesprout.shared.generated.resources.icon_speaker
 import littlesprout.shared.generated.resources.img_back_button
 import littlesprout.shared.generated.resources.img_cat
@@ -140,7 +141,7 @@ fun AnimalsContent(
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
-                            painter = painterResource(Res.drawable.icon_speaker),
+                            painter = painterResource(Res.drawable.icon_repeat),
                             contentDescription = if (isPlaying) "Stop Audio" else "Play Audio",
                             modifier = Modifier.fillMaxSize()
                         )

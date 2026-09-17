@@ -3,6 +3,7 @@ package com.hathway.littlesprout.presentation.shapes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,16 +16,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hathway.littlesprout.domain.model.ShapeItem
 import littlesprout.shared.generated.resources.Res
-import littlesprout.shared.generated.resources.icon_speaker
+import littlesprout.shared.generated.resources.icon_repeat
 import littlesprout.shared.generated.resources.img_back_button
 import littlesprout.shared.generated.resources.img_shape_bg
 import littlesprout.shared.generated.resources.img_sweep_left
@@ -45,12 +53,15 @@ fun ShapesContent(
     currentItem: ShapeItem,
     currentIndex: Int,
     totalItemsCount: Int,
+    isPlaying: Boolean,
     onBackClick: () -> Unit,
     onHomeClick: () -> Unit,
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
     onPlaySoundClick: () -> Unit
 ) {
+    var swipeOffset by remember { mutableStateOf(0f) }
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Background Image
         Image(
@@ -80,56 +91,97 @@ fun ShapesContent(
                 )
 
                 // FIXED: Replaced the Home button with the Speaker Icon in the Top Right Corner
-                Image(
-                    painter = painterResource(Res.drawable.icon_speaker),
-                    contentDescription = "Play Audio",
+                // FIXED: Speaker Icon with dynamic Canvas red slash logic on top layer
+                Box(
                     modifier = Modifier
-                        .size(56.dp)
-                        .clickable { onPlaySoundClick() }
-                )
+                        .size(64.dp) // Proportional uniform sizing matching back action
+                        .clickable { onPlaySoundClick()} // Passes the string out
+                        .drawWithContent {
+                            drawContent()
+                            if (!isPlaying) {
+                                // Draws an anti-aliased crosswise diagonal cancellation bar
+                                drawLine(
+                                    color = Color.Red,
+                                    start = Offset(size.width * 0.25f, size.height * 0.25f),
+                                    end = Offset(size.width * 0.75f, size.height * 0.75f),
+                                    strokeWidth = 4.dp.toPx(),
+                                    cap = StrokeCap.Round
+                                )
+                            }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.icon_repeat),
+                        contentDescription = if (isPlaying) "Stop Audio" else "Play Audio",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Main White Card Container
+            // Main Content Area with Swipe Support
             Box(
                 modifier = Modifier
+                    .fillMaxSize()
                     .weight(1f)
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .clip(RoundedCornerShape(40.dp))
-                    .background(Color.White.copy(alpha = 0.9f))
+                    .pointerInput(currentItem) {
+                        detectHorizontalDragGestures(
+                            onDragEnd = {
+                                if (swipeOffset > 150f && currentIndex > 0) {
+                                    onPreviousClick()
+                                } else if (swipeOffset < -150f && currentIndex < totalItemsCount - 1) {
+                                    onNextClick()
+                                }
+                                swipeOffset = 0f
+                            },
+                            onHorizontalDrag = { change, dragAmount ->
+                                change.consume()
+                                swipeOffset += dragAmount
+                            }
+                        )
+                    }
             ) {
-                // Core Card Content Layout (Clean with no inner float layers)
-                Column(
+                // Main White Card Container
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                        .padding(horizontal = 24.dp)
+                        .clip(RoundedCornerShape(40.dp))
+                        .background(Color.White.copy(alpha = 0.9f))
                 ) {
-                    // Shape Image
-                    Image(
-                        painter = painterResource(currentItem.shapeImage),
-                        contentDescription = currentItem.name,
-                        modifier = Modifier.size(260.dp),
-                        contentScale = ContentScale.Fit
-                    )
-
-                    Spacer(modifier = Modifier.height(32.dp))
-
-                    // Shape Name Bubble
-                    Surface(
-                        color = Color(0xFFFFF9C4),
-                        shape = RoundedCornerShape(24.dp)
+                    // Core Card Content Layout (Clean with no inner float layers)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Text(
-                            text = currentItem.name,
-                            fontSize = 48.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFFD32F2F),
-                            modifier = Modifier.padding(horizontal = 40.dp, vertical = 8.dp)
+                        // Shape Image
+                        Image(
+                            painter = painterResource(currentItem.shapeImage),
+                            contentDescription = currentItem.name,
+                            modifier = Modifier.size(260.dp),
+                            contentScale = ContentScale.Fit
                         )
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+                        // Shape Name Bubble
+                        Surface(
+                            color = Color(0xFFFFF9C4),
+                            shape = RoundedCornerShape(24.dp)
+                        ) {
+                            Text(
+                                text = currentItem.name,
+                                fontSize = 48.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color(0xFFD32F2F),
+                                modifier = Modifier.padding(horizontal = 40.dp, vertical = 8.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -214,6 +266,7 @@ fun ShapesScreenPreview() {
             currentItem = mockShape,
             currentIndex = 1, // Activates both overlay left and right navigation swipe arrows
             totalItemsCount = 3,
+            isPlaying = false,
             onBackClick = {},
             onHomeClick = {},
             onPreviousClick = {},

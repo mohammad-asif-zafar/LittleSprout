@@ -2,11 +2,14 @@ package com.hathway.littlesprout.presentation.alphabet
 
 import androidx.lifecycle.ViewModel
 import com.hathway.littlesprout.domain.model.AlphabetItem
+import com.hathway.littlesprout.presentation.music.getAudioPlayer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import littlesprout.shared.generated.resources.*
 
 class AlphabetViewModel : ViewModel() {
+    private val audioPlayer = getAudioPlayer()
+
     private val _alphabetList = MutableStateFlow(
         listOf(
             AlphabetItem(
@@ -14,21 +17,21 @@ class AlphabetViewModel : ViewModel() {
                 letterImage = Res.drawable.aa,
                 objectImage = Res.drawable.img_apple,
                 description = "A for Apple",
-                audio = "a_apple"
+                audio = "audio_a_apple.mp3"
             ),
             AlphabetItem(
                 letter = "Bb",
                 letterImage = Res.drawable.bb,
                 objectImage = Res.drawable.img_ball,
                 description = "B for Ball",
-                audio = "b_ball"
+                audio = "audio_b_ball.mp3"
             ),
             AlphabetItem(
                 letter = "Cc",
                 letterImage = Res.drawable.cc,
                 objectImage = Res.drawable.img_cat,
                 description = "C for Cat",
-                audio = "c_cat"
+                audio = "audio_c_cat.mp3"
             ),
             AlphabetItem(
                 letter = "Dd",
@@ -198,15 +201,51 @@ class AlphabetViewModel : ViewModel() {
     private val _currentIndex = MutableStateFlow(0)
     val currentIndex = _currentIndex.asStateFlow()
 
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying = _isPlaying.asStateFlow()
+
+    init {
+        audioPlayer.preload(_alphabetList.value.mapNotNull { it.audio })
+        audioPlayer.onPlaybackComplete {
+            _isPlaying.value = false
+        }
+    }
+
+    fun playCurrentAudio() {
+        if (_isPlaying.value) {
+            stopAudio()
+            return
+        }
+        val current = _alphabetList.value.getOrNull(_currentIndex.value)
+        current?.audio?.let {
+            _isPlaying.value = true
+            audioPlayer.play(it)
+        }
+    }
+
     fun nextItem() {
+        stopAudio()
         if (_currentIndex.value < _alphabetList.value.size - 1) {
             _currentIndex.value++
+            playCurrentAudio()
         }
     }
 
     fun previousItem() {
+        stopAudio()
         if (_currentIndex.value > 0) {
             _currentIndex.value--
+            playCurrentAudio()
         }
+    }
+
+    private fun stopAudio() {
+        audioPlayer.stop()
+        _isPlaying.value = false
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopAudio()
     }
 }

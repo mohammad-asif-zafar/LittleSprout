@@ -16,17 +16,23 @@ fun ColorsScreen(
 ) {
     val colors by viewModel.colors.collectAsState()
     val currentIndex by viewModel.currentIndex.collectAsState()
+    val isPlaying by viewModel.isPlaying.collectAsState()
     val currentItem = colors.getOrNull(currentIndex) ?: return
+
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        viewModel.playCurrentAudio()
+    }
 
     ColorsContent(
         currentItem = currentItem,
         currentIndex = currentIndex,
         totalItemsCount = colors.size,
+        isPlaying = isPlaying,
         onBackClick = onBackClick,
         onHomeClick = onHomeClick,
         onPreviousClick = { viewModel.previousColor() },
         onNextClick = { viewModel.nextColor() },
-        onPlaySoundClick = { /* Play Color Sound */ })
+        onPlaySoundClick = { viewModel.playCurrentAudio() })
 }
 
 // 3. THE PREVIEW FUNCTION
@@ -46,6 +52,7 @@ fun ColorsScreenPreviewMain() {
             currentItem = mockColor,
             currentIndex = 1, // Simulates an active middle item so left & right arrow elements load up
             totalItemsCount = 3,
+            isPlaying = false,
             onBackClick = {},
             onHomeClick = {},
             onPreviousClick = {},

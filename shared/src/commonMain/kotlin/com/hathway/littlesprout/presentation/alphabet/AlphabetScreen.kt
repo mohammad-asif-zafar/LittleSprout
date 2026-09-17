@@ -11,7 +11,12 @@ fun AlphabetScreen(
 ) {
     val items by viewModel.alphabetList.collectAsState()
     val currentIndex by viewModel.currentIndex.collectAsState()
+    val isPlaying by viewModel.isPlaying.collectAsState()
     val currentItem = items.getOrNull(currentIndex) ?: return
+
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        viewModel.playCurrentAudio()
+    }
 
     AlphabetContent(
         currentItem = currentItem,
@@ -20,8 +25,8 @@ fun AlphabetScreen(
         onBackClick = onBackClick,
         onPreviousClick = { viewModel.previousItem() },
         onNextClick = { viewModel.nextItem() },
-        isPlaying = ,
-        onPlaySoundClick = ,
+        isPlaying = isPlaying,
+        onPlaySoundClick = { viewModel.playCurrentAudio() },
     )
 }
 

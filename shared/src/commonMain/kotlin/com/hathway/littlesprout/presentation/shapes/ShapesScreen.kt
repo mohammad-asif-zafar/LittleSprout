@@ -11,15 +11,21 @@ fun ShapesScreen(
 ) {
     val shapes by viewModel.shapes.collectAsState()
     val currentIndex by viewModel.currentIndex.collectAsState()
+    val isPlaying by viewModel.isPlaying.collectAsState()
     val currentItem = shapes.getOrNull(currentIndex) ?: return
+
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        viewModel.playCurrentAudio()
+    }
 
     ShapesContent(
         currentItem = currentItem,
         currentIndex = currentIndex,
         totalItemsCount = shapes.size,
+        isPlaying = isPlaying,
         onBackClick = onBackClick,
         onHomeClick = onHomeClick,
         onPreviousClick = { viewModel.previousShape() },
         onNextClick = { viewModel.nextShape() },
-        onPlaySoundClick = { /* Play Shape Sound */ })
+        onPlaySoundClick = { viewModel.playCurrentAudio() })
 }
