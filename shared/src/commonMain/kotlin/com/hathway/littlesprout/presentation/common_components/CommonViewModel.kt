@@ -128,7 +128,7 @@ class CommonViewModel : ViewModel() {
                 letterImage = Res.drawable.img_apple,
                 objectImage = Res.drawable.img_apple,
                 description = "Apple",
-                audio = "a_apple.mp3"
+                audio = "audio_apple.mp3"
             ), CommonItem(
                 letter = "2",
                 letterImage = Res.drawable.fruits_Banana,
@@ -154,10 +154,6 @@ class CommonViewModel : ViewModel() {
                 description = "Kiwi",
                 audio = "audio_kiwi.mp3"
             ), CommonItem(
-                letter = "6", letterImage = Res.drawable.bird_parrot, // Fallback asset
-                objectImage = Res.drawable.bird_parrot, // Fallback asset
-                description = "Orange", audio = "audio_orange.mp3"
-            ), CommonItem(
                 letter = "7",
                 letterImage = Res.drawable.fruit_Oranges,
                 objectImage = Res.drawable.fruit_Oranges,
@@ -173,8 +169,8 @@ class CommonViewModel : ViewModel() {
                 letter = "9",
                 letterImage = Res.drawable.fruit_Dragon,
                 objectImage = Res.drawable.fruit_Dragon,
-                description = "Dragon",
-                audio = "audio_dragon.mp3"
+                description = "Dragon Fruit",
+                audio = "audio_dragon_fruit.mp3"
             ), CommonItem(
                 letter = "10",
                 letterImage = Res.drawable.fruit_Limes,
@@ -245,8 +241,8 @@ class CommonViewModel : ViewModel() {
                 letter = "6",
                 letterImage = Res.drawable.vehicle_bullock_cart,
                 objectImage = Res.drawable.vehicle_bullock_cart,
-                description = "Bullock",
-                audio = "audio_bullock.mp3"
+                description = "Bullock cart",
+                audio = "audio_bullock_cart.mp3"
             ), CommonItem(
                 letter = "7",
                 letterImage = Res.drawable.vehicle_bus,

@@ -47,6 +47,7 @@ import littlesprout.shared.generated.resources.Res
 import littlesprout.shared.generated.resources.bird_hornbill
 import littlesprout.shared.generated.resources.common_bg
 import littlesprout.shared.generated.resources.common_card_bg
+import littlesprout.shared.generated.resources.icon_repeat
 import littlesprout.shared.generated.resources.icon_speaker
 import littlesprout.shared.generated.resources.img_back_button
 import littlesprout.shared.generated.resources.img_sweep_left
@@ -141,7 +142,7 @@ fun CommonContent(
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painter = painterResource(Res.drawable.icon_speaker),
+                        painter = painterResource(Res.drawable.icon_repeat),
                         contentDescription = if (isPlaying) "Stop Audio" else "Play Audio",
                         modifier = Modifier.fillMaxSize()
                     )

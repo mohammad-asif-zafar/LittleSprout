@@ -19,6 +19,22 @@ fun AlphabetScreen(
         isNextEnabled = currentIndex < items.size - 1,
         onBackClick = onBackClick,
         onPreviousClick = { viewModel.previousItem() },
-        onNextClick = { viewModel.nextItem() })
+        onNextClick = { viewModel.nextItem() },
+        isPlaying = ,
+        onPlaySoundClick = ,
+    )
 }
 
+
+
+/*
+AlphabetContent(
+currentItem = currentItem,
+isPreviousEnabled = currentIndex > 0,
+isNextEnabled = currentIndex < items.size - 1,
+isPlaying = isPlaying,
+onBackClick = onBackClick,
+onPreviousClick =  { viewModel.previousItem() ,
+onNextClick = onNextClick,
+onPlaySoundClick = { viewModel.nextItem() })
+}*/
