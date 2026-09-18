@@ -19,7 +19,6 @@ import com.hathway.littlesprout.domain.model.MusicType
 import com.hathway.littlesprout.domain.model.SongItem
 import org.jetbrains.compose.resources.painterResource
 
-// 1. STATEFUL WRAPPER: Handles your ViewModel reactive flow states safely
 @Composable
 fun MusicScreen(
     viewModel: MusicViewModel,

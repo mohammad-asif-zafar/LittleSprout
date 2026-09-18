@@ -51,40 +51,33 @@ fun MusicContent(
             contentScale = ContentScale.FillBounds
         )
 
-        // 2. Content Layer
         Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-            // Top Bar
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Back Button
                 Image(
                     painter = painterResource(Res.drawable.img_back_button),
                     contentDescription = "Back",
                     modifier = Modifier.size(56.dp).clickable { onBackClick() })
 
-                // Home Button
                 Image(
                     painter = painterResource(Res.drawable.icon_home),
                     contentDescription = "Home",
                     modifier = Modifier.size(56.dp).clickable { onHomeClick() })
             }
 
-            // Since only one item is available for now, we show the songs directly!
             if (items.size == 1) {
                 val singAlong = items.first()
-                
+
                 Column(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Category Header
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(30.dp))
+                        modifier = Modifier.clip(RoundedCornerShape(30.dp))
                             .background(Color.White.copy(alpha = 0.8f))
                             .padding(horizontal = 24.dp, vertical = 12.dp)
                     ) {
@@ -104,7 +97,6 @@ fun MusicContent(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // Useful Song Grid - making full use of the screen
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
                         contentPadding = PaddingValues(bottom = 32.dp),
@@ -121,7 +113,6 @@ fun MusicContent(
                     }
                 }
             } else {
-                // Fallback for future development (Multiple Categories)
                 Spacer(modifier = Modifier.height(300.dp))
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
@@ -145,10 +136,7 @@ fun MusicContent(
 @Composable
 fun SongGridItem(song: SongItem, onClick: () -> Unit) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(0.85f)
-            .clickable { onClick() },
+        modifier = Modifier.fillMaxWidth().aspectRatio(0.85f).clickable { onClick() },
         shape = RoundedCornerShape(32.dp),
         color = Color(song.backgroundColorLong).copy(alpha = 0.95f),
         shadowElevation = 4.dp
@@ -161,10 +149,7 @@ fun SongGridItem(song: SongItem, onClick: () -> Unit) {
             Image(
                 painter = painterResource(song.imageRes),
                 contentDescription = null,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .clip(CircleShape),
+                modifier = Modifier.weight(1f).fillMaxWidth().clip(CircleShape),
                 contentScale = ContentScale.Fit
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -198,7 +183,6 @@ fun MusicScreenPreview() {
             onBackClick = {},
             onHomeClick = {},
             onSongClick = {},
-            onItemClick = {}
-        )
+            onItemClick = {})
     }
 }

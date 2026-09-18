@@ -42,7 +42,6 @@ import littlesprout.shared.generated.resources.img_back_button
 import littlesprout.shared.generated.resources.img_music_list_bg
 import org.jetbrains.compose.resources.painterResource
 
-// 1. STATEFUL WRAPPER: Observes ViewModel states safely for your core app flow
 @Composable
 fun SongListScreen(
     viewModel: MusicViewModel,
@@ -60,7 +59,6 @@ fun SongListScreen(
     )
 }
 
-// 2. STATELESS CONTENT: Pure layout rendering logic (Safe for instant Previews!)
 @Composable
 fun SongListContent(
     songs: List<SongItem>,
@@ -69,29 +67,23 @@ fun SongListContent(
     onSongClick: (SongItem) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background Image
         Image(
             painter = painterResource(Res.drawable.img_music_list_bg),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillBounds
         )
-
-        // Content Layer
         Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-            // Top Bar
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Back Button
                 Image(
                     painter = painterResource(Res.drawable.img_back_button),
                     contentDescription = "Back",
                     modifier = Modifier.size(56.dp).clickable { onBackClick() })
 
-                // Home Button
                 Image(
                     painter = painterResource(Res.drawable.icon_home),
                     contentDescription = "Home",
@@ -100,7 +92,6 @@ fun SongListContent(
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Song List Container
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 24.dp, vertical = 48.dp),
@@ -128,7 +119,6 @@ fun SongListItem(song: SongItem, onClick: () -> Unit) {
             modifier = Modifier.fillMaxSize().padding(horizontal = 0.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Song Icon (Circle)
             Image(
                 painter = painterResource(song.imageRes),
                 contentDescription = null,
@@ -140,12 +130,10 @@ fun SongListItem(song: SongItem, onClick: () -> Unit) {
     }
 }
 
-// 3. THE PREVIEW FUNCTION
 @Preview
 @Composable
 fun SongListScreenPreview() {
     MaterialTheme {
-        // Mocking list items to preview the vertical lazy list spacing and color rendering
         val mockSongs = listOf(
             SongItem(
                 title = "Clap Clap",
@@ -177,7 +165,7 @@ fun SongListScreenPreview() {
                 imageRes = Res.drawable.icon_zoom_zoom_car,
                 backgroundColorLong = 0xFFFCE4EC,
                 audioPath = "audio_zoom_zoom.mp3"
-            )      // Blue card tint
+            )
         )
 
         SongListContent(songs = mockSongs, onBackClick = {}, onHomeClick = {}, onSongClick = {})

@@ -77,19 +77,15 @@ fun DashboardContent(
         }, containerColor = Color.Transparent
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
-            // 1. Background Image
             Image(
                 painter = painterResource(Res.drawable.img_dashboard_bg),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.FillBounds
             )
-
-            // Dashboard Content Column
             Column(
                 modifier = Modifier.fillMaxSize().padding(paddingValues).statusBarsPadding()
             ) {
-                // Header
                 Row(
                     modifier = Modifier.fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 12.dp),
@@ -103,8 +99,6 @@ fun DashboardContent(
                         contentScale = ContentScale.Fit
                     )
                 }
-
-                // Banner
                 Image(
                     painter = painterResource(Res.drawable.hello_little_sprout),
                     contentDescription = "Welcome Banner",
@@ -115,7 +109,6 @@ fun DashboardContent(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Grid
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -127,76 +120,71 @@ fun DashboardContent(
                         DashboardGridItem(item) {
                             when (item.title) {
                                 CategoryConstants.ALPHABET -> onAlphabetClick()
-                                CategoryConstants.NUMBERS  -> onNumbersClick()
-                                CategoryConstants.COLORS   -> onColorsClick()
-                                CategoryConstants.SHAPES   -> onShapesClick()
-                                CategoryConstants.ANIMALS  -> onAnimalsClick()
-                                CategoryConstants.BIRDS    -> onBirdsClick()
-                                CategoryConstants.SONGS    -> onMusicClick()
-                                CategoryConstants.FRUITS   -> onFruitsClick()
-                                CategoryConstants.VEHICLE  -> onVehicleClick() // Newly registered click listener
+                                CategoryConstants.NUMBERS -> onNumbersClick()
+                                CategoryConstants.COLORS -> onColorsClick()
+                                CategoryConstants.SHAPES -> onShapesClick()
+                                CategoryConstants.ANIMALS -> onAnimalsClick()
+                                CategoryConstants.BIRDS -> onBirdsClick()
+                                CategoryConstants.SONGS -> onMusicClick()
+                                CategoryConstants.FRUITS -> onFruitsClick()
+                                CategoryConstants.VEHICLE -> onVehicleClick() // Newly registered click listener
                             }
                         }
 
                     }
                 }
 
-                // Today's Goal (Ultra-Compact Version)
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(
                         horizontal = 16.dp, vertical = 5.dp
-                    ) // Scaled vertical gap up slightly
-                        .clickable { onGoalClick() },
+                    ).clickable { onGoalClick() },
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4).copy(alpha = 0.9f)),
-                    shape = RoundedCornerShape(15.dp), // Increased from 12.dp to 15.dp
+                    shape = RoundedCornerShape(15.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
                     Row(
                         modifier = Modifier.padding(
                             horizontal = 12.dp, vertical = 8.dp
-                        ), // Increased padding by ~25%
-                        verticalAlignment = Alignment.CenterVertically
+                        ), verticalAlignment = Alignment.CenterVertically
                     ) {
                         Surface(
-                            modifier = Modifier.size(35.dp), // Increased from 28.dp to 35.dp
+                            modifier = Modifier.size(35.dp),
                             color = Color.White,
-                            shape = RoundedCornerShape(10.dp) // Increased from 8.dp to 10.dp
+                            shape = RoundedCornerShape(10.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
-                                Text("⭐", fontSize = 18.sp) // Increased from 14.sp to 18.sp
+                                Text("⭐", fontSize = 18.sp)
                             }
                         }
 
-                        Spacer(modifier = Modifier.width(12.dp)) // Increased from 10.dp to 12.dp
+                        Spacer(modifier = Modifier.width(12.dp))
 
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = "Today's Goal",
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp, // Increased from 12.sp to 15.sp
+                                fontSize = 15.sp,
                                 color = Color(0xFF333333)
                             )
                             Text(
                                 text = "Play, explore and learn something new!",
-                                fontSize = 12.sp, // Increased from 10.sp to 12.sp
+                                fontSize = 12.sp,
                                 color = Color(0xFF555555),
                                 maxLines = 1
                             )
                         }
 
-                        Spacer(modifier = Modifier.width(8.dp)) // Increased from 6.dp to 8.dp
+                        Spacer(modifier = Modifier.width(8.dp))
 
                         Button(
                             onClick = onLetsGoClick,
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-                            shape = RoundedCornerShape(10.dp), // Increased from 8.dp to 10.dp
-                            contentPadding = PaddingValues(horizontal = 12.dp), // Increased button side margins
-                            modifier = Modifier.height(32.dp) // Increased height from 26.dp to 32.dp
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp),
+                            modifier = Modifier.height(32.dp)
                         ) {
                             Text(
-                                text = "Let's Go!",
-                                fontSize = 12.sp, // Increased from 10.sp to 12.sp
-                                fontWeight = FontWeight.Bold
+                                text = "Let's Go!", fontSize = 12.sp, fontWeight = FontWeight.Bold
                             )
                         }
                     }
@@ -212,18 +200,21 @@ fun DashboardContent(
 @Composable
 fun DashboardScreenPreview() {
     MaterialTheme {
-        // Generating static category entries assuming icon property holds resource references
         val mockItems = listOf(
             DashboardItem(CategoryConstants.ANIMALS, Res.drawable.icon_animals),
             DashboardItem(CategoryConstants.ALPHABET, Res.drawable.img_alphabet),
             DashboardItem(CategoryConstants.NUMBERS, Res.drawable.img_number),
-            DashboardItem( CategoryConstants.COLORS , Res.drawable.img_colors), // Alternative structure if needed
+            DashboardItem(
+                CategoryConstants.COLORS, Res.drawable.img_colors
+            ),
             DashboardItem(CategoryConstants.COLORS, Res.drawable.img_colors),
             DashboardItem(CategoryConstants.SHAPES, Res.drawable.img_shapes),
             DashboardItem(CategoryConstants.SONGS, Res.drawable.img_songs),
             DashboardItem(CategoryConstants.BIRDS, Res.drawable.icon_birds),
             DashboardItem(CategoryConstants.FRUITS, Res.drawable.icon_fruits),
-            DashboardItem(CategoryConstants.VEHICLE, Res.drawable.icon_vehicle) // Fixed: Changed title from "Fruits" to CategoryConstants.VEHICLE
+            DashboardItem(
+                CategoryConstants.VEHICLE, Res.drawable.icon_vehicle
+            )
         )
 
         DashboardContent(
