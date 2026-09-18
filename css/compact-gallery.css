@@ -9,8 +9,27 @@
   justify-self: center;
 }
 
+.shot img {
+  height: 280px;
+  aspect-ratio: auto;
+  object-fit: cover;
+  object-position: top;
+}
+
+.adventure .phone-shot {
+  width: min(100%, 185px);
+}
+
 @media (max-width: 520px) {
   .shot {
     max-width: 175px;
+  }
+
+  .shot img {
+    height: 250px;
+  }
+
+  .adventure .phone-shot {
+    width: min(100%, 165px);
   }
 }
