@@ -17,8 +17,8 @@
 }
 
 .adventure .phone-shot {
-  width: min(100%, 165px);
-  height: 230px;
+  width: min(100%, 135px);
+  height: 180px;
   object-fit: cover;
   object-position: top;
   order: -1;
@@ -34,7 +34,7 @@
   }
 
   .adventure .phone-shot {
-    width: min(100%, 145px);
-    height: 205px;
+    width: min(100%, 120px);
+    height: 160px;
   }
 }
