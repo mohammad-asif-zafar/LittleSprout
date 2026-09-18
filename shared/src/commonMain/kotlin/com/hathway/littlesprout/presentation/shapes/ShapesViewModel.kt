@@ -1,13 +1,25 @@
 package com.hathway.littlesprout.presentation.shapes
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.hathway.littlesprout.domain.model.AppSettings
 import com.hathway.littlesprout.domain.model.ShapeItem
+import com.hathway.littlesprout.domain.repository.ProgressRepository
+import com.hathway.littlesprout.domain.repository.SettingsRepository
 import com.hathway.littlesprout.presentation.music.getAudioPlayer
+import com.hathway.littlesprout.presentation.util.CategoryConstants
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import littlesprout.shared.generated.resources.*
 
-class ShapesViewModel : ViewModel() {
+class ShapesViewModel(
+    private val progressRepository: ProgressRepository? = null,
+    private val settingsRepository: SettingsRepository? = null
+) : ViewModel() {
     private val audioPlayer = getAudioPlayer()
 
     private val _shapes = MutableStateFlow(
@@ -32,6 +44,10 @@ class ShapesViewModel : ViewModel() {
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying = _isPlaying.asStateFlow()
 
+    private val appSettings: StateFlow<AppSettings> = settingsRepository?.settings
+        ?.stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings())
+        ?: MutableStateFlow(AppSettings())
+
     init {
         audioPlayer.preload(_shapes.value.mapNotNull { it.soundRes })
         audioPlayer.onPlaybackComplete {
@@ -39,11 +55,16 @@ class ShapesViewModel : ViewModel() {
         }
     }
 
-    fun playCurrentAudio() {
+    fun playCurrentAudio(isAutoPlay: Boolean = false) {
+        if (isAutoPlay && !appSettings.value.autoPlayEnabled) return
+        if (!appSettings.value.soundEnabled) return
+        if (appSettings.value.quietModeEnabled) return
+
         val current = _shapes.value.getOrNull(_currentIndex.value)
         current?.soundRes?.let {
             _isPlaying.value = true
             audioPlayer.play(it, interruptCurrent = true)
+            recordProgress(current.name, false)
         }
     }
 
@@ -51,7 +72,9 @@ class ShapesViewModel : ViewModel() {
         stopAudio()
         if (_currentIndex.value < _shapes.value.size - 1) {
             _currentIndex.value++
-            playCurrentAudio()
+            playCurrentAudio(isAutoPlay = true)
+        } else {
+            recordProgress("SHAPES_COMPLETE", true)
         }
     }
 
@@ -59,7 +82,13 @@ class ShapesViewModel : ViewModel() {
         stopAudio()
         if (_currentIndex.value > 0) {
             _currentIndex.value--
-            playCurrentAudio()
+            playCurrentAudio(isAutoPlay = true)
+        }
+    }
+
+    private fun recordProgress(activityId: String, completed: Boolean) {
+        viewModelScope.launch {
+            progressRepository?.recordActivity(activityId, CategoryConstants.SHAPES, completed)
         }
     }
 

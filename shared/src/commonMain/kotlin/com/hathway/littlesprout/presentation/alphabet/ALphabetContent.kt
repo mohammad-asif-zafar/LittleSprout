@@ -10,19 +10,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -47,6 +35,7 @@ import com.hathway.littlesprout.domain.model.AlphabetItem
 import com.hathway.littlesprout.presentation.common_components.ColoredText
 import littlesprout.shared.generated.resources.Res
 import littlesprout.shared.generated.resources.aa
+import littlesprout.shared.generated.resources.icon_home
 import littlesprout.shared.generated.resources.icon_repeat
 import littlesprout.shared.generated.resources.img_alphabet_bg
 import littlesprout.shared.generated.resources.img_apple
@@ -62,6 +51,7 @@ fun AlphabetContent(
     isNextEnabled: Boolean,
     isPlaying: Boolean,
     onBackClick: () -> Unit,
+    onHomeClick: () -> Unit,
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
     onPlaySoundClick: (String) -> Unit
@@ -70,7 +60,6 @@ fun AlphabetContent(
 
     Box(
         modifier = Modifier.fillMaxSize()
-
             .pointerInput(currentItem) {
                 detectHorizontalDragGestures(onDragEnd = {
                     if (swipeOffset > 150f && isPreviousEnabled) {
@@ -105,28 +94,32 @@ fun AlphabetContent(
                     contentDescription = "Back",
                     modifier = Modifier.size(56.dp).clickable { onBackClick() })
 
-                Box(
-                    modifier = Modifier.size(56.dp)
-                        .clickable { currentItem.audio?.let { onPlaySoundClick(it) } } // Passes the string out
-                        .drawWithContent {
-                            drawContent()
-                            if (!isPlaying) {
-
-                                drawLine(
-                                    color = Color.Red,
-                                    start = Offset(size.width * 0.25f, size.height * 0.25f),
-                                    end = Offset(size.width * 0.75f, size.height * 0.75f),
-                                    strokeWidth = 4.dp.toPx(),
-                                    cap = StrokeCap.Round
-                                )
-                            }
-                        }, contentAlignment = Alignment.Center
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Image(
-                        painter = painterResource(Res.drawable.icon_repeat),
-                        contentDescription = if (isPlaying) "Stop Audio" else "Play Audio",
-                        modifier = Modifier.fillMaxSize()
-                    )
+                    Box(
+                        modifier = Modifier.size(56.dp)
+                            .clickable { currentItem.audio?.let { onPlaySoundClick(it) } } // Passes the string out
+                            .drawWithContent {
+                                drawContent()
+                                if (!isPlaying) {
+                                    drawLine(
+                                        color = Color.Red,
+                                        start = Offset(size.width * 0.25f, size.height * 0.25f),
+                                        end = Offset(size.width * 0.75f, size.height * 0.75f),
+                                        strokeWidth = 4.dp.toPx(),
+                                        cap = StrokeCap.Round
+                                    )
+                                }
+                            }, contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(Res.drawable.icon_repeat),
+                            contentDescription = if (isPlaying) "Stop Audio" else "Play Audio",
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
             }
 
@@ -138,7 +131,6 @@ fun AlphabetContent(
                 colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-
                 AnimatedContent(
                     targetState = currentItem, transitionSpec = {
                         (fadeIn(animationSpec = tween(400)) + scaleIn(
@@ -169,8 +161,8 @@ fun AlphabetContent(
                         )
                         Box(
                             modifier = Modifier.fillMaxWidth()
-                                .wrapContentHeight() // FIXED: Allows the layout to expand naturally for large fonts
-                                .defaultMinSize(minHeight = 80.dp) // Ensures a stable minimum baseline container height
+                                .wrapContentHeight()
+                                .defaultMinSize(minHeight = 80.dp)
                                 .padding(bottom = 8.dp), contentAlignment = Alignment.Center
                         ) {
                             ColoredText(
@@ -227,6 +219,7 @@ fun AlphabetScreenPreview() {
             isPreviousEnabled = false,
             isNextEnabled = true,
             onBackClick = {},
+            onHomeClick = {},
             onPreviousClick = {},
             onNextClick = {},
             isPlaying = false,

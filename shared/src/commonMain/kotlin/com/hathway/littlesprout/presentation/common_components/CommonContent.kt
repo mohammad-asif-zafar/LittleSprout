@@ -41,6 +41,7 @@ import littlesprout.shared.generated.resources.Res
 import littlesprout.shared.generated.resources.bird_hornbill
 import littlesprout.shared.generated.resources.common_bg
 import littlesprout.shared.generated.resources.common_card_bg
+import littlesprout.shared.generated.resources.icon_home
 import littlesprout.shared.generated.resources.icon_repeat
 import littlesprout.shared.generated.resources.img_back_button
 import littlesprout.shared.generated.resources.img_sweep_left
@@ -54,6 +55,7 @@ fun CommonContent(
     isNextEnabled: Boolean,
     isPlaying: Boolean,
     onBackClick: () -> Unit,
+    onHomeClick: () -> Unit,
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
     onPlaySoundClick: (String) -> Unit
@@ -97,27 +99,32 @@ fun CommonContent(
                     contentDescription = "Back",
                     modifier = Modifier.size(64.dp).clickable { onBackClick() })
 
-                Box(
-                    modifier = Modifier.size(64.dp)
-                    .clickable { currentItem.audio?.let { onPlaySoundClick(it) } } // Passes the string out
-                    .drawWithContent {
-                        drawContent()
-                        if (!isPlaying) {
-                            drawLine(
-                                color = Color.Red,
-                                start = Offset(size.width * 0.25f, size.height * 0.25f),
-                                end = Offset(size.width * 0.75f, size.height * 0.75f),
-                                strokeWidth = 4.dp.toPx(),
-                                cap = StrokeCap.Round
-                            )
-                        }
-                    }, contentAlignment = Alignment.Center
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Image(
-                        painter = painterResource(Res.drawable.icon_repeat),
-                        contentDescription = if (isPlaying) "Stop Audio" else "Play Audio",
-                        modifier = Modifier.fillMaxSize()
-                    )
+                    Box(
+                        modifier = Modifier.size(64.dp)
+                            .clickable { currentItem.audio?.let { onPlaySoundClick(it) } } // Passes the string out
+                            .drawWithContent {
+                                drawContent()
+                                if (!isPlaying) {
+                                    drawLine(
+                                        color = Color.Red,
+                                        start = Offset(size.width * 0.25f, size.height * 0.25f),
+                                        end = Offset(size.width * 0.75f, size.height * 0.75f),
+                                        strokeWidth = 4.dp.toPx(),
+                                        cap = StrokeCap.Round
+                                    )
+                                }
+                            }, contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(Res.drawable.icon_repeat),
+                            contentDescription = if (isPlaying) "Stop Audio" else "Play Audio",
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
             }
 
@@ -221,6 +228,7 @@ fun CommonContentPreview() {
             isPreviousEnabled = true,
             isNextEnabled = true,
             onBackClick = {},
+            onHomeClick = {},
             onPreviousClick = {},
             onNextClick = {},
             isPlaying = false,

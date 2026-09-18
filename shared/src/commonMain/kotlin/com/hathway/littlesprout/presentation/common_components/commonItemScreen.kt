@@ -10,7 +10,8 @@ fun CommonItemScreen(
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
     onPlaySoundClick: (String) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onHomeClick: () -> Unit
 ) {
     val currentItem = items.getOrNull(currentIndex) ?: return
 
@@ -20,6 +21,7 @@ fun CommonItemScreen(
         isNextEnabled = currentIndex < items.size - 1,
         isPlaying = isPlaying,
         onBackClick = onBackClick,
+        onHomeClick = onHomeClick,
         onPreviousClick = onPreviousClick,
         onNextClick = onNextClick,
         onPlaySoundClick = onPlaySoundClick

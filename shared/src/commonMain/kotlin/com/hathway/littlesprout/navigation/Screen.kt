@@ -16,4 +16,14 @@ sealed class Screen {
     object Vehicle : Screen()
     object SongList : Screen()
     data class MusicPlayer(val song: com.hathway.littlesprout.domain.model.SongItem) : Screen()
+
+    // New Parent Sections
+    object Progress : Screen()
+    object ForParents : Screen()
+    object PrivacySafety : Screen()
+    object PrivacyPolicy : Screen()
+    object ContentCredits : Screen()
+    object ContactDeveloper : Screen()
+    object AppInformation : Screen()
+    object Settings : Screen()
 }

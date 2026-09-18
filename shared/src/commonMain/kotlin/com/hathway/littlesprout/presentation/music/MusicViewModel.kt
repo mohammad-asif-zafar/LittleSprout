@@ -2,16 +2,26 @@ package com.hathway.littlesprout.presentation.music
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hathway.littlesprout.domain.model.AppSettings
 import com.hathway.littlesprout.domain.model.MusicItem
 import com.hathway.littlesprout.domain.model.MusicType
 import com.hathway.littlesprout.domain.model.SongItem
+import com.hathway.littlesprout.domain.repository.ProgressRepository
+import com.hathway.littlesprout.domain.repository.SettingsRepository
+import com.hathway.littlesprout.presentation.util.CategoryConstants
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import littlesprout.shared.generated.resources.*
 
-class MusicViewModel : ViewModel() {
+class MusicViewModel(
+    private val progressRepository: ProgressRepository? = null,
+    private val settingsRepository: SettingsRepository? = null
+) : ViewModel() {
     private val audioPlayer = getAudioPlayer()
 
     private val _musicItems = MutableStateFlow(
@@ -28,31 +38,35 @@ class MusicViewModel : ViewModel() {
         listOf(
             SongItem(
                 title = "Clap Clap",
-                lyrics = "\uD83C\uDFB5  Clap Clap Song \n\n" + "Clap, clap, clap your hands, \n" + "Clap them high, clap them low! \n" + "Tap, tap, tap your toes, \n" + "Tap them fast, then nice and slow! \n\n" + "Clap, clap — hooray! \n" + "Tap, tap — play! \n" + "Clap and tap, clap and tap, \n" + "Let’s do it again! ",
+                lyrics = "Clap, clap, clap your hands,\nClap them high, clap them low!\nTap, tap, tap your toes,\nTap them fast, then nice and slow!",
                 imageRes = Res.drawable.icon_clap_clap,
                 backgroundColorLong = 0xFFE1F5FE,
                 audioPath = "audio_clap_clap.mp3"
-            ), SongItem(
+            ),
+            SongItem(
                 title = "Bunny Hop",
-                lyrics = "\uD83D\uDC30  Bunny Hop \n\n" + "Bunny hop, hop, hop, \n" + "Little bunny never stops! \n" + "Hop to the left, \n" + "Hop to the right, \n" + "Hop, hop, hop — \n" + "What a funny sight! ",
+                lyrics = "Bunny hop, hop, hop,\nLittle bunny never stops!\nHop to the left,\nHop to the right,\nHop, hop, hop —\nWhat a funny sight!",
                 imageRes = Res.drawable.icon_bunny_hop,
                 backgroundColorLong = 0xFFE8F5E9,
                 audioPath = "audio_bunny_hop.mp3"
-            ), SongItem(
+            ),
+            SongItem(
                 title = "Hello Sun",
-                lyrics = "☀\uFE0F  Hello, Sun! \n\n" + "Hello, sun! Hello, sky! \n" + "Wave your hands and say hi-hi! \n" + "Jump up high, touch your toes, \n" + "Wiggle, wiggle — off we go! \n\n" + "Hi-hi! Bye-bye! \n" + "Wave up high! \n" + "Hello, sun, hello, sky, \n" + "See you soon — bye-bye! ",
+                lyrics = "Hello, sun! Hello, sky!\nWave your hands and say hi-hi!\nJump up high, touch your toes,\nWiggle, wiggle — off we go!",
                 imageRes = Res.drawable.icon_hello_sun,
                 backgroundColorLong = 0xFFFFF9C4,
                 audioPath = "audio_hello_sun.mp3"
-            ), SongItem(
+            ),
+            SongItem(
                 title = "Little Chick",
-                lyrics = "\uD83D\uDC25  Little Chick \n\n" + "Little chick goes peep, peep, peep! \n" + "Wakes up from a cozy sleep. \n" + "Waddle left, waddle right, \n" + "Flap your wings with all your might! \n\n" + "Peep-peep-peep! \n" + "Tweet-tweet-tweet! \n" + "Little chick has dancing feet! ",
+                lyrics = "Little chick goes peep, peep, peep!\nWakes up from a cozy sleep.\nWaddle left, waddle right,\nFlap your wings with all your might!",
                 imageRes = Res.drawable.icon_little_chick,
                 backgroundColorLong = 0xFFFCE4EC,
                 audioPath = "audio_little_chick.mp3"
-            ), SongItem(
+            ),
+            SongItem(
                 title = "Zoom Zoom Car",
-                lyrics = "\uD83D\uDE97  Zoom Zoom Car \n\n" + "Zoom, zoom, little car, \n" + "Round the room and not too far! \n" + "Beep-beep here, \n" + "Beep-beep there, \n" + "Zoom around with happy care! \n\n" + "Zoom, zoom! Beep, beep! \n" + "Round and round we go! \n" + "Zoom, zoom, little car, \n" + "Fast, then nice and slow! ",
+                lyrics = "Zoom, zoom, little car,\nRound the room and not too far!\nBeep-beep here,\nBeep-beep there,\nZoom around with happy care!",
                 imageRes = Res.drawable.icon_zoom_zoom_car,
                 backgroundColorLong = 0xFFFCE4EC,
                 audioPath = "audio_zoom_zoom.mp3"
@@ -74,11 +88,18 @@ class MusicViewModel : ViewModel() {
     private val _totalDuration = MutableStateFlow("00:00")
     val totalDuration = _totalDuration.asStateFlow()
 
+    private var currentSong: SongItem? = null
+
+    private val appSettings: StateFlow<AppSettings> = settingsRepository?.settings
+        ?.stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings())
+        ?: MutableStateFlow(AppSettings())
+
     init {
         audioPlayer.onPlaybackComplete {
             _isPlaying.value = false
             _playbackProgress.value = 0f
             _currentTime.value = "00:00"
+            currentSong?.let { recordProgress(it.title, true) }
         }
         startProgressTracker()
     }
@@ -108,10 +129,13 @@ class MusicViewModel : ViewModel() {
     }
 
     fun playSong(song: SongItem) {
-        println("MusicViewModel: Requested to play song: ${song.title} with res: ${song.audioPath}")
+        if (!appSettings.value.musicEnabled) return
+        
+        currentSong = song
         song.audioPath.let {
             audioPlayer.play(it)
             _isPlaying.value = true
+            recordProgress(song.title, false)
         }
     }
 
@@ -120,6 +144,7 @@ class MusicViewModel : ViewModel() {
             audioPlayer.pause()
             _isPlaying.value = false
         } else {
+            if (!appSettings.value.musicEnabled) return
             audioPlayer.resume()
             _isPlaying.value = true
         }
@@ -139,6 +164,12 @@ class MusicViewModel : ViewModel() {
         _isPlaying.value = false
         _playbackProgress.value = 0f
         _currentTime.value = "00:00"
+    }
+
+    private fun recordProgress(activityId: String, completed: Boolean) {
+        viewModelScope.launch {
+            progressRepository?.recordActivity(activityId, CategoryConstants.SONGS, completed)
+        }
     }
 
     override fun onCleared() {

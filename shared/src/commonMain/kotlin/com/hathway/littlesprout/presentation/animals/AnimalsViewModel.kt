@@ -3,13 +3,17 @@ package com.hathway.littlesprout.presentation.animals
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hathway.littlesprout.domain.model.AnimalItem
+import com.hathway.littlesprout.domain.repository.ProgressRepository
 import com.hathway.littlesprout.presentation.music.getAudioPlayer
+import com.hathway.littlesprout.presentation.util.CategoryConstants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import littlesprout.shared.generated.resources.*
 
-class AnimalsViewModel : ViewModel() {
+class AnimalsViewModel(
+    private val progressRepository: ProgressRepository? = null
+) : ViewModel() {
     private val audioPlayer = getAudioPlayer()
 
     private val _animals = MutableStateFlow(
@@ -47,6 +51,8 @@ class AnimalsViewModel : ViewModel() {
         if (_currentIndex.value < _animals.value.size - 1) {
             _currentIndex.value++
             playAnimalSound()
+        } else {
+            recordProgress("ANIMALS_COMPLETE", true)
         }
     }
 
@@ -63,6 +69,13 @@ class AnimalsViewModel : ViewModel() {
         currentAnimal?.audio?.let { audioFile ->
             _isPlaying.value = true
             audioPlayer.play(audioFile, interruptCurrent = true)
+            recordProgress(currentAnimal.name, false)
+        }
+    }
+
+    private fun recordProgress(activityId: String, completed: Boolean) {
+        viewModelScope.launch {
+            progressRepository?.recordActivity(activityId, CategoryConstants.ANIMALS, completed)
         }
     }
 
@@ -73,9 +86,6 @@ class AnimalsViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        // We don't release here if the audioPlayer is shared/app-scoped, 
-        // but since getAudioPlayer() currently returns a new instance (refactored to return shared SoundPool on Android though),
-        // we follow the prompt: "Separate stop playback from destroy audio engine".
         stopAudio()
     }
 }

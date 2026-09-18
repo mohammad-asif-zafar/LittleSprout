@@ -6,6 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.remember
+import com.hathway.littlesprout.di.AppContainer
 import com.hathway.littlesprout.presentation.music.AudioPlayerFactory
 
 class MainActivity : ComponentActivity() {
@@ -16,7 +18,8 @@ class MainActivity : ComponentActivity() {
         AudioPlayerFactory.context = applicationContext
 
         setContent {
-            App()
+            val appContainer = remember { AppContainer(applicationContext) }
+            App(appContainer)
         }
     }
 }

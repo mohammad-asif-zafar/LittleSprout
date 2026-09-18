@@ -1,13 +1,25 @@
 package com.hathway.littlesprout.presentation.alphabet
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.hathway.littlesprout.domain.model.AlphabetItem
+import com.hathway.littlesprout.domain.model.AppSettings
+import com.hathway.littlesprout.domain.repository.ProgressRepository
+import com.hathway.littlesprout.domain.repository.SettingsRepository
 import com.hathway.littlesprout.presentation.music.getAudioPlayer
+import com.hathway.littlesprout.presentation.util.CategoryConstants
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import littlesprout.shared.generated.resources.*
 
-class AlphabetViewModel : ViewModel() {
+class AlphabetViewModel(
+    private val progressRepository: ProgressRepository? = null,
+    private val settingsRepository: SettingsRepository? = null
+) : ViewModel() {
     private val audioPlayer = getAudioPlayer()
 
     private val _alphabetList = MutableStateFlow(
@@ -204,6 +216,10 @@ class AlphabetViewModel : ViewModel() {
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying = _isPlaying.asStateFlow()
 
+    private val appSettings: StateFlow<AppSettings> = settingsRepository?.settings
+        ?.stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings())
+        ?: MutableStateFlow(AppSettings())
+
     init {
         audioPlayer.preload(_alphabetList.value.mapNotNull { it.audio })
         audioPlayer.onPlaybackComplete {
@@ -211,11 +227,16 @@ class AlphabetViewModel : ViewModel() {
         }
     }
 
-    fun playCurrentAudio() {
+    fun playCurrentAudio(isAutoPlay: Boolean = false) {
+        if (isAutoPlay && !appSettings.value.autoPlayEnabled) return
+        if (!appSettings.value.soundEnabled) return
+        if (appSettings.value.quietModeEnabled) return
+
         val current = _alphabetList.value.getOrNull(_currentIndex.value)
         current?.audio?.let {
             _isPlaying.value = true
             audioPlayer.play(it, interruptCurrent = true)
+            recordProgress(current.letter, false)
         }
     }
 
@@ -223,7 +244,9 @@ class AlphabetViewModel : ViewModel() {
         stopAudio()
         if (_currentIndex.value < _alphabetList.value.size - 1) {
             _currentIndex.value++
-            playCurrentAudio()
+            playCurrentAudio(isAutoPlay = true)
+        } else {
+            recordProgress("ALPHABET_COMPLETE", true)
         }
     }
 
@@ -231,7 +254,13 @@ class AlphabetViewModel : ViewModel() {
         stopAudio()
         if (_currentIndex.value > 0) {
             _currentIndex.value--
-            playCurrentAudio()
+            playCurrentAudio(isAutoPlay = true)
+        }
+    }
+
+    private fun recordProgress(activityId: String, completed: Boolean) {
+        viewModelScope.launch {
+            progressRepository?.recordActivity(activityId, CategoryConstants.ALPHABET, completed)
         }
     }
 

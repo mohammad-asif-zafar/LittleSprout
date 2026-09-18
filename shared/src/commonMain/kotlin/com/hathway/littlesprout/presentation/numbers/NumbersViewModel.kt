@@ -1,13 +1,19 @@
 package com.hathway.littlesprout.presentation.numbers
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.hathway.littlesprout.domain.model.NumberItem
+import com.hathway.littlesprout.domain.repository.ProgressRepository
 import com.hathway.littlesprout.presentation.music.getAudioPlayer
+import com.hathway.littlesprout.presentation.util.CategoryConstants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import littlesprout.shared.generated.resources.*
 
-class NumbersViewModel : ViewModel() {
+class NumbersViewModel(
+    private val progressRepository: ProgressRepository? = null
+) : ViewModel() {
     private val audioPlayer = getAudioPlayer()
 
     private val _numbers = MutableStateFlow(
@@ -41,7 +47,7 @@ class NumbersViewModel : ViewModel() {
 
     fun selectNumber(index: Int) {
         _selectedNumberIndex.value = index
-        // Note: Audio playback is handled by LaunchedEffect in NumberDetailScreen
+        playCurrentAudio()
     }
 
     fun playCurrentAudio() {
@@ -49,26 +55,36 @@ class NumbersViewModel : ViewModel() {
         val current = _numbers.value.getOrNull(index)
         current?.soundRes?.let {
             _isPlaying.value = true
-            // interruptCurrent = true ensures it repeats/restarts on every call
             audioPlayer.play(it, interruptCurrent = true)
+            recordProgress(current.name, false)
         }
     }
 
     fun nextNumber() {
+        stopAudio()
         _selectedNumberIndex.value?.let { current ->
             if (current < _numbers.value.size - 1) {
                 _selectedNumberIndex.value = current + 1
-                // Audio will play automatically via LaunchedEffect in the Screen
+                playCurrentAudio()
+            } else {
+                recordProgress("NUMBERS_COMPLETE", true)
             }
         }
     }
 
     fun previousNumber() {
+        stopAudio()
         _selectedNumberIndex.value?.let { current ->
             if (current > 0) {
                 _selectedNumberIndex.value = current - 1
-                // Audio will play automatically via LaunchedEffect in the Screen
+                playCurrentAudio()
             }
+        }
+    }
+
+    private fun recordProgress(activityId: String, completed: Boolean) {
+        viewModelScope.launch {
+            progressRepository?.recordActivity(activityId, CategoryConstants.NUMBERS, completed)
         }
     }
 

@@ -4,10 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 
-// 1. STATEFUL WRAPPER: Used by your App navigation
 @Composable
 fun AlphabetScreen(
-    viewModel: AlphabetViewModel, onBackClick: () -> Unit
+    viewModel: AlphabetViewModel,
+    onBackClick: () -> Unit,
+    onHomeClick: () -> Unit
 ) {
     val items by viewModel.alphabetList.collectAsState()
     val currentIndex by viewModel.currentIndex.collectAsState()
@@ -23,6 +24,7 @@ fun AlphabetScreen(
         isPreviousEnabled = currentIndex > 0,
         isNextEnabled = currentIndex < items.size - 1,
         onBackClick = onBackClick,
+        onHomeClick = onHomeClick,
         onPreviousClick = { viewModel.previousItem() },
         onNextClick = { viewModel.nextItem() },
         isPlaying = isPlaying,

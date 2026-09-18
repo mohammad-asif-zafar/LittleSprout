@@ -2,16 +2,24 @@ package com.hathway.littlesprout.presentation.common_components
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hathway.littlesprout.domain.model.AppSettings
+import com.hathway.littlesprout.domain.repository.ProgressRepository
+import com.hathway.littlesprout.domain.repository.SettingsRepository
 import com.hathway.littlesprout.presentation.music.getAudioPlayer
 import com.hathway.littlesprout.presentation.util.CategoryConstants
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import littlesprout.shared.generated.resources.*
 
-class CommonViewModel : ViewModel() {
+class CommonViewModel(
+    private val progressRepository: ProgressRepository? = null,
+    private val settingsRepository: SettingsRepository? = null
+) : ViewModel() {
 
     private val _birdList = MutableStateFlow(
         listOf(
@@ -337,39 +345,23 @@ class CommonViewModel : ViewModel() {
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying = _isPlaying.asStateFlow()
 
-    // Separate Data Streams for All 8 items
-    val alphabetList = MutableStateFlow<List<CommonItem>>(emptyList()).asStateFlow()
-    val numbersList = MutableStateFlow<List<CommonItem>>(emptyList()).asStateFlow()
-    val colorsList = MutableStateFlow<List<CommonItem>>(emptyList()).asStateFlow()
-    val shapesList = MutableStateFlow<List<CommonItem>>(emptyList()).asStateFlow()
-    val animalsList = MutableStateFlow<List<CommonItem>>(emptyList()).asStateFlow()
-    val songsList = MutableStateFlow<List<CommonItem>>(emptyList()).asStateFlow()
-
-    // Existing list flows initialized in previous steps
     val birdList = _birdList.asStateFlow()
     val fruitsList = _fruitsList.asStateFlow()
     val vehicleList = _vehiclesList.asStateFlow()
 
-    // Internal Private State Index Counters
     private val _currentBirdIndex = MutableStateFlow(0)
     private val _currentFruitIndex = MutableStateFlow(0)
     private val _currentVehicleIndex = MutableStateFlow(0)
 
-    // Public State Index Counters
-    val currentAlphabetIndex = MutableStateFlow(0)
-    val currentNumbersIndex = MutableStateFlow(0)
-    val currentColorsIndex = MutableStateFlow(0)
-    val currentShapesIndex = MutableStateFlow(0)
-    val currentAnimalsIndex = MutableStateFlow(0)
-    val currentSongsIndex = MutableStateFlow(0)
-
-    // Connected clean state flows
     val currentBirdIndex = _currentBirdIndex.asStateFlow()
     val currentFruitIndex = _currentFruitIndex.asStateFlow()
     val currentVehicleIndex = _currentVehicleIndex.asStateFlow()
 
+    private val appSettings: StateFlow<AppSettings> = settingsRepository?.settings
+        ?.stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings())
+        ?: MutableStateFlow(AppSettings())
+
     init {
-        // Preload sounds for all categories in this ViewModel
         audioPlayer.preload(_birdList.value.mapNotNull { it.audio })
         audioPlayer.preload(_fruitsList.value.mapNotNull { it.audio })
         audioPlayer.preload(_vehiclesList.value.mapNotNull { it.audio })
@@ -380,48 +372,47 @@ class CommonViewModel : ViewModel() {
     }
 
     fun playInitialAudio(category: String) {
+        if (!appSettings.value.autoPlayEnabled) return
         playCurrentItemAudio(category)
     }
 
     private fun playCurrentItemAudio(category: String) {
-        val audioFile = when (category) {
-            CategoryConstants.BIRDS -> birdList.value.getOrNull(_currentBirdIndex.value)?.audio
-            CategoryConstants.FRUITS -> fruitsList.value.getOrNull(_currentFruitIndex.value)?.audio
-            CategoryConstants.VEHICLE -> vehicleList.value.getOrNull(_currentVehicleIndex.value)?.audio
-            // Add other categories if they have audio
+        if (!appSettings.value.soundEnabled) return
+        if (appSettings.value.quietModeEnabled) return
+
+        val (audioFile, activityId) = when (category) {
+            CategoryConstants.BIRDS -> birdList.value.getOrNull(_currentBirdIndex.value)?.let { it.audio to it.description }
+            CategoryConstants.FRUITS -> fruitsList.value.getOrNull(_currentFruitIndex.value)?.let { it.audio to it.description }
+            CategoryConstants.VEHICLE -> vehicleList.value.getOrNull(_currentVehicleIndex.value)?.let { it.audio to it.description }
             else -> null
-        }
+        } ?: (null to null)
+
         audioFile?.let { 
             _isPlaying.value = true
             audioPlayer.play(it, interruptCurrent = true)
+            activityId?.let { id -> recordProgress(id, category, false) }
         }
     }
 
     fun nextItem(category: String) {
         stopAudio()
+        var completed = false
         when (category) {
-            CategoryConstants.ALPHABET -> if (currentAlphabetIndex.value < alphabetList.value.size - 1) currentAlphabetIndex.value++
-            CategoryConstants.NUMBERS -> if (currentNumbersIndex.value < numbersList.value.size - 1) currentNumbersIndex.value++
-            CategoryConstants.COLORS -> if (currentColorsIndex.value < colorsList.value.size - 1) currentColorsIndex.value++
-            CategoryConstants.SHAPES -> if (currentShapesIndex.value < shapesList.value.size - 1) currentShapesIndex.value++
-            CategoryConstants.ANIMALS -> if (currentAnimalsIndex.value < animalsList.value.size - 1) currentAnimalsIndex.value++
-            CategoryConstants.SONGS -> if (currentSongsIndex.value < songsList.value.size - 1) currentSongsIndex.value++
-            CategoryConstants.BIRDS -> if (_currentBirdIndex.value < birdList.value.size - 1) _currentBirdIndex.value++
-            CategoryConstants.FRUITS -> if (_currentFruitIndex.value < fruitsList.value.size - 1) _currentFruitIndex.value++
-            CategoryConstants.VEHICLE -> if (_currentVehicleIndex.value < vehicleList.value.size - 1) _currentVehicleIndex.value++
+            CategoryConstants.BIRDS -> if (_currentBirdIndex.value < birdList.value.size - 1) _currentBirdIndex.value++ else completed = true
+            CategoryConstants.FRUITS -> if (_currentFruitIndex.value < fruitsList.value.size - 1) _currentFruitIndex.value++ else completed = true
+            CategoryConstants.VEHICLE -> if (_currentVehicleIndex.value < vehicleList.value.size - 1) _currentVehicleIndex.value++ else completed = true
         }
-        playCurrentItemAudio(category)
+        
+        if (completed) {
+            recordProgress("${category.uppercase()}_COMPLETE", category, true)
+        } else {
+            playCurrentItemAudio(category)
+        }
     }
 
     fun previousItem(category: String) {
         stopAudio()
         when (category) {
-            CategoryConstants.ALPHABET -> if (currentAlphabetIndex.value > 0) currentAlphabetIndex.value--
-            CategoryConstants.NUMBERS -> if (currentNumbersIndex.value > 0) currentNumbersIndex.value--
-            CategoryConstants.COLORS -> if (currentColorsIndex.value > 0) currentColorsIndex.value--
-            CategoryConstants.SHAPES -> if (currentShapesIndex.value > 0) currentShapesIndex.value--
-            CategoryConstants.ANIMALS -> if (currentAnimalsIndex.value > 0) currentAnimalsIndex.value--
-            CategoryConstants.SONGS -> if (currentSongsIndex.value > 0) currentSongsIndex.value--
             CategoryConstants.BIRDS -> if (_currentBirdIndex.value > 0) _currentBirdIndex.value--
             CategoryConstants.FRUITS -> if (_currentFruitIndex.value > 0) _currentFruitIndex.value--
             CategoryConstants.VEHICLE -> if (_currentVehicleIndex.value > 0) _currentVehicleIndex.value--
@@ -434,18 +425,24 @@ class CommonViewModel : ViewModel() {
         playbackJob = null
         try {
             audioPlayer.stop()
-        } catch (e: Exception) {
-            // Suppress platform engine clear exceptions safely during item transitions
-        }
+        } catch (e: Exception) {}
         _isPlaying.value = false
     }
 
-    // FIXED: Generic toggle for all categories matching CommonContent string signature
     fun toggleAudioPlayback(audioFile: String) {
+        if (!appSettings.value.soundEnabled) return
+        if (appSettings.value.quietModeEnabled) return
+        
         _isPlaying.value = true
         audioPlayer.play(audioFile, interruptCurrent = true)
+        recordProgress(audioFile, "Common", false)
     }
 
+    private fun recordProgress(activityId: String, category: String, completed: Boolean) {
+        viewModelScope.launch {
+            progressRepository?.recordActivity(activityId, category, completed)
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()
