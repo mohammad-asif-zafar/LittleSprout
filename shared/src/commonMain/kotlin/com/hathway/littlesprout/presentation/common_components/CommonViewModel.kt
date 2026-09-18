@@ -248,7 +248,7 @@ class CommonViewModel : ViewModel() {
                 letterImage = Res.drawable.vehicle_bus,
                 objectImage = Res.drawable.vehicle_bus,
                 description = "Bus",
-                audio = "audio_Bus.mp3"
+                audio = "audio_bus.mp3"
             ), CommonItem(
                 letter = "8",
                 letterImage = Res.drawable.vehicle_car,
@@ -260,7 +260,7 @@ class CommonViewModel : ViewModel() {
                 letterImage = Res.drawable.vehicle_fire_Truck,
                 objectImage = Res.drawable.vehicle_fire_Truck,
                 description = "Fire Truck",
-                audio = "audio_firetruck.mp3"
+                audio = "audio_fire_truck.mp3"
             ), CommonItem(
                 letter = "10",
                 letterImage = Res.drawable.vehicle_Helicopter,
@@ -278,7 +278,7 @@ class CommonViewModel : ViewModel() {
                 letterImage = Res.drawable.vehicle_motor_bike,
                 objectImage = Res.drawable.vehicle_motor_bike,
                 description = "Motor Bike",
-                audio = "audio_motorbike.mp3"
+                audio = "audio_motor_bike.mp3"
             ), CommonItem(
                 letter = "13",
                 letterImage = Res.drawable.vehicle_scooter,

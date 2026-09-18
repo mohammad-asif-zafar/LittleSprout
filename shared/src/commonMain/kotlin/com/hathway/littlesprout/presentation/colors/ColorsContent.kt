@@ -162,7 +162,8 @@ fun ColorsContent(
                                 contentAlignment = Alignment.Center
                             ) {
                                 ColoredText(
-                                    text = targetColor.name.uppercase()
+                                    text = targetColor.name.uppercase(),
+                                    singleColor = Color(targetColor.colorCode)
                                 )
                             }
                         }

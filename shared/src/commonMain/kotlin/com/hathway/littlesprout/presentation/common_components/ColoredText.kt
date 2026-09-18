@@ -17,7 +17,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun ColoredText(text: String, modifier: Modifier = Modifier) {
+fun ColoredText(
+    text: String,
+    modifier: Modifier = Modifier,
+    singleColor: Color? = null
+) {
     // Dynamic text size reduction for longer words to prevent bubble blowouts
     val computedFontSize = when {
         text.length > 8 -> 34.sp
@@ -25,17 +29,23 @@ fun ColoredText(text: String, modifier: Modifier = Modifier) {
         else -> 54.sp
     }
 
-    // Light yellow bubble background
+    // FIXED: Dynamically switch background based on whether a single color is used
+    val bubbleBackgroundColor = if (singleColor != null) {
+        Color.White.copy(alpha = 0.95f) // High-contrast crisp white background for custom colors
+    } else {
+        Color(0xFFFFF9C4).copy(alpha = 0.9f) // Classic light yellow background for rainbow text
+    }
+
     Box(
-        modifier = modifier.clip(RoundedCornerShape(32.dp))
-            .background(Color(0xFFFFF9C4).copy(alpha = 0.9f))
+        modifier = modifier
+            .clip(RoundedCornerShape(32.dp))
+            .background(bubbleBackgroundColor)
             .padding(horizontal = 32.dp, vertical = 8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            // FIXED: Swapped out the blending yellow for high-contrast kid-friendly colors
             val colors = listOf(
                 Color(0xFFE91E63), // Vibrant Pink/Red
                 Color(0xFF4CAF50), // Playful Green
@@ -47,11 +57,12 @@ fun ColoredText(text: String, modifier: Modifier = Modifier) {
                 Text(
                     text = char.toString(),
                     fontSize = computedFontSize,
-                    fontWeight = FontWeight.ExtraBold, // Thick letterforms for toddlers
-                    color = colors[index % colors.size],
+                    fontWeight = FontWeight.ExtraBold,
+                    color = singleColor ?: colors[index % colors.size],
                     letterSpacing = 2.sp
                 )
             }
         }
     }
 }
+
