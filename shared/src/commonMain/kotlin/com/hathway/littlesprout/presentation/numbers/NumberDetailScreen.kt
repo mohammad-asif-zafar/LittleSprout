@@ -11,16 +11,22 @@ fun NumberDetailScreen(
 ) {
     val numbers by viewModel.numbers.collectAsState()
     val selectedIndex by viewModel.selectedNumberIndex.collectAsState()
+    val isPlaying by viewModel.isPlaying.collectAsState()
 
     val currentItem = selectedIndex?.let { numbers.getOrNull(it) } ?: return
+
+    androidx.compose.runtime.LaunchedEffect(currentItem) {
+        viewModel.playCurrentAudio()
+    }
 
     NumberDetailContent(
         currentItem = currentItem,
         selectedIndex = selectedIndex ?: 0,
         totalItemsCount = numbers.size,
+        isPlaying = isPlaying,
         onBackClick = onBackClick,
         onHomeClick = onHomeClick,
         onPreviousClick = { viewModel.previousNumber() },
         onNextClick = { viewModel.nextNumber() },
-        onPlaySoundClick = { /* Play Number Sound */ })
+        onPlaySoundClick = { viewModel.playCurrentAudio() })
 }

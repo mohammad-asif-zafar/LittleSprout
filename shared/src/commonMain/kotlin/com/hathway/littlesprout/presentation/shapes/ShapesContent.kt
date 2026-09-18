@@ -1,5 +1,12 @@
 package com.hathway.littlesprout.presentation.shapes
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -146,35 +153,46 @@ fun ShapesContent(
                         .clip(RoundedCornerShape(40.dp))
                         .background(Color.White.copy(alpha = 0.9f))
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        // Shape Image
-                        Image(
-                            painter = painterResource(currentItem.shapeImage),
-                            contentDescription = currentItem.name,
-                            modifier = Modifier.size(260.dp),
-                            contentScale = ContentScale.Fit
-                        )
-
-                        Spacer(modifier = Modifier.height(32.dp))
-
-                        // Shape Name Bubble
-                        Surface(
-                            color = Color(0xFFFFF9C4),
-                            shape = RoundedCornerShape(24.dp)
+                    // 2. ENTRANCE ANIMATION: Smooth crossfade + bounce scale when currentItem changes
+                    AnimatedContent(
+                        targetState = currentItem,
+                        transitionSpec = {
+                            (fadeIn(animationSpec = tween(400)) + scaleIn(initialScale = 0.85f, animationSpec = tween(400))) togetherWith
+                                    (fadeOut(animationSpec = tween(300)) + scaleOut(targetScale = 0.95f, animationSpec = tween(300)))
+                        },
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) { targetShape ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
                         ) {
-                            Text(
-                                text = currentItem.name,
-                                fontSize = 48.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Color(0xFFD32F2F),
-                                modifier = Modifier.padding(horizontal = 40.dp, vertical = 8.dp)
+                            // Shape Image
+                            Image(
+                                painter = painterResource(targetShape.shapeImage),
+                                contentDescription = targetShape.name,
+                                modifier = Modifier.size(260.dp),
+                                contentScale = ContentScale.Fit
                             )
+
+                            Spacer(modifier = Modifier.height(32.dp))
+
+                            // Shape Name Bubble
+                            Surface(
+                                color = Color(0xFFFFF9C4),
+                                shape = RoundedCornerShape(24.dp)
+                            ) {
+                                Text(
+                                    text = targetShape.name,
+                                    fontSize = 48.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = Color(0xFFD32F2F),
+                                    modifier = Modifier.padding(horizontal = 40.dp, vertical = 8.dp)
+                                )
+                            }
                         }
                     }
                 }

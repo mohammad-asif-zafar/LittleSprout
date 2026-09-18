@@ -212,14 +212,10 @@ class AlphabetViewModel : ViewModel() {
     }
 
     fun playCurrentAudio() {
-        if (_isPlaying.value) {
-            stopAudio()
-            return
-        }
         val current = _alphabetList.value.getOrNull(_currentIndex.value)
         current?.audio?.let {
             _isPlaying.value = true
-            audioPlayer.play(it)
+            audioPlayer.play(it, interruptCurrent = true)
         }
     }
 

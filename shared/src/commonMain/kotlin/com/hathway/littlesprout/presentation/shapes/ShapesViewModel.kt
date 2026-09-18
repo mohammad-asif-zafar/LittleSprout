@@ -40,14 +40,10 @@ class ShapesViewModel : ViewModel() {
     }
 
     fun playCurrentAudio() {
-        if (_isPlaying.value) {
-            stopAudio()
-            return
-        }
         val current = _shapes.value.getOrNull(_currentIndex.value)
         current?.soundRes?.let {
             _isPlaying.value = true
-            audioPlayer.play(it)
+            audioPlayer.play(it, interruptCurrent = true)
         }
     }
 

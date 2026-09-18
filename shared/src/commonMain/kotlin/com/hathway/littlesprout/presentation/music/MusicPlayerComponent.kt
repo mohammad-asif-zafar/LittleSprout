@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -47,6 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hathway.littlesprout.domain.model.SongItem
+import com.hathway.littlesprout.presentation.common_components.ColoredText
 import kotlinx.coroutines.delay
 import littlesprout.shared.generated.resources.Res
 import littlesprout.shared.generated.resources.icon_clap_clap
@@ -77,7 +80,6 @@ fun MusicPlayerComponent(
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        // Background
         Image(
             painter = painterResource(Res.drawable.music_playing_bg),
             contentDescription = null,
@@ -89,7 +91,6 @@ fun MusicPlayerComponent(
             modifier = Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Top Bar
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -102,25 +103,18 @@ fun MusicPlayerComponent(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Image(
-                        painter = painterResource(categoryIcon),
+                        painter = painterResource(song.imageRes),
                         contentDescription = null,
                         modifier = Modifier.size(36.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = song.title,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF0D47A1)
-                    )
+
                 }
 
-                Spacer(modifier = Modifier.size(56.dp))
+                Spacer(modifier = Modifier.size(26.dp))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Main Illustration with Animation
             val infiniteTransition = rememberInfiniteTransition()
             val scale by infiniteTransition.animateFloat(
                 initialValue = 1f,
@@ -150,16 +144,12 @@ fun MusicPlayerComponent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Lyrics Card - Middle with translucent background and sync
             LyricsSyncedCard(
-                lyrics = song.lyrics,
-                progress = progress,
-                modifier = Modifier.weight(1f)
+                lyrics = song.lyrics, progress = progress, modifier = Modifier.weight(1f)
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Playback Controls
             PlaybackControls(
                 isPlaying = isPlaying,
                 onRewind = onRewindClick,
@@ -169,7 +159,6 @@ fun MusicPlayerComponent(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Progress Bar
             PlaybackProgress(
                 currentTime = currentTime,
                 totalTime = totalTime,
@@ -186,17 +175,14 @@ fun LyricsSyncedCard(lyrics: String, progress: Float, modifier: Modifier = Modif
     val currentLineIndex = (progress * lines.size).toInt().coerceIn(0, lines.size - 1)
 
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(Color.White.copy(alpha = 0.4f), RoundedCornerShape(32.dp))
-            .padding(20.dp),
+        modifier = modifier.fillMaxWidth()
+            .background(Color.White.copy(alpha = 0.4f), RoundedCornerShape(32.dp)).padding(20.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Show current line and next/prev for context
             val start = (currentLineIndex - 1).coerceAtLeast(0)
             val end = (currentLineIndex + 1).coerceAtMost(lines.size - 1)
 
@@ -224,7 +210,6 @@ fun PlaybackControls(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Rewind
         ControlIcon(
             res = Res.drawable.icon_reween,
             contentDescription = "Rewind",
@@ -235,7 +220,6 @@ fun PlaybackControls(
 
         Spacer(modifier = Modifier.width(20.dp))
 
-        // Play/Pause
         Box(contentAlignment = Alignment.Center) {
             ControlIcon(
                 res = if (isPlaying) Res.drawable.playgreen else Res.drawable.icon_pause,
@@ -248,7 +232,6 @@ fun PlaybackControls(
 
         Spacer(modifier = Modifier.width(20.dp))
 
-        // Skip
         ControlIcon(
             res = Res.drawable.icon_skip,
             contentDescription = "Skip",
@@ -309,7 +292,6 @@ fun ControlIcon(
 fun PlaybackProgress(
     currentTime: String, totalTime: String, progress: Float, onProgressChange: (Float) -> Unit
 ) {
-    // Animate progress smoothly
     val animatedProgress by animateFloatAsState(
         targetValue = progress, animationSpec = tween(durationMillis = 500, easing = LinearEasing)
     )
@@ -346,12 +328,10 @@ fun PlaybackProgress(
     }
 }
 
-// =================--- PREVIEW AREA ---=================
-
 @Preview
 @Composable
 fun MusicPlayerComponentPreview() {
-    // Create a mock song item matching your domain setup
+
     val mockSong = SongItem(
         title = "Clap Clap",
         lyrics = "Clap, clap, clap your hands,\nClap them high, clap them low!\nTap, tap, tap your toes,\nTap them fast, then nice and slow!",

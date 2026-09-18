@@ -151,7 +151,7 @@ class MusicViewModel : ViewModel() {
 
     fun playSong(song: SongItem) {
         println("MusicViewModel: Requested to play song: ${song.title} with res: ${song.audioPath}")
-        song.audioPath?.let {
+        song.audioPath.let {
             audioPlayer.play(it)
             _isPlaying.value = true
         }

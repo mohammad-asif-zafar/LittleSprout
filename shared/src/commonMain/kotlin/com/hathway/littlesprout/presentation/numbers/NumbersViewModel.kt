@@ -2,23 +2,26 @@ package com.hathway.littlesprout.presentation.numbers
 
 import androidx.lifecycle.ViewModel
 import com.hathway.littlesprout.domain.model.NumberItem
+import com.hathway.littlesprout.presentation.music.getAudioPlayer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import littlesprout.shared.generated.resources.*
 
 class NumbersViewModel : ViewModel() {
+    private val audioPlayer = getAudioPlayer()
+
     private val _numbers = MutableStateFlow(
         listOf(
-            NumberItem(1, "One", Res.drawable.img_one, Res.drawable.img_hand_one, "One finger",soundRes = "audio_one.mp3"),
-            NumberItem(2, "Two", Res.drawable.img_two, Res.drawable.img_hand_two, "Two fingers",soundRes = "audio_two.mp3"),
-            NumberItem(3, "Three", Res.drawable.img_three, Res.drawable.img_hand_three, "Three fingers",soundRes = "audio_three.mp3"),
-            NumberItem(4, "Four", Res.drawable.img_four, Res.drawable.img_hand_four, "Four fingers",soundRes = "audio_four.mp3"),
-            NumberItem(5, "Five", Res.drawable.img_five, Res.drawable.img_hand_five, "Five fingers",soundRes = "audio_five.mp3"),
-            NumberItem(6, "Six", Res.drawable.img_six, Res.drawable.img_hand_six, "Six fingers",soundRes = "audio_six.mp3"),
-            NumberItem(7, "Seven", Res.drawable.img_seven, Res.drawable.img_hand_seven, "Seven fingers",soundRes = "audio_seven.mp3"),
-            NumberItem(8, "Eight", Res.drawable.img_eight, Res.drawable.img_hand_eight, "Eight fingers",soundRes = "audio_eight.mp3"),
-            NumberItem(9, "Nine", Res.drawable.img_nine, Res.drawable.img_hand_nine, "Nine fingers",soundRes = "audio_nine.mp3"),
-            NumberItem(10, "Ten", Res.drawable.img_ten, Res.drawable.img_hand_ten, "Ten fingers",soundRes = "audio_ten.mp3")
+            NumberItem(1, "One", Res.drawable.img_one, Res.drawable.img_hand_one, "One finger", soundRes = "audio_one.mp3"),
+            NumberItem(2, "Two", Res.drawable.img_two, Res.drawable.img_hand_two, "Two fingers", soundRes = "audio_two.mp3"),
+            NumberItem(3, "Three", Res.drawable.img_three, Res.drawable.img_hand_three, "Three fingers", soundRes = "audio_three.mp3"),
+            NumberItem(4, "Four", Res.drawable.img_four, Res.drawable.img_hand_four, "Four fingers", soundRes = "audio_four.mp3"),
+            NumberItem(5, "Five", Res.drawable.img_five, Res.drawable.img_hand_five, "Five fingers", soundRes = "audio_five.mp3"),
+            NumberItem(6, "Six", Res.drawable.img_six, Res.drawable.img_hand_six, "Six fingers", soundRes = "audio_six.mp3"),
+            NumberItem(7, "Seven", Res.drawable.img_seven, Res.drawable.img_hand_seven, "Seven fingers", soundRes = "audio_seven.mp3"),
+            NumberItem(8, "Eight", Res.drawable.img_eight, Res.drawable.img_hand_eight, "Eight fingers", soundRes = "audio_eight.mp3"),
+            NumberItem(9, "Nine", Res.drawable.img_nine, Res.drawable.img_hand_nine, "Nine fingers", soundRes = "audio_nine.mp3"),
+            NumberItem(10, "Ten", Res.drawable.img_ten, Res.drawable.img_hand_ten, "Ten fingers", soundRes = "audio_ten.mp3")
         )
     )
     val numbers = _numbers.asStateFlow()
@@ -26,14 +29,36 @@ class NumbersViewModel : ViewModel() {
     private val _selectedNumberIndex = MutableStateFlow<Int?>(null)
     val selectedNumberIndex = _selectedNumberIndex.asStateFlow()
 
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying = _isPlaying.asStateFlow()
+
+    init {
+        audioPlayer.preload(_numbers.value.mapNotNull { it.soundRes })
+        audioPlayer.onPlaybackComplete {
+            _isPlaying.value = false
+        }
+    }
+
     fun selectNumber(index: Int) {
         _selectedNumberIndex.value = index
+        // Note: Audio playback is handled by LaunchedEffect in NumberDetailScreen
+    }
+
+    fun playCurrentAudio() {
+        val index = _selectedNumberIndex.value ?: return
+        val current = _numbers.value.getOrNull(index)
+        current?.soundRes?.let {
+            _isPlaying.value = true
+            // interruptCurrent = true ensures it repeats/restarts on every call
+            audioPlayer.play(it, interruptCurrent = true)
+        }
     }
 
     fun nextNumber() {
         _selectedNumberIndex.value?.let { current ->
             if (current < _numbers.value.size - 1) {
                 _selectedNumberIndex.value = current + 1
+                // Audio will play automatically via LaunchedEffect in the Screen
             }
         }
     }
@@ -42,11 +67,23 @@ class NumbersViewModel : ViewModel() {
         _selectedNumberIndex.value?.let { current ->
             if (current > 0) {
                 _selectedNumberIndex.value = current - 1
+                // Audio will play automatically via LaunchedEffect in the Screen
             }
         }
     }
 
+    private fun stopAudio() {
+        audioPlayer.stop()
+        _isPlaying.value = false
+    }
+
     fun clearSelection() {
+        stopAudio()
         _selectedNumberIndex.value = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopAudio()
     }
 }

@@ -59,15 +59,10 @@ class AnimalsViewModel : ViewModel() {
     }
 
     fun playAnimalSound() {
-        if (_isPlaying.value) {
-            stopAudio()
-            return
-        }
-
         val currentAnimal = _animals.value.getOrNull(_currentIndex.value)
         currentAnimal?.audio?.let { audioFile ->
             _isPlaying.value = true
-            audioPlayer.play(audioFile)
+            audioPlayer.play(audioFile, interruptCurrent = true)
         }
     }
 

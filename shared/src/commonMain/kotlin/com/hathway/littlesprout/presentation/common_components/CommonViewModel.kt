@@ -393,7 +393,7 @@ class CommonViewModel : ViewModel() {
         }
         audioFile?.let { 
             _isPlaying.value = true
-            audioPlayer.play(it) 
+            audioPlayer.play(it, interruptCurrent = true)
         }
     }
 
@@ -442,13 +442,8 @@ class CommonViewModel : ViewModel() {
 
     // FIXED: Generic toggle for all categories matching CommonContent string signature
     fun toggleAudioPlayback(audioFile: String) {
-        if (_isPlaying.value) {
-            stopAudio()
-            return
-        }
-
         _isPlaying.value = true
-        audioPlayer.play(audioFile)
+        audioPlayer.play(audioFile, interruptCurrent = true)
     }
 
 
