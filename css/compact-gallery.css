@@ -5,12 +5,12 @@
 
 .shot {
   width: 100%;
-  max-width: 190px;
+  max-width: 150px;
   justify-self: center;
 }
 
 .shot img {
-  height: 280px;
+  height: 210px;
   aspect-ratio: auto;
   object-fit: cover;
   object-position: top;
@@ -22,11 +22,11 @@
 
 @media (max-width: 520px) {
   .shot {
-    max-width: 175px;
+    max-width: 135px;
   }
 
   .shot img {
-    height: 250px;
+    height: 190px;
   }
 
   .adventure .phone-shot {
