@@ -1,0 +1,16 @@
+/* Compact thumbnails preserve the original screen proportions; tap to open full size. */
+.gallery {
+  align-items: start;
+}
+
+.shot {
+  width: 100%;
+  max-width: 190px;
+  justify-self: center;
+}
+
+@media (max-width: 520px) {
+  .shot {
+    max-width: 175px;
+  }
+}
