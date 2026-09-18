@@ -26,12 +26,82 @@ class MusicViewModel : ViewModel() {
 
     private val _songs = MutableStateFlow(
         listOf(
-            SongItem("Old MacDonald", Res.drawable.img_music_old_macdonald, 0xFFE1F5FE, "a_apple.mp3"),
-            SongItem("Twinkle Twinkle\nLittle Star", Res.drawable.img_music_twinkle, 0xFFE8F5E9, "TunePocket-Old-Mcdonald-Had-A-Farm-Preview.mp3"),
-            SongItem("The Wheels\non the Bus", Res.drawable.img_music_bus, 0xFFFFF9C4, "wheels_on_bus.mp3"),
-            SongItem("If You're\nHappy", Res.drawable.img_music_happy, 0xFFFCE4EC, "TunePocket-Old-Mcdonald-Had-A-Farm-Preview.mp3")
+            SongItem(
+                title = "Clap Clap",
+                lyrics = "\uD83C\uDFB5  Clap Clap Song \n\n" +
+                        "Clap, clap, clap your hands, \n" +
+                        "Clap them high, clap them low! \n" +
+                        "Tap, tap, tap your toes, \n" +
+                        "Tap them fast, then nice and slow! \n\n" +
+                        "Clap, clap — hooray! \n" +
+                        "Tap, tap — play! \n" +
+                        "Clap and tap, clap and tap, \n" +
+                        "Let’s do it again! ",
+                imageRes = Res.drawable.icon_clap_clap,
+                backgroundColorLong = 0xFFE1F5FE,
+                audioPath = "audio_clap_clap.mp3"
+            ),
+            SongItem(
+                title = "Bunny Hop",
+                lyrics = "\uD83D\uDC30  Bunny Hop \n\n" +
+                        "Bunny hop, hop, hop, \n" +
+                        "Little bunny never stops! \n" +
+                        "Hop to the left, \n" +
+                        "Hop to the right, \n" +
+                        "Hop, hop, hop — \n" +
+                        "What a funny sight! ",
+                imageRes = Res.drawable.icon_bunny_hop,
+                backgroundColorLong = 0xFFE8F5E9,
+                audioPath = "audio_bunny_hop.mp3"
+            ),
+            SongItem(
+                title = "Hello Sun",
+                lyrics = "☀\uFE0F  Hello, Sun! \n\n" +
+                        "Hello, sun! Hello, sky! \n" +
+                        "Wave your hands and say hi-hi! \n" +
+                        "Jump up high, touch your toes, \n" +
+                        "Wiggle, wiggle — off we go! \n\n" +
+                        "Hi-hi! Bye-bye! \n" +
+                        "Wave up high! \n" +
+                        "Hello, sun, hello, sky, \n" +
+                        "See you soon — bye-bye! ",
+                imageRes = Res.drawable.icon_hello_sun,
+                backgroundColorLong = 0xFFFFF9C4,
+                audioPath = "audio_hello_sun.mp3"
+            ),
+            SongItem(
+                title = "Little Chick",
+                lyrics = "\uD83D\uDC25  Little Chick \n\n" +
+                        "Little chick goes peep, peep, peep! \n" +
+                        "Wakes up from a cozy sleep. \n" +
+                        "Waddle left, waddle right, \n" +
+                        "Flap your wings with all your might! \n\n" +
+                        "Peep-peep-peep! \n" +
+                        "Tweet-tweet-tweet! \n" +
+                        "Little chick has dancing feet! ",
+                imageRes = Res.drawable.icon_little_chick,
+                backgroundColorLong = 0xFFFCE4EC,
+                audioPath = "audio_little_chick.mp3"
+            ),
+            SongItem(
+                title = "Zoom Zoom Car",
+                lyrics = "\uD83D\uDE97  Zoom Zoom Car \n\n" +
+                        "Zoom, zoom, little car, \n" +
+                        "Round the room and not too far! \n" +
+                        "Beep-beep here, \n" +
+                        "Beep-beep there, \n" +
+                        "Zoom around with happy care! \n\n" +
+                        "Zoom, zoom! Beep, beep! \n" +
+                        "Round and round we go! \n" +
+                        "Zoom, zoom, little car, \n" +
+                        "Fast, then nice and slow! ",
+                imageRes = Res.drawable.icon_zoom_zoom_car,
+                backgroundColorLong = 0xFFFCE4EC,
+                audioPath = "audio_zoom_zoom.mp3"
+            )
         )
     )
+
     val songs = _songs.asStateFlow()
 
     private val _isPlaying = MutableStateFlow(false)
@@ -61,7 +131,7 @@ class MusicViewModel : ViewModel() {
                 if (_isPlaying.value) {
                     val current = audioPlayer.getCurrentPosition()
                     val total = audioPlayer.getDuration()
-                    
+
                     if (total > 0) {
                         _playbackProgress.value = current.toFloat() / total.toFloat()
                         _currentTime.value = formatTime(current)
@@ -80,9 +150,9 @@ class MusicViewModel : ViewModel() {
     }
 
     fun playSong(song: SongItem) {
-        println("MusicViewModel: Requested to play song: ${song.title} with res: ${song.audioRes}")
-        song.audioRes?.let { 
-            audioPlayer.play(it) 
+        println("MusicViewModel: Requested to play song: ${song.title} with res: ${song.audioPath}")
+        song.audioPath?.let {
+            audioPlayer.play(it)
             _isPlaying.value = true
         }
     }

@@ -224,19 +224,7 @@ fun ColorsContent(
                     color = Color.White,
                     shadowElevation = 4.dp
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 24.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Great job!",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1E88E5)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("⭐", fontSize = 24.sp)
-                    }
+
                 }
 
                 // Right Arrow

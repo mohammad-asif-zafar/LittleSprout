@@ -7,7 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.hathway.littlesprout.domain.model.SongItem
 import littlesprout.shared.generated.resources.Res
-import littlesprout.shared.generated.resources.img_music_twinkle
+import littlesprout.shared.generated.resources.icon_clap_clap
 
 @Composable
 fun MusicPlayerScreen(
@@ -45,10 +45,19 @@ fun MusicPlayerScreen(
 @Composable
 fun MusicPlayerScreenPreview() {
     val mockSong = SongItem(
-        title = "Twinkle Twinkle\nLittle Star",
-        icon = Res.drawable.img_music_twinkle,
-        backgroundColor = 0xFFE8F5E9,
-        audioRes = "twinkle.mp3"
+        title = "Clap Clap",
+        lyrics = "\uD83C\uDFB5  Clap Clap Song \n\n" +
+                "Clap, clap, clap your hands, \n" +
+                "Clap them high, clap them low! \n" +
+                "Tap, tap, tap your toes, \n" +
+                "Tap them fast, then nice and slow! \n\n" +
+                "Clap, clap — hooray! \n" +
+                "Tap, tap — play! \n" +
+                "Clap and tap, clap and tap, \n" +
+                "Let’s do it again! ",
+        imageRes = Res.drawable.icon_clap_clap,
+        backgroundColorLong = 0xFFE1F5FE,
+        audioPath = "audio_clap_clap.mp3"
     )
     MusicPlayerComponent(
         song = mockSong,

@@ -32,12 +32,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.hathway.littlesprout.domain.model.SongItem
 import littlesprout.shared.generated.resources.Res
+import littlesprout.shared.generated.resources.icon_bunny_hop
+import littlesprout.shared.generated.resources.icon_clap_clap
+import littlesprout.shared.generated.resources.icon_hello_sun
+import littlesprout.shared.generated.resources.icon_little_chick
+import littlesprout.shared.generated.resources.icon_zoom_zoom_car
 import littlesprout.shared.generated.resources.img_back_button
-import littlesprout.shared.generated.resources.img_music_bus
-import littlesprout.shared.generated.resources.img_music_happy
 import littlesprout.shared.generated.resources.img_music_list_bg
-import littlesprout.shared.generated.resources.img_music_old_macdonald
-import littlesprout.shared.generated.resources.img_music_twinkle
 import org.jetbrains.compose.resources.painterResource
 
 // 1. STATEFUL WRAPPER: Observes ViewModel states safely for your core app flow
@@ -116,7 +117,7 @@ fun SongListItem(song: SongItem, onClick: () -> Unit) {
             .height(140.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(32.dp),
-        color = Color(song.backgroundColor),
+        color = Color(song.backgroundColorLong),
         shadowElevation = 2.dp
     ) {
         Row(
@@ -125,7 +126,7 @@ fun SongListItem(song: SongItem, onClick: () -> Unit) {
         ) {
             // Song Icon (Circle)
             Image(
-                painter = painterResource(song.icon),
+                painter = painterResource(song.imageRes),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize().clip(CircleShape),
                 contentScale = ContentScale.FillBounds
@@ -143,25 +144,78 @@ fun SongListScreenPreview() {
         // Mocking list items to preview the vertical lazy list spacing and color rendering
         val mockSongs = listOf(
             SongItem(
-                title = "Twinkle Twinkle Little Star",
-                icon = Res.drawable.img_music_old_macdonald,
-                backgroundColor = 0xFFFFF9C4
-            ), // Yellow card tint
+                title = "Clap Clap",
+                lyrics = "\uD83C\uDFB5  Clap Clap Song \n\n" +
+                        "Clap, clap, clap your hands, \n" +
+                        "Clap them high, clap them low! \n" +
+                        "Tap, tap, tap your toes, \n" +
+                        "Tap them fast, then nice and slow! \n\n" +
+                        "Clap, clap — hooray! \n" +
+                        "Tap, tap — play! \n" +
+                        "Clap and tap, clap and tap, \n" +
+                        "Let’s do it again! ",
+                imageRes = Res.drawable.icon_clap_clap,
+                backgroundColorLong = 0xFFE1F5FE,
+                audioPath = "audio_clap_clap.mp3"
+            ),
             SongItem(
-                title = "Old MacDonald Had a Farm",
-                icon = Res.drawable.img_music_twinkle,
-                backgroundColor = 0xFFE8F5E9
-            ),    // Green card tint
+                title = "Bunny Hop",
+                lyrics = "\uD83D\uDC30  Bunny Hop \n\n" +
+                        "Bunny hop, hop, hop, \n" +
+                        "Little bunny never stops! \n" +
+                        "Hop to the left, \n" +
+                        "Hop to the right, \n" +
+                        "Hop, hop, hop — \n" +
+                        "What a funny sight! ",
+                imageRes = Res.drawable.icon_bunny_hop,
+                backgroundColorLong = 0xFFE8F5E9,
+                audioPath = "audio_bunny_hop.mp3"
+            ),
             SongItem(
-                title = "The Wheels on the Bus",
-                icon = Res.drawable.img_music_bus,
-                backgroundColor = 0xFFE1F5FE
-            ),      // Blue card tint
+                title = "Hello Sun",
+                lyrics = "☀\uFE0F  Hello, Sun! \n\n" +
+                        "Hello, sun! Hello, sky! \n" +
+                        "Wave your hands and say hi-hi! \n" +
+                        "Jump up high, touch your toes, \n" +
+                        "Wiggle, wiggle — off we go! \n\n" +
+                        "Hi-hi! Bye-bye! \n" +
+                        "Wave up high! \n" +
+                        "Hello, sun, hello, sky, \n" +
+                        "See you soon — bye-bye! ",
+                imageRes = Res.drawable.icon_hello_sun,
+                backgroundColorLong = 0xFFFFF9C4,
+                audioPath = "audio_hello_sun.mp3"
+            ),
             SongItem(
-                title = "The Wheels on the Bus",
-                icon = Res.drawable.img_music_happy,
-                backgroundColor = 0xFFE1F5FE
-            )       // Blue card tint
+                title = "Little Chick",
+                lyrics = "\uD83D\uDC25  Little Chick \n\n" +
+                        "Little chick goes peep, peep, peep! \n" +
+                        "Wakes up from a cozy sleep. \n" +
+                        "Waddle left, waddle right, \n" +
+                        "Flap your wings with all your might! \n\n" +
+                        "Peep-peep-peep! \n" +
+                        "Tweet-tweet-tweet! \n" +
+                        "Little chick has dancing feet! ",
+                imageRes = Res.drawable.icon_little_chick,
+                backgroundColorLong = 0xFFFCE4EC,
+                audioPath = "audio_little_chick.mp3"
+            ),
+            SongItem(
+                title = "Zoom Zoom Car",
+                lyrics = "\uD83D\uDE97  Zoom Zoom Car \n\n" +
+                        "Zoom, zoom, little car, \n" +
+                        "Round the room and not too far! \n" +
+                        "Beep-beep here, \n" +
+                        "Beep-beep there, \n" +
+                        "Zoom around with happy care! \n\n" +
+                        "Zoom, zoom! Beep, beep! \n" +
+                        "Round and round we go! \n" +
+                        "Zoom, zoom, little car, \n" +
+                        "Fast, then nice and slow! ",
+                imageRes = Res.drawable.icon_zoom_zoom_car,
+                backgroundColorLong = 0xFFFCE4EC,
+                audioPath = "audio_zoom_zoom.mp3"
+            )      // Blue card tint
         )
 
         SongListContent(

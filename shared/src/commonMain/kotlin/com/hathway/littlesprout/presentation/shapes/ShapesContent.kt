@@ -89,17 +89,13 @@ fun ShapesContent(
                         .size(56.dp)
                         .clickable { onBackClick() }
                 )
-
-                // FIXED: Replaced the Home button with the Speaker Icon in the Top Right Corner
-                // FIXED: Speaker Icon with dynamic Canvas red slash logic on top layer
                 Box(
                     modifier = Modifier
-                        .size(64.dp) // Proportional uniform sizing matching back action
+                        .size(64.dp)
                         .clickable { onPlaySoundClick()} // Passes the string out
                         .drawWithContent {
                             drawContent()
                             if (!isPlaying) {
-                                // Draws an anti-aliased crosswise diagonal cancellation bar
                                 drawLine(
                                     color = Color.Red,
                                     start = Offset(size.width * 0.25f, size.height * 0.25f),
@@ -121,7 +117,6 @@ fun ShapesContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Main Content Area with Swipe Support
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -143,7 +138,7 @@ fun ShapesContent(
                         )
                     }
             ) {
-                // Main White Card Container
+
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -151,7 +146,6 @@ fun ShapesContent(
                         .clip(RoundedCornerShape(40.dp))
                         .background(Color.White.copy(alpha = 0.9f))
                 ) {
-                    // Core Card Content Layout (Clean with no inner float layers)
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -188,7 +182,6 @@ fun ShapesContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // MOVED: Bottom Navigation and Badge Row (Outside the main white card)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

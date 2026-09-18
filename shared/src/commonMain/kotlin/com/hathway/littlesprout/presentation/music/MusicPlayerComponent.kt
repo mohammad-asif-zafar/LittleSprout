@@ -42,18 +42,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hathway.littlesprout.domain.model.SongItem
 import kotlinx.coroutines.delay
 import littlesprout.shared.generated.resources.Res
+import littlesprout.shared.generated.resources.icon_clap_clap
 import littlesprout.shared.generated.resources.icon_pause
-import littlesprout.shared.generated.resources.icon_pay_red
 import littlesprout.shared.generated.resources.icon_reween
+import littlesprout.shared.generated.resources.icon_sing_along
 import littlesprout.shared.generated.resources.icon_skip
 import littlesprout.shared.generated.resources.img_back_button
-import littlesprout.shared.generated.resources.img_music_twinkle
 import littlesprout.shared.generated.resources.music_playing_bg
 import littlesprout.shared.generated.resources.playgreen
 import org.jetbrains.compose.resources.DrawableResource
@@ -62,6 +63,8 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun MusicPlayerComponent(
     song: SongItem,
+    categoryIcon: DrawableResource = Res.drawable.icon_sing_along,
+    categoryName: String = "Sing Along",
     onBackClick: () -> Unit,
     onPlayPauseClick: () -> Unit,
     onRewindClick: () -> Unit,
@@ -89,27 +92,39 @@ fun MusicPlayerComponent(
             // Top Bar
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                horizontalArrangement = Arrangement.Start
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
                     painter = painterResource(Res.drawable.img_back_button),
                     contentDescription = "Back",
-                    modifier = Modifier.size(60.dp).clickable { onBackClick() })
+                    modifier = Modifier.size(56.dp).clickable { onBackClick() })
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(categoryIcon),
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = song.title,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFF0D47A1)
+                    )
+                }
+
+                Spacer(modifier = Modifier.size(56.dp))
             }
 
-            Text(
-                text = song.title.replace("\n", " "),
-                fontSize = 36.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFF0D47A1),
-                modifier = Modifier.padding(top = 8.dp)
-            )
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Main Illustration with Animation
             val infiniteTransition = rememberInfiniteTransition()
             val scale by infiniteTransition.animateFloat(
                 initialValue = 1f,
-                targetValue = if (isPlaying) 1.08f else 1f,
+                targetValue = if (isPlaying) 1.05f else 1f,
                 animationSpec = infiniteRepeatable(
                     animation = tween(1200, easing = FastOutSlowInEasing),
                     repeatMode = RepeatMode.Reverse
@@ -117,30 +132,32 @@ fun MusicPlayerComponent(
             )
 
             val rotation by infiniteTransition.animateFloat(
-                initialValue = -2f,
-                targetValue = if (isPlaying) 2f else 0f,
+                initialValue = -1f,
+                targetValue = if (isPlaying) 1f else 0f,
                 animationSpec = infiniteRepeatable(
                     animation = tween(2000, easing = LinearEasing), repeatMode = RepeatMode.Reverse
                 )
             )
 
             Image(
-                painter = painterResource(song.icon),
+                painter = painterResource(song.imageRes),
                 contentDescription = null,
-                modifier = Modifier.fillMaxWidth(0.85f).height(260.dp).graphicsLayer(
+                modifier = Modifier.fillMaxWidth(0.7f).height(200.dp).graphicsLayer(
                     scaleX = scale, scaleY = scale, rotationZ = rotation
                 ),
                 contentScale = ContentScale.Fit
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Lyrics Card
-            LyricsCard(
-                mainText = "Old MacDonald had a farm", subText = "E-I-E-I-O!"
+            // Lyrics Card - Middle with translucent background and sync
+            LyricsSyncedCard(
+                lyrics = song.lyrics,
+                progress = progress,
+                modifier = Modifier.weight(1f)
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Playback Controls
             PlaybackControls(
@@ -164,25 +181,36 @@ fun MusicPlayerComponent(
 }
 
 @Composable
-fun LyricsCard(mainText: String, subText: String) {
+fun LyricsSyncedCard(lyrics: String, progress: Float, modifier: Modifier = Modifier) {
+    val lines = remember(lyrics) { lyrics.split("\n").filter { it.isNotBlank() } }
+    val currentLineIndex = (progress * lines.size).toInt().coerceIn(0, lines.size - 1)
+
     Box(
-        modifier = Modifier.fillMaxWidth()
-            .background(Color(0xFFE8F5E9).copy(alpha = 0.9f), RoundedCornerShape(32.dp))
-            .padding(24.dp), contentAlignment = Alignment.Center
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color.White.copy(alpha = 0.4f), RoundedCornerShape(32.dp))
+            .padding(20.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = mainText,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF1B5E20)
-            )
-            Text(
-                text = subText,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFF1B5E20)
-            )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Show current line and next/prev for context
+            val start = (currentLineIndex - 1).coerceAtLeast(0)
+            val end = (currentLineIndex + 1).coerceAtMost(lines.size - 1)
+
+            for (i in start..end) {
+                val isCurrent = i == currentLineIndex
+                Text(
+                    text = lines[i].trim(),
+                    fontSize = if (isCurrent) 28.sp else 20.sp,
+                    fontWeight = if (isCurrent) FontWeight.ExtraBold else FontWeight.Bold,
+                    color = if (isCurrent) Color(0xFF1B5E20) else Color(0xFF1B5E20).copy(alpha = 0.5f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
         }
     }
 }
@@ -325,10 +353,11 @@ fun PlaybackProgress(
 fun MusicPlayerComponentPreview() {
     // Create a mock song item matching your domain setup
     val mockSong = SongItem(
-        "Twinkle Twinkle\nLittle Star",
-        Res.drawable.img_music_twinkle,
-        0xFFE8F5E9,
-        "TunePocket-Old-Mcdonald-Had-A-Farm-Preview.mp3"
+        title = "Clap Clap",
+        lyrics = "Clap, clap, clap your hands,\nClap them high, clap them low!\nTap, tap, tap your toes,\nTap them fast, then nice and slow!",
+        imageRes = Res.drawable.icon_clap_clap,
+        backgroundColorLong = 0xFFE1F5FE,
+        audioPath = "audio_clap_clap.mp3"
     )
 
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
