@@ -135,13 +135,17 @@ fun App() {
             }
 
             is Screen.Music -> {
-                MusicScreen(viewModel = musicViewModel, onBackClick = {
-                    currentScreen = Screen.Main
-                }, onItemClick = { type ->
-                    if (type == MusicType.SING_ALONG) {
-                        currentScreen = Screen.SongList
+                MusicScreen(
+                    viewModel = musicViewModel,
+                    onBackClick = { currentScreen = Screen.Main },
+                    onHomeClick = { currentScreen = Screen.Main },
+                    onSongClick = { song -> currentScreen = Screen.MusicPlayer(song) },
+                    onItemClick = { type ->
+                        if (type == MusicType.SING_ALONG) {
+                            currentScreen = Screen.SongList
+                        }
                     }
-                })
+                )
             }
 
             is Screen.Birds -> {
@@ -218,6 +222,8 @@ fun App() {
                     currentScreen = Screen.Music
                 }, onSongClick = { song ->
                     currentScreen = Screen.MusicPlayer(song)
+                }, onHomeClick = {
+                    currentScreen = Screen.Main
                 })
             }
 

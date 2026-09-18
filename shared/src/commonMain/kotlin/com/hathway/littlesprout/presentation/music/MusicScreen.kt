@@ -16,6 +16,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.hathway.littlesprout.domain.model.MusicItem
 import com.hathway.littlesprout.domain.model.MusicType
+import com.hathway.littlesprout.domain.model.SongItem
 import org.jetbrains.compose.resources.painterResource
 
 // 1. STATEFUL WRAPPER: Handles your ViewModel reactive flow states safely
@@ -23,13 +24,19 @@ import org.jetbrains.compose.resources.painterResource
 fun MusicScreen(
     viewModel: MusicViewModel,
     onBackClick: () -> Unit,
+    onHomeClick: () -> Unit,
+    onSongClick: (SongItem) -> Unit,
     onItemClick: (MusicType) -> Unit
 ) {
     val items by viewModel.musicItems.collectAsState()
+    val songs by viewModel.songs.collectAsState()
 
     MusicContent(
         items = items,
+        songs = songs,
         onBackClick = onBackClick,
+        onHomeClick = onHomeClick,
+        onSongClick = onSongClick,
         onItemClick = onItemClick
     )
 }
