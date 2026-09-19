@@ -32,7 +32,7 @@ fun PrivacyPolicyScreen(
         ) {
             item {
                 Text(
-                    "Effective Date: January 1, 2024",
+                    "Effective Date: September 19, 2026",
                     style = MaterialTheme.typography.labelMedium
                 )
             }
