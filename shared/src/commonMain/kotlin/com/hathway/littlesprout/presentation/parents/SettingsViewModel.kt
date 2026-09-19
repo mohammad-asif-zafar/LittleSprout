@@ -42,6 +42,12 @@ class SettingsViewModel(
         }
     }
 
+    fun completeOnboarding() {
+        viewModelScope.launch {
+            settingsRepository.updateSettings(settings.value.copy(isOnboardingCompleted = true))
+        }
+    }
+
     fun resetProgress() {
         viewModelScope.launch {
             progressRepository.resetProgress()

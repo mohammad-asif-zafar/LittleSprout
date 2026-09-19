@@ -4,5 +4,6 @@ data class AppSettings(
     val soundEnabled: Boolean = true,
     val musicEnabled: Boolean = true,
     val autoPlayEnabled: Boolean = true,
-    val quietModeEnabled: Boolean = false
+    val quietModeEnabled: Boolean = false,
+    val isOnboardingCompleted: Boolean = false
 )

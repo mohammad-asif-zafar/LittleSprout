@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hathway.littlesprout.di.AppContainer
+import com.hathway.littlesprout.domain.model.AppSettings
 import com.hathway.littlesprout.domain.model.MusicType
 import com.hathway.littlesprout.navigation.BottomNavigationBar
 import com.hathway.littlesprout.navigation.NavItem
@@ -76,6 +77,8 @@ fun App(appContainer: AppContainer? = null) {
             viewModel { ProgressViewModel(appContainer.progressRepository) }
         } else null
 
+        val appSettings by settingsViewModel?.settings?.collectAsState() ?: remember { mutableStateOf(AppSettings()) }
+
         val showBottomBar = when (currentScreen) {
             is Screen.Main, is Screen.Progress, is Screen.ForParents -> true
             else -> false
@@ -122,7 +125,11 @@ fun App(appContainer: AppContainer? = null) {
                         val viewModel: SplashViewModel = viewModel { SplashViewModel() }
                         SplashScreen(
                             viewModel = viewModel, onSplashFinished = {
-                                currentScreen = Screen.Onboarding
+                                if (appSettings.isOnboardingCompleted) {
+                                    currentScreen = Screen.Main
+                                } else {
+                                    currentScreen = Screen.Onboarding
+                                }
                             })
                     }
 
@@ -130,6 +137,7 @@ fun App(appContainer: AppContainer? = null) {
                         val viewModel: OnboardingViewModel = viewModel { OnboardingViewModel() }
                         OnboardingScreen(
                             viewModel = viewModel, onOnboardingFinished = {
+                                settingsViewModel?.completeOnboarding()
                                 currentScreen = Screen.Main
                             })
                     }
