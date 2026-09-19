@@ -33,12 +33,14 @@ import com.hathway.littlesprout.presentation.animals.AnimalsScreen
 import com.hathway.littlesprout.presentation.animals.AnimalsViewModel
 import com.hathway.littlesprout.presentation.common_components.CommonItemScreen
 import com.hathway.littlesprout.presentation.common_components.CommonViewModel
+import com.hathway.littlesprout.presentation.common_components.ParentalGate
 import com.hathway.littlesprout.presentation.music.MusicScreen
 import com.hathway.littlesprout.presentation.music.MusicViewModel
 import com.hathway.littlesprout.presentation.music.SongListScreen
 import com.hathway.littlesprout.presentation.music.MusicPlayerScreen
 import com.hathway.littlesprout.presentation.parents.*
 import com.hathway.littlesprout.presentation.util.CategoryConstants
+import com.hathway.littlesprout.util.Constants
 import com.hathway.littlesprout.util.getAppInfo
 import com.hathway.littlesprout.util.getLinkLauncher
 
@@ -48,6 +50,8 @@ fun App(appContainer: AppContainer? = null) {
     MaterialTheme {
         var currentScreen by remember { mutableStateOf<Screen>(Screen.Splash) }
         var selectedNavItem by remember { mutableStateOf(NavItem.Home) }
+        var showParentalGate by remember { mutableStateOf(false) }
+        var pendingNavItem by remember { mutableStateOf<NavItem?>(null) }
 
         // Persistent ViewModels
         val numbersViewModel: NumbersViewModel = viewModel {
@@ -82,16 +86,37 @@ fun App(appContainer: AppContainer? = null) {
                 if (showBottomBar) {
                     BottomNavigationBar(
                         selectedItem = selectedNavItem, onItemSelected = { navItem ->
-                            selectedNavItem = navItem
-                            currentScreen = when (navItem) {
-                                NavItem.Home -> Screen.Main
-                                NavItem.Progress -> Screen.Progress
-                                NavItem.Parents -> Screen.ForParents
+                            if (navItem == NavItem.Home) {
+                                selectedNavItem = navItem
+                                currentScreen = Screen.Main
+                            } else {
+                                pendingNavItem = navItem
+                                showParentalGate = true
                             }
                         })
                 }
             }) { paddingValues ->
             Box(modifier = Modifier.padding(if (showBottomBar) paddingValues else PaddingValues())) {
+                if (showParentalGate) {
+                    ParentalGate(
+                        onDismiss = {
+                            showParentalGate = false
+                            pendingNavItem = null
+                        },
+                        onSuccess = {
+                            showParentalGate = false
+                            pendingNavItem?.let { navItem ->
+                                selectedNavItem = navItem
+                                currentScreen = when (navItem) {
+                                    NavItem.Home -> Screen.Main
+                                    NavItem.Progress -> Screen.Progress
+                                    NavItem.Parents -> Screen.ForParents
+                                }
+                            }
+                            pendingNavItem = null
+                        }
+                    )
+                }
                 when (currentScreen) {
                     is Screen.Splash -> {
                         val viewModel: SplashViewModel = viewModel { SplashViewModel() }
@@ -162,7 +187,7 @@ fun App(appContainer: AppContainer? = null) {
                             onPrivacySafetyClick = { currentScreen = Screen.PrivacySafety },
                             onContentCreditsClick = { currentScreen = Screen.ContentCredits },
                             onContactDeveloperClick = { currentScreen = Screen.ContactDeveloper },
-                            onWebsiteClick = { launcher.openUrl("https://www.littlesprout.com") },
+                            onWebsiteClick = { launcher.openUrl(Constants.WEBSITE_URL) },
                             onSettingsClick = { currentScreen = Screen.Settings },
                             onAppInformationClick = { currentScreen = Screen.AppInformation })
                     }
@@ -187,10 +212,10 @@ fun App(appContainer: AppContainer? = null) {
                             onBackClick = { currentScreen = Screen.ForParents },
                             onEmailClick = {
                                 launcher.sendEmail(
-                                    "support@littlesprout.com", "Little Sprout Support"
+                                    Constants.SUPPORT_EMAIL, "Little Sprout Support"
                                 )
                             },
-                            onWebsiteClick = { launcher.openUrl("https://www.littlesprout.com") })
+                            onWebsiteClick = { launcher.openUrl(Constants.WEBSITE_URL) })
                     }
 
                     is Screen.AppInformation -> {

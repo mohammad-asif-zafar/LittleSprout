@@ -6,7 +6,6 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.MediaMetadataRetriever
 import android.media.SoundPool
-import android.util.Log
 import kotlinx.coroutines.*
 
 class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
@@ -23,8 +22,8 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
                 .setMaxStreams(MAX_STREAMS)
                 .setAudioAttributes(attributes)
                 .build().apply {
-                    setOnLoadCompleteListener { _, sampleId, status ->
-                        Log.d("AudioPlayer", "SoundPool load complete: id=$sampleId, status=$status")
+                    setOnLoadCompleteListener { _, _, _ ->
+                        // Load complete
                     }
                 }
         }
@@ -46,7 +45,6 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
         scope.launch(Dispatchers.IO) {
             val path = resolvePath(fileName)
             if (path == null) {
-                Log.e("AudioPlayer", "Preload failed: could not resolve path for $fileName")
                 return@launch
             }
             try {
@@ -61,9 +59,8 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
                 durationMap[fileName] = durationStr?.toLong() ?: 0L
                 retriever.release()
                 descriptor.close()
-                Log.d("AudioPlayer", "Preloaded SoundPool: $fileName (path=$path, duration=${durationMap[fileName]}ms)")
             } catch (e: Exception) {
-                Log.e("AudioPlayer", "Failed to preload SoundPool: $fileName at path $path", e)
+                // Handle failure
             }
         }
     }
@@ -74,7 +71,6 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
 
     override fun play(fileName: String, interruptCurrent: Boolean) {
         if (fileName.isBlank()) return
-        Log.d("AudioPlayer", "Play requested: $fileName")
 
         if (interruptCurrent) {
             stop()
@@ -83,15 +79,12 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
         val soundId = soundMap[fileName]
         if (soundId != null) {
             // Play via SoundPool (Short Audio)
-            Log.d("AudioPlayer", "Attempting SoundPool play: $fileName (soundId=$soundId)")
             currentStreamId = soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
             if (currentStreamId != 0) {
                 currentPlayingFile = fileName
                 val duration = durationMap[fileName] ?: 0L
                 startCompletionTimer(duration)
-                Log.d("AudioPlayer", "SoundPool play successful, streamId=$currentStreamId")
             } else {
-                Log.w("AudioPlayer", "SoundPool returned 0 for $fileName - falling back to MediaPlayer")
                 playViaMediaPlayer(fileName)
             }
         } else {
@@ -104,7 +97,6 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
         scope.launch(Dispatchers.IO) {
             val path = resolvePath(fileName)
             if (path == null) {
-                Log.e("AudioPlayer", "Could not resolve path for: $fileName")
                 return@launch
             }
             withContext(Dispatchers.Main) {
@@ -130,9 +122,8 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
                         start()
                     }
                     currentPlayingFile = fileName
-                    Log.d("AudioPlayer", "Playing via MediaPlayer: $path")
                 } catch (e: Exception) {
-                    Log.e("AudioPlayer", "MediaPlayer failed for $fileName", e)
+                    // Handle failure
                 }
             }
         }
@@ -215,7 +206,6 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
     private fun resolvePath(fileName: String): String? {
         pathCache[fileName]?.let { return it }
 
-        Log.d("AudioPlayer", "Resolving path for: $fileName")
         val targetedPaths = listOf(
             "composeResources/littlesprout.shared.generated.resources/files/$fileName",
             "composeResources/com.hathway.littlesprout.shared.generated.resources/files/$fileName",
@@ -225,7 +215,6 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
         for (path in targetedPaths) {
             try {
                 context.assets.open(path).use { it.close() }
-                Log.d("AudioPlayer", "Found asset at targeted path: $path")
                 pathCache[fileName] = path
                 return path
             } catch (e: Exception) {

@@ -41,7 +41,7 @@ fun PrivacyPolicyScreen(
             item { PrivacySection("2. Information We Collect", "Little Sprout does not collect any personal information, device identifiers, or usage data that is transmitted to us or any third party.") }
             item { PrivacySection("3. Information We Do Not Collect", "We do not collect: Name, Age, Email, Location, Contacts, Camera data, or Microphone data.") }
             item { PrivacySection("4. Offline Operation", "The app is designed to work entirely offline. No internet connection is required for any learning activities.") }
-            item { PrivacySection("5. Local Learning Progress", "Learning progress and app settings are stored locally on your device only. This data is never synchronized to the cloud.") }
+            item { PrivacySection("5. Local Learning Progress", "Learning progress and app settings are stored locally on your device only. If you use system-level backup (like Google Drive or iCloud), this data may be included in your device backups. This data is never synchronized to our own servers.") }
             item { PrivacySection("6. Children's Privacy", "The app is intended for children ages 2-3. Since no data is collected, it is inherently safe and compliant with children's privacy standards.") }
             item { PrivacySection("7. Third-Party Services", "We do not use any third-party analytics, tracking, or advertising SDKs.") }
             item { PrivacySection("8. Advertising", "There are no advertisements in Little Sprout.") }

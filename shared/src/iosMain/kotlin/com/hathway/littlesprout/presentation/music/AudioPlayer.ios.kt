@@ -45,7 +45,7 @@ class IosAudioPlayer : AudioPlayer {
                 player.delegate = delegate
                 players[fileName] = player
             } catch (e: Exception) {
-                println("iOS AudioPlayer: Failed to load $fileName - ${e.message}")
+                // Failed to load
             }
         }
     }
