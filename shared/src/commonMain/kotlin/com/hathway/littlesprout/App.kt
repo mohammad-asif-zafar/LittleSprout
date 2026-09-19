@@ -2,12 +2,14 @@ package com.hathway.littlesprout
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hathway.littlesprout.di.AppContainer
 import com.hathway.littlesprout.domain.model.AppSettings
@@ -99,7 +101,7 @@ fun App(appContainer: AppContainer? = null) {
                         })
                 }
             }) { paddingValues ->
-            Box(modifier = Modifier.padding(if (showBottomBar) paddingValues else PaddingValues())) {
+            Box(modifier = Modifier.fillMaxSize().padding(bottom = if (showBottomBar) paddingValues.calculateBottomPadding() else 0.dp)) {
                 if (showParentalGate) {
                     ParentalGate(
                         onDismiss = {
