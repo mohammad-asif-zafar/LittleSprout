@@ -15,7 +15,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 
 @OptIn(ExperimentalForeignApi::class)
 actual fun createDataStore(context: Any?): DataStore<Preferences> {
-    return PreferenceDataStoreFactory.create(
+    return PreferenceDataStoreFactory.createWithPath(
         scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
         produceFile = {
             val directory = NSFileManager.defaultManager.URLForDirectory(

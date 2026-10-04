@@ -2,6 +2,7 @@ package com.hathway.littlesprout.presentation.music
 
 import platform.AVFAudio.*
 import platform.Foundation.NSBundle
+import platform.Foundation.NSFileManager
 import platform.Foundation.NSURL
 import platform.darwin.NSObject
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -18,24 +19,65 @@ class IosAudioPlayer : AudioPlayer {
         }
     }
 
+    init {
+        setupAudioSession()
+    }
+
+    private fun setupAudioSession() {
+        try {
+            val audioSession = AVAudioSession.sharedInstance()
+            audioSession.setCategory(AVAudioSessionCategoryPlayback, error = null)
+            audioSession.setActive(true, error = null)
+        } catch (e: Exception) {
+            println("Error setting up AVAudioSession: $e")
+        }
+    }
+
     override fun preload(fileName: String) {
         if (players.containsKey(fileName)) return
 
-        val name = fileName.substringBeforeLast(".")
-        val extension = fileName.substringAfterLast(".", "")
-        
+        val cleanFileName = fileName.substringAfterLast("/")
+        val name = cleanFileName.substringBeforeLast(".")
+        val extension = cleanFileName.substringAfterLast(".", "")
+
         val paths = listOf(
-            "compose-resources/files",
+            "compose-resources/composeResources/littlesprout.shared.generated.resources/files",
+            "compose-resources/composeResources/com.hathway.littlesprout.shared.generated.resources/files",
             "compose-resources/littlesprout.shared.generated.resources/files",
             "compose-resources/com.hathway.littlesprout.shared.generated.resources/files",
+            "compose-resources/files",
+            "composeResources/littlesprout.shared.generated.resources/files",
+            "composeResources/com.hathway.littlesprout.shared.generated.resources/files",
             "files",
-            null
+            ""
         )
 
         var url: NSURL? = null
         for (path in paths) {
-            url = NSBundle.mainBundle.URLForResource(name, extension, path)
+            url = if (path.isEmpty()) {
+                NSBundle.mainBundle.URLForResource(name, extension)
+            } else {
+                NSBundle.mainBundle.URLForResource(name, extension, path)
+            }
             if (url != null) break
+        }
+
+        if (url == null) {
+            val bundlePath = NSBundle.mainBundle.resourcePath
+            if (bundlePath != null) {
+                val fileManager = NSFileManager.defaultManager
+                for (p in paths) {
+                    val fullPath = if (p.isEmpty()) {
+                        "$bundlePath/$cleanFileName"
+                    } else {
+                        "$bundlePath/$p/$cleanFileName"
+                    }
+                    if (fileManager.fileExistsAtPath(fullPath)) {
+                        url = NSURL.fileURLWithPath(fullPath)
+                        break
+                    }
+                }
+            }
         }
 
         if (url != null) {
@@ -45,8 +87,10 @@ class IosAudioPlayer : AudioPlayer {
                 player.delegate = delegate
                 players[fileName] = player
             } catch (e: Exception) {
-                // Failed to load
+                println("Error creating AVAudioPlayer for $fileName: $e")
             }
+        } else {
+            println("Audio file not found in bundle: $fileName")
         }
     }
 
@@ -63,10 +107,14 @@ class IosAudioPlayer : AudioPlayer {
         }
 
         player?.let {
+            setupAudioSession()
             it.currentTime = 0.0
-            it.play()
+            it.prepareToPlay()
+            if (!it.play()) {
+                println("AVAudioPlayer play() returned false for $fileName")
+            }
             currentPlayer = it
-        }
+        } ?: println("Cannot play audio, player is null for $fileName")
     }
 
     override fun stop() {
@@ -80,6 +128,7 @@ class IosAudioPlayer : AudioPlayer {
     }
 
     override fun resume() {
+        setupAudioSession()
         currentPlayer?.play()
     }
 
@@ -90,9 +139,9 @@ class IosAudioPlayer : AudioPlayer {
         players.clear()
     }
 
-    override fun getDuration(): Long = (currentPlayer?.duration ?: 0.0).toLong() * 1000L
+    override fun getDuration(): Long = ((currentPlayer?.duration ?: 0.0) * 1000.0).toLong()
 
-    override fun getCurrentPosition(): Long = (currentPlayer?.currentTime ?: 0.0).toLong() * 1000L
+    override fun getCurrentPosition(): Long = ((currentPlayer?.currentTime ?: 0.0) * 1000.0).toLong()
 
     override fun seekTo(position: Long) {
         currentPlayer?.currentTime = position / 1000.0

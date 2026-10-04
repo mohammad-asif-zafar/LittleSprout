@@ -8,7 +8,7 @@ import com.hathway.littlesprout.domain.model.ActivityProgress
 import com.hathway.littlesprout.domain.repository.ProgressRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
