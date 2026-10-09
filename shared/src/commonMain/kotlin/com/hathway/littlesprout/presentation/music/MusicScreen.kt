@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -17,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.hathway.littlesprout.domain.model.MusicItem
 import com.hathway.littlesprout.domain.model.MusicType
 import com.hathway.littlesprout.domain.model.SongItem
+import com.hathway.littlesprout.presentation.common_components.ComingSoonDialog
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -29,15 +28,32 @@ fun MusicScreen(
 ) {
     val items by viewModel.musicItems.collectAsState()
     val songs by viewModel.songs.collectAsState()
+    var comingSoonFeature by remember { mutableStateOf<String?>(null) }
 
-    MusicContent(
-        items = items,
-        songs = songs,
-        onBackClick = onBackClick,
-        onHomeClick = onHomeClick,
-        onSongClick = onSongClick,
-        onItemClick = onItemClick
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        MusicContent(
+            items = items,
+            songs = songs,
+            onBackClick = onBackClick,
+            onHomeClick = onHomeClick,
+            onSongClick = onSongClick,
+            onItemClick = { type ->
+                if (type == MusicType.SING_ALONG) {
+                    onItemClick(type)
+                } else {
+                    val item = items.find { it.type == type }
+                    comingSoonFeature = item?.name ?: "This feature"
+                }
+            }
+        )
+
+        comingSoonFeature?.let { feature ->
+            ComingSoonDialog(
+                featureName = feature,
+                onDismiss = { comingSoonFeature = null }
+            )
+        }
+    }
 }
 
 @Composable

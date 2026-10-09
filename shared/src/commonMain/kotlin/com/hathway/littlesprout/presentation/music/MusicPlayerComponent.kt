@@ -210,7 +210,7 @@ fun PlaybackControls(
 
         Box(contentAlignment = Alignment.Center) {
             ControlIcon(
-                res = if (isPlaying) Res.drawable.playgreen else Res.drawable.icon_pause,
+                res = if (isPlaying) Res.drawable.icon_pause else Res.drawable.playgreen,
                 contentDescription = if (isPlaying) "Pause" else "Play",
                 onClick = onPlayPause,
                 size = 110,

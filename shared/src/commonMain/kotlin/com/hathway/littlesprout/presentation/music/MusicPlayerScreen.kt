@@ -1,6 +1,7 @@
 package com.hathway.littlesprout.presentation.music
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,6 +25,12 @@ fun MusicPlayerScreen(
         viewModel.playSong(song)
     }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.stopMusic()
+        }
+    }
+
     MusicPlayerComponent(
         song = song,
         onBackClick = {
@@ -31,8 +38,8 @@ fun MusicPlayerScreen(
             onBackClick()
         },
         onPlayPauseClick = { viewModel.togglePlayPause() },
-        onRewindClick = { /* Handle rewind */ },
-        onSkipClick = { /* Handle skip */ },
+        onRewindClick = { viewModel.rewindSong() },
+        onSkipClick = { viewModel.skipToNextSong() },
         onSeek = { viewModel.seekTo(it) },
         isPlaying = isPlaying,
         progress = progress,

@@ -145,8 +145,38 @@ class MusicViewModel(
             _isPlaying.value = false
         } else {
             if (!appSettings.value.musicEnabled) return
-            audioPlayer.resume()
+            val song = currentSong
+            if (song != null && (!audioPlayer.isPlaying() && audioPlayer.getCurrentPosition() == 0L)) {
+                audioPlayer.play(song.audioPath)
+            } else {
+                audioPlayer.resume()
+            }
             _isPlaying.value = true
+        }
+    }
+
+    fun rewindSong() {
+        val song = currentSong ?: return
+        val current = audioPlayer.getCurrentPosition()
+        if (current > 3000L) {
+            val total = audioPlayer.getDuration()
+            if (total > 0) {
+                val newPos = (current - 5000L).coerceAtLeast(0L)
+                audioPlayer.seekTo(newPos)
+                _playbackProgress.value = newPos.toFloat() / total.toFloat()
+            }
+        } else {
+            playSong(song)
+        }
+    }
+
+    fun skipToNextSong() {
+        val songList = _songs.value
+        val currentIndex = songList.indexOfFirst { it.title == currentSong?.title }
+        if (currentIndex != -1 && currentIndex < songList.size - 1) {
+            playSong(songList[currentIndex + 1])
+        } else if (songList.isNotEmpty()) {
+            playSong(songList[0])
         }
     }
 

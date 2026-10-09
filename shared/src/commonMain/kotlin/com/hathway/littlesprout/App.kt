@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hathway.littlesprout.di.AppContainer
 import com.hathway.littlesprout.domain.model.AppSettings
 import com.hathway.littlesprout.domain.model.MusicType
+import com.hathway.littlesprout.navigation.BackHandler
 import com.hathway.littlesprout.navigation.BottomNavigationBar
 import com.hathway.littlesprout.navigation.NavItem
 import com.hathway.littlesprout.navigation.Screen
@@ -80,6 +81,48 @@ fun App(appContainer: AppContainer? = null) {
         } else null
 
         val appSettings by settingsViewModel?.settings?.collectAsState() ?: remember { mutableStateOf(AppSettings()) }
+
+        val isBackHandlerEnabled = showParentalGate || when (currentScreen) {
+            is Screen.Main, is Screen.Splash -> false
+            else -> true
+        }
+
+        BackHandler(enabled = isBackHandlerEnabled) {
+            if (showParentalGate) {
+                showParentalGate = false
+                pendingNavItem = null
+            } else {
+                when (currentScreen) {
+                    is Screen.Progress, is Screen.ForParents -> {
+                        selectedNavItem = NavItem.Home
+                        currentScreen = Screen.Main
+                    }
+                    is Screen.PrivacySafety -> currentScreen = Screen.ForParents
+                    is Screen.PrivacyPolicy -> currentScreen = Screen.PrivacySafety
+                    is Screen.ContentCredits -> currentScreen = Screen.ForParents
+                    is Screen.ContactDeveloper -> currentScreen = Screen.ForParents
+                    is Screen.AppInformation -> currentScreen = Screen.ForParents
+                    is Screen.Settings -> currentScreen = Screen.ForParents
+                    is Screen.Animals -> currentScreen = Screen.Main
+                    is Screen.Alphabet -> currentScreen = Screen.Main
+                    is Screen.Number -> currentScreen = Screen.Main
+                    is Screen.NumberDetail -> {
+                        numbersViewModel.clearSelection()
+                        currentScreen = Screen.Number
+                    }
+                    is Screen.Colors -> currentScreen = Screen.Main
+                    is Screen.Shapes -> currentScreen = Screen.Main
+                    is Screen.Music -> currentScreen = Screen.Main
+                    is Screen.SongList -> currentScreen = Screen.Music
+                    is Screen.MusicPlayer -> currentScreen = Screen.SongList
+                    is Screen.Birds -> currentScreen = Screen.Main
+                    is Screen.Fruits -> currentScreen = Screen.Main
+                    is Screen.Vehicle -> currentScreen = Screen.Main
+                    is Screen.Onboarding -> currentScreen = Screen.Main
+                    else -> {}
+                }
+            }
+        }
 
         val showBottomBar = when (currentScreen) {
             is Screen.Main, is Screen.Progress, is Screen.ForParents -> true
