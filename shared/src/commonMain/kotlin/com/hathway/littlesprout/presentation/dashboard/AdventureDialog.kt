@@ -48,7 +48,8 @@ fun AdventureDialog(
     items: List<DashboardItem>, onItemClick: (String) -> Unit, onDismiss: () -> Unit
 ) {
     Dialog(
-        onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         AdventureDialogContent(
             items = items, onItemClick = onItemClick, onDismiss = onDismiss
