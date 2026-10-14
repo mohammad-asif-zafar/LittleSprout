@@ -11,6 +11,8 @@ sealed class Screen {
     object Shapes : Screen()
     object Animals : Screen()
     object Music : Screen()
+    object Piano : Screen()
+    object Drums : Screen()
     object Fruits : Screen()
     object Birds : Screen()
     object Vehicle : Screen()

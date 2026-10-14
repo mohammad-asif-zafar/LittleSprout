@@ -1,7 +1,6 @@
 package com.hathway.littlesprout
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +39,10 @@ import com.hathway.littlesprout.presentation.common_components.CommonViewModel
 import com.hathway.littlesprout.presentation.common_components.ParentalGate
 import com.hathway.littlesprout.presentation.music.MusicScreen
 import com.hathway.littlesprout.presentation.music.MusicViewModel
+import com.hathway.littlesprout.presentation.music.paino.PianoScreen
+import com.hathway.littlesprout.presentation.music.paino.PianoViewModel
+import com.hathway.littlesprout.presentation.music.drums.DrumsScreen
+import com.hathway.littlesprout.presentation.music.drums.DrumsViewModel
 import com.hathway.littlesprout.presentation.music.SongListScreen
 import com.hathway.littlesprout.presentation.music.MusicPlayerScreen
 import com.hathway.littlesprout.presentation.parents.*
@@ -63,6 +66,12 @@ fun App(appContainer: AppContainer? = null) {
         }
         val musicViewModel: MusicViewModel = viewModel {
             MusicViewModel(appContainer?.progressRepository, appContainer?.settingsRepository)
+        }
+        val pianoViewModel: PianoViewModel = viewModel {
+            PianoViewModel(appContainer?.progressRepository, appContainer?.settingsRepository)
+        }
+        val drumsViewModel: DrumsViewModel = viewModel {
+            DrumsViewModel(appContainer?.progressRepository, appContainer?.settingsRepository)
         }
         val dashboardViewModel: DashboardViewModel = viewModel {
             DashboardViewModel(appContainer?.progressRepository)
@@ -113,6 +122,8 @@ fun App(appContainer: AppContainer? = null) {
                     is Screen.Colors -> currentScreen = Screen.Main
                     is Screen.Shapes -> currentScreen = Screen.Main
                     is Screen.Music -> currentScreen = Screen.Main
+                    is Screen.Piano -> currentScreen = Screen.Music
+                    is Screen.Drums -> currentScreen = Screen.Music
                     is Screen.SongList -> currentScreen = Screen.Music
                     is Screen.MusicPlayer -> currentScreen = Screen.SongList
                     is Screen.Birds -> currentScreen = Screen.Main
@@ -359,10 +370,27 @@ fun App(appContainer: AppContainer? = null) {
                             onHomeClick = { currentScreen = Screen.Main },
                             onSongClick = { song -> currentScreen = Screen.MusicPlayer(song) },
                             onItemClick = { type ->
-                                if (type == MusicType.SING_ALONG) {
-                                    currentScreen = Screen.SongList
+                                when (type) {
+                                    MusicType.SING_ALONG -> currentScreen = Screen.SongList
+                                    MusicType.PIANO -> currentScreen = Screen.Piano
+                                    MusicType.DRUMS -> currentScreen = Screen.Drums
+                                    else -> {}
                                 }
                             })
+                    }
+
+                    is Screen.Piano -> {
+                        PianoScreen(
+                            viewModel = pianoViewModel,
+                            onBackClick = { currentScreen = Screen.Music }
+                        )
+                    }
+
+                    is Screen.Drums -> {
+                        DrumsScreen(
+                            viewModel = drumsViewModel,
+                            onBackClick = { currentScreen = Screen.Music }
+                        )
                     }
 
                     is Screen.Birds -> {
