@@ -13,6 +13,7 @@ sealed class Screen {
     object Music : Screen()
     object Piano : Screen()
     object Drums : Screen()
+    object Rhythm : Screen()
     object Fruits : Screen()
     object Birds : Screen()
     object Vehicle : Screen()

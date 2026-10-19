@@ -16,9 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -27,7 +25,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,7 +52,7 @@ fun PianoContent(
     var floatingParticleX by remember { mutableStateOf(0f) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // 1. Background Image
+        // 1. Background Image (Fills 100% of screen bounds, NO BLACK BARS!)
         Image(
             painter = painterResource(Res.drawable.paino_music_bg),
             contentDescription = null,
@@ -63,15 +60,16 @@ fun PianoContent(
             contentScale = ContentScale.Crop
         )
 
+        // LANDSCAPE / UNIFIED HORIZONTAL LAYOUT
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .statusBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .systemBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // 2. Top Header Bar
+            // Top Header Bar
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -84,7 +82,7 @@ fun PianoContent(
                     painter = painterResource(Res.drawable.icon_home),
                     contentDescription = "Home",
                     modifier = Modifier
-                        .size(54.dp)
+                        .size(52.dp)
                         .clip(CircleShape)
                         .clickable { onHomeClick() }
                 )
@@ -98,13 +96,12 @@ fun PianoContent(
 
                 // Controls: Song Mode & Mute Toggle
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Song Mode Toggle Button
                     Surface(
                         modifier = Modifier
-                            .size(52.dp)
+                            .size(48.dp)
                             .clip(CircleShape)
                             .clickable { onToggleSongMode() },
                         shape = CircleShape,
@@ -115,15 +112,14 @@ fun PianoContent(
                             Image(
                                 painter = painterResource(Res.drawable.icon_star),
                                 contentDescription = "Song Mode",
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(28.dp)
                             )
                         }
                     }
 
-                    // Mute / Unmute Button
                     Surface(
                         modifier = Modifier
-                            .size(52.dp)
+                            .size(48.dp)
                             .clip(CircleShape)
                             .clickable { onToggleMute() },
                         shape = CircleShape,
@@ -134,48 +130,21 @@ fun PianoContent(
                             Image(
                                 painter = painterResource(if (isMuted) Res.drawable.icon_pause else Res.drawable.icon_speaker),
                                 contentDescription = if (isMuted) "Muted" else "Sound On",
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(28.dp)
                             )
                         }
                     }
                 }
             }
 
-            // 3. Middle Area: Parrot Mascot on Left
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Piano Chassis (Fills all remaining height)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.35f),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                // Parrot mascot on tree branch
-                val infiniteTransition = rememberInfiniteTransition()
-                val parrotBounce by infiniteTransition.animateFloat(
-                    initialValue = -4f,
-                    targetValue = 4f,
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(1200, easing = LinearOutSlowInEasing),
-                        repeatMode = RepeatMode.Reverse
-                    )
-                )
-
-                Image(
-                    painter = painterResource(Res.drawable.bird_parrot),
-                    contentDescription = "Mascot",
-                    modifier = Modifier
-                        .padding(start = 24.dp)
-                        .size(110.dp)
-                        .offset(y = parrotBounce.dp),
-                    contentScale = ContentScale.Fit
-                )
-            }
-
-            // 4. Piano Chassis & Keys
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.65f)
-                    .padding(bottom = 8.dp),
+                    .weight(1f)
+                    .padding(bottom = 4.dp),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 PianoChassis(
@@ -195,6 +164,28 @@ fun PianoContent(
                 )
             }
         }
+
+        // Mascot Overlay on Top Left Branch
+        val infiniteTransition = rememberInfiniteTransition()
+        val parrotBounce by infiniteTransition.animateFloat(
+            initialValue = -3f,
+            targetValue = 3f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1200, easing = LinearOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse
+            )
+        )
+
+        Image(
+            painter = painterResource(Res.drawable.bird_parrot),
+            contentDescription = "Mascot",
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(start = 72.dp, top = 8.dp)
+                .size(76.dp)
+                .offset(y = parrotBounce.dp),
+            contentScale = ContentScale.Fit
+        )
 
         // Floating Musical Note Particles on Tap
         floatingParticleNote?.let { solfege ->
@@ -268,7 +259,6 @@ fun PianoChassis(
     onNotePress: (Int) -> Unit,
     onNoteRelease: (Int) -> Unit
 ) {
-    // Red top hood + Yellow/Orange bottom body
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -287,7 +277,6 @@ fun PianoChassis(
             .border(4.dp, Color(0xFFFF6D00), RoundedCornerShape(36.dp))
             .padding(top = 16.dp, start = 12.dp, end = 12.dp, bottom = 12.dp)
     ) {
-        // White/Yellow Keyboard Base
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -338,7 +327,6 @@ fun PianoKeyButton(
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
     )
 
-    // Bouncing effect for song mode guide
     val infiniteTransition = rememberInfiniteTransition()
     val guidePulse by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -374,7 +362,6 @@ fun PianoKeyButton(
                 contentScale = ContentScale.FillBounds
             )
         } ?: run {
-            // Fallback 3D Glossy Key Shape
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -396,7 +383,6 @@ fun PianoKeyButton(
             )
         }
 
-        // White Text Label "Do", "Re", "Mi", "Fa", "Sol", "La", "Ti"
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
@@ -458,37 +444,11 @@ fun FloatingNoteEffect(
     }
 }
 
-@Preview
-@Composable
-fun PianoChassisPreview() {
-    MaterialTheme {
-        val sampleNotes = listOf(
-            PianoNote("C", "Do", "piano_c.wav", Color(0xFFFF3B30), Res.drawable.paino_red),
-            PianoNote("D", "Re", "piano_d.wav", Color(0xFFFF9500), Res.drawable.paino_oranage),
-            PianoNote("E", "Mi", "piano_e.wav", Color(0xFFFFCC00), Res.drawable.paino_yellow),
-            PianoNote("F", "Fa", "piano_f.wav", Color(0xFF34C759), Res.drawable.paino_green),
-            PianoNote("G", "Sol", "piano_g.wav", Color(0xFF007AFF), Res.drawable.paino_blue),
-            PianoNote("A", "La", "piano_a.wav", Color(0xFFAF52DE), Res.drawable.paino_voilet),
-            PianoNote("B", "Ti", "piano_b.wav", Color(0xFFFF2D55), Res.drawable.paino_red)
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(280.dp)
-                .background(Color(0xFF81C784))
-                .padding(16.dp)
-        ) {
-            PianoChassis(
-                notes = sampleNotes,
-                activeNoteIndex = 0,
-                highlightedKeyIndex = 2,
-                onNotePress = {},
-                onNoteRelease = {}
-            )
-        }
-    }
-}
-
+@Preview(
+    showBackground = true,
+    widthDp = 1280,
+    heightDp = 800
+)
 @Preview
 @Composable
 fun PianoContentPreview() {

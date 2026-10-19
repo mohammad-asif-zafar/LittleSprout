@@ -1,3 +1,11 @@
+# Little Sprout 🌱
+
+Early learning app for toddlers ages 2–3.
+
+📱 **Download on Google Play:** [Little Sprout on Google Play Store](https://play.google.com/store/apps/details?id=com.hathway.littlesprout)
+
+---
+
 This is a Kotlin Multiplatform project targeting Android, iOS.
 
 * [/iosApp](./iosApp/iosApp) contains an iOS application. Even if you’re sharing your UI with Compose Multiplatform,

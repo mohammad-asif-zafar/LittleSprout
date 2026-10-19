@@ -55,7 +55,7 @@ fun DrumsContent(
     var floatingParticleX by remember { mutableStateOf(0f) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // 1. Background Image
+        // 1. Background Image (Fills 100% bounds, NO BLACK BARS!)
         Image(
             painter = painterResource(Res.drawable.drum_music_bg),
             contentDescription = null,
@@ -63,7 +63,7 @@ fun DrumsContent(
             contentScale = ContentScale.Crop
         )
 
-        // 2. Main Layout (Top Header + Drum Kit)
+        // LANDSCAPE / UNIFIED HORIZONTAL LAYOUT
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -102,7 +102,6 @@ fun DrumsContent(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Rhythm Mode Toggle Button
                     Surface(
                         modifier = Modifier
                             .size(48.dp)
@@ -121,7 +120,6 @@ fun DrumsContent(
                         }
                     }
 
-                    // Mute / Unmute Button
                     Surface(
                         modifier = Modifier
                             .size(48.dp)
@@ -169,7 +167,7 @@ fun DrumsContent(
             }
         }
 
-        // 3. Parrot Mascot Overlaid on Top-Left
+        // Parrot Mascot Overlaid on Top-Left
         val infiniteTransition = rememberInfiniteTransition()
         val parrotBounce by infiniteTransition.animateFloat(
             initialValue = -3f,

@@ -17,6 +17,7 @@ import com.hathway.littlesprout.navigation.BackHandler
 import com.hathway.littlesprout.navigation.BottomNavigationBar
 import com.hathway.littlesprout.navigation.NavItem
 import com.hathway.littlesprout.navigation.Screen
+import com.hathway.littlesprout.navigation.Screen.*
 import com.hathway.littlesprout.presentation.alphabet.AlphabetScreen
 import com.hathway.littlesprout.presentation.alphabet.AlphabetViewModel
 import com.hathway.littlesprout.presentation.colors.ColorsScreen
@@ -43,6 +44,8 @@ import com.hathway.littlesprout.presentation.music.paino.PianoScreen
 import com.hathway.littlesprout.presentation.music.paino.PianoViewModel
 import com.hathway.littlesprout.presentation.music.drums.DrumsScreen
 import com.hathway.littlesprout.presentation.music.drums.DrumsViewModel
+import com.hathway.littlesprout.presentation.music.rhythm.RhythmScreen
+import com.hathway.littlesprout.presentation.music.rhythm.RhythmViewModel
 import com.hathway.littlesprout.presentation.music.SongListScreen
 import com.hathway.littlesprout.presentation.music.MusicPlayerScreen
 import com.hathway.littlesprout.presentation.parents.*
@@ -72,6 +75,9 @@ fun App(appContainer: AppContainer? = null) {
         }
         val drumsViewModel: DrumsViewModel = viewModel {
             DrumsViewModel(appContainer?.progressRepository, appContainer?.settingsRepository)
+        }
+        val rhythmViewModel: RhythmViewModel = viewModel {
+            RhythmViewModel(appContainer?.progressRepository, appContainer?.settingsRepository)
         }
         val dashboardViewModel: DashboardViewModel = viewModel {
             DashboardViewModel(appContainer?.progressRepository)
@@ -124,6 +130,7 @@ fun App(appContainer: AppContainer? = null) {
                     is Screen.Music -> currentScreen = Screen.Main
                     is Screen.Piano -> currentScreen = Screen.Music
                     is Screen.Drums -> currentScreen = Screen.Music
+                    is Screen.Rhythm -> currentScreen = Screen.Music
                     is Screen.SongList -> currentScreen = Screen.Music
                     is Screen.MusicPlayer -> currentScreen = Screen.SongList
                     is Screen.Birds -> currentScreen = Screen.Main
@@ -368,13 +375,13 @@ fun App(appContainer: AppContainer? = null) {
                             viewModel = musicViewModel,
                             onBackClick = { currentScreen = Screen.Main },
                             onHomeClick = { currentScreen = Screen.Main },
-                            onSongClick = { song -> currentScreen = Screen.MusicPlayer(song) },
+                            onSongClick = { song -> currentScreen = MusicPlayer(song) },
                             onItemClick = { type ->
                                 when (type) {
                                     MusicType.SING_ALONG -> currentScreen = Screen.SongList
                                     MusicType.PIANO -> currentScreen = Screen.Piano
                                     MusicType.DRUMS -> currentScreen = Screen.Drums
-                                    else -> {}
+                                    MusicType.RHYTHM -> currentScreen = Screen.Rhythm
                                 }
                             })
                     }
@@ -393,6 +400,13 @@ fun App(appContainer: AppContainer? = null) {
                         )
                     }
 
+                    is Screen.Rhythm -> {
+                        RhythmScreen(
+                            viewModel = rhythmViewModel,
+                            onBackClick = { currentScreen = Screen.Music }
+                        )
+                    }
+
                     is Screen.Birds -> {
                         val viewModelBirds: CommonViewModel = viewModel {
                             CommonViewModel(
@@ -403,7 +417,7 @@ fun App(appContainer: AppContainer? = null) {
                         val currentIndex by viewModelBirds.currentBirdIndex.collectAsState()
                         val isPlaying by viewModelBirds.isPlaying.collectAsState()
 
-                        androidx.compose.runtime.LaunchedEffect(Unit) {
+                        LaunchedEffect(Unit) {
                             viewModelBirds.playInitialAudio(CategoryConstants.BIRDS)
                         }
 
@@ -432,7 +446,7 @@ fun App(appContainer: AppContainer? = null) {
                         val currentIndex by viewModelFruits.currentFruitIndex.collectAsState()
                         val isPlaying by viewModelFruits.isPlaying.collectAsState()
 
-                        androidx.compose.runtime.LaunchedEffect(Unit) {
+                        LaunchedEffect(Unit) {
                             viewModelFruits.playInitialAudio(CategoryConstants.FRUITS)
                         }
 
@@ -461,7 +475,7 @@ fun App(appContainer: AppContainer? = null) {
                         val currentIndex by viewModelVehicle.currentVehicleIndex.collectAsState()
                         val isPlaying by viewModelVehicle.isPlaying.collectAsState()
 
-                        androidx.compose.runtime.LaunchedEffect(Unit) {
+                        LaunchedEffect(Unit) {
                             viewModelVehicle.playInitialAudio(CategoryConstants.VEHICLE)
                         }
 
@@ -493,7 +507,7 @@ fun App(appContainer: AppContainer? = null) {
                         SongListScreen(viewModel = musicViewModel, onBackClick = {
                             currentScreen = Screen.Music
                         }, onSongClick = { song ->
-                            currentScreen = Screen.MusicPlayer(song)
+                            currentScreen = MusicPlayer(song)
                         }, onHomeClick = {
                             currentScreen = Screen.Main
                         })
@@ -506,6 +520,8 @@ fun App(appContainer: AppContainer? = null) {
                                 currentScreen = Screen.SongList
                             })
                     }
+
+                    Screen.Rhythm -> TODO()
                 }
             }
         }
