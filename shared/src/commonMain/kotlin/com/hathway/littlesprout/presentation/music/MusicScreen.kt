@@ -38,7 +38,7 @@ fun MusicScreen(
             onHomeClick = onHomeClick,
             onSongClick = onSongClick,
             onItemClick = { type ->
-                if (type == MusicType.SING_ALONG) {
+                if (type == MusicType.SING_ALONG || type == MusicType.PIANO || type == MusicType.DRUMS || type == MusicType.RHYTHM) {
                     onItemClick(type)
                 } else {
                     val item = items.find { it.type == type }

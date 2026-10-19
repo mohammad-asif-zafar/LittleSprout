@@ -248,4 +248,35 @@ object AudioPlayerFactory {
     lateinit var context: Context
 }
 
-actual fun getAudioPlayer(): AudioPlayer = AndroidAudioPlayer(AudioPlayerFactory.context.applicationContext)
+class NoOpAudioPlayer : AudioPlayer {
+    override fun preload(fileName: String) {}
+    override fun preload(fileNames: List<String>) {}
+    override fun play(fileName: String, interruptCurrent: Boolean) {}
+    override fun stop() {}
+    override fun pause() {}
+    override fun resume() {}
+    override fun isPlaying(): Boolean = false
+    override fun release() {}
+    override fun getDuration(): Long = 0L
+    override fun getCurrentPosition(): Long = 0L
+    override fun seekTo(position: Long) {}
+    override fun onPlaybackComplete(callback: () -> Unit) {}
+}
+
+actual fun getAudioPlayer(): AudioPlayer {
+    return try {
+        val ctx = try {
+            AudioPlayerFactory.context
+        } catch (e: Throwable) {
+            null
+        }
+        if (ctx == null) {
+            NoOpAudioPlayer()
+        } else {
+            Class.forName("android.media.SoundPool")
+            AndroidAudioPlayer(ctx.applicationContext)
+        }
+    } catch (e: Throwable) {
+        NoOpAudioPlayer()
+    }
+}
