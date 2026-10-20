@@ -40,7 +40,10 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
     private var playbackJob: Job? = null
 
     override fun preload(fileName: String) {
-        if (fileName.isBlank() || soundMap.containsKey(fileName)) return
+        if (fileName.isBlank()) return
+        // Do not load long music files into SoundPool
+        if (isMusicFile(fileName)) return
+        if (soundMap.containsKey(fileName)) return
 
         scope.launch(Dispatchers.IO) {
             val path = resolvePath(fileName)
@@ -69,11 +72,20 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
         fileNames.forEach { preload(it) }
     }
 
+    private fun isMusicFile(fileName: String): Boolean {
+        return fileName.endsWith(".mp3", ignoreCase = true) || fileName.contains("music", ignoreCase = true)
+    }
+
     override fun play(fileName: String, interruptCurrent: Boolean) {
         if (fileName.isBlank()) return
 
         if (interruptCurrent) {
             stop()
+        }
+
+        if (isMusicFile(fileName)) {
+            playViaMediaPlayer(fileName)
+            return
         }
 
         val soundId = soundMap[fileName]
@@ -102,26 +114,31 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
             withContext(Dispatchers.Main) {
                 try {
                     val descriptor = context.assets.openFd(path)
-                    
-                    if (mediaPlayer == null) {
-                        mediaPlayer = MediaPlayer()
-                    } else {
-                        mediaPlayer?.reset()
-                    }
-
-                    mediaPlayer?.apply {
-                        setDataSource(descriptor.fileDescriptor, descriptor.startOffset, descriptor.length)
-                        descriptor.close()
-                        
-                        setVolume(1.0f, 1.0f)
-                        setOnCompletionListener {
-                            currentPlayingFile = null
-                            completionCallback?.invoke()
+                    try {
+                        if (mediaPlayer == null) {
+                            mediaPlayer = MediaPlayer()
+                        } else {
+                            mediaPlayer?.reset()
                         }
-                        prepare()
-                        start()
+
+                        mediaPlayer?.apply {
+                            setDataSource(descriptor.fileDescriptor, descriptor.startOffset, descriptor.length)
+                            setVolume(1.0f, 1.0f)
+                            setOnCompletionListener {
+                                currentPlayingFile = null
+                                completionCallback?.invoke()
+                            }
+                            prepare()
+                            start()
+                        }
+                        currentPlayingFile = fileName
+                    } finally {
+                        try {
+                            descriptor.close()
+                        } catch (e: Exception) {
+                            // Ignore
+                        }
                     }
-                    currentPlayingFile = fileName
                 } catch (e: Exception) {
                     // Handle failure
                 }
