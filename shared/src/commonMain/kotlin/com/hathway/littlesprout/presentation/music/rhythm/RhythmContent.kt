@@ -3,6 +3,7 @@ package com.hathway.littlesprout.presentation.music.rhythm
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -49,13 +50,24 @@ fun RhythmContent(
     onToggleMute: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // 1. Background Image using rhythm_bg.png
-        Image(
-            painter = painterResource(Res.drawable.rhythm_bg),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        // 1. Background Image dynamically based on currentMode
+        Crossfade(
+            targetState = currentMode,
+            animationSpec = tween(durationMillis = 600),
+            label = "BackgroundCrossfade"
+        ) { mode ->
+            val bgDrawable = if (mode == RhythmMode.DANCE) {
+                Res.drawable.rhthym_dance
+            } else {
+                Res.drawable.rhythm_bg
+            }
+            Image(
+                painter = painterResource(bgDrawable),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -276,32 +288,90 @@ fun DancePartyView(
 ) {
     var poseIndex by remember { mutableStateOf(0) }
 
+    // Slower pose cycle for 2-3 year olds (3.5 seconds per pose)
     LaunchedEffect(isMuted) {
         while (true) {
-            delay(1400L)
+            delay(3500L)
             poseIndex = (poseIndex + 1) % orbidinoPoses.size
         }
     }
 
-    val infiniteTransition = rememberInfiniteTransition(label = "DanceMotion")
-    val danceScale by infiniteTransition.animateFloat(
-        initialValue = 0.95f,
-        targetValue = 1.05f,
+    // Dance motions
+    val infiniteTransition = rememberInfiniteTransition(label = "DancePartyMotion")
+
+    // 1. Cheerful vertical bounce (Slower)
+    val danceYOffset by infiniteTransition.animateFloat(
+        initialValue = -10f,
+        targetValue = 10f,
         animationSpec = infiniteRepeatable(
-            animation = tween(700, easing = FastOutSlowInEasing),
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "DanceYOffset"
+    )
+
+    // 2. Playful rocking tilt (Slower)
+    val danceRotation by infiniteTransition.animateFloat(
+        initialValue = -6f,
+        targetValue = 6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1400, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "DanceRotation"
+    )
+
+    // 3. Rhythmic pulse scale (Slower)
+    val danceScale by infiniteTransition.animateFloat(
+        initialValue = 0.94f,
+        targetValue = 1.06f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1100, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "DanceScale"
     )
 
-    val danceRotation by infiniteTransition.animateFloat(
-        initialValue = -5f,
-        targetValue = 5f,
+    // 4. Ground shadow pulse scale (inverse of bounce) (Slower)
+    val shadowScale by infiniteTransition.animateFloat(
+        initialValue = 1.15f,
+        targetValue = 0.85f,
         animationSpec = infiniteRepeatable(
-            animation = tween(800, easing = LinearEasing),
+            animation = tween(1200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "DanceRotation"
+        label = "ShadowScale"
+    )
+
+    // 5. Floating musical notes and sparkles movement
+    val noteFloat1 by infiniteTransition.animateFloat(
+        initialValue = -14f,
+        targetValue = 14f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1300, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "NoteFloat1"
+    )
+
+    val noteFloat2 by infiniteTransition.animateFloat(
+        initialValue = 12f,
+        targetValue = -12f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1500, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "NoteFloat2"
+    )
+
+    val sparkleScale by infiniteTransition.animateFloat(
+        initialValue = 0.7f,
+        targetValue = 1.3f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(700, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "SparkleScale"
     )
 
     BoxWithConstraints(
@@ -353,7 +423,7 @@ fun DancePartyView(
                 }
             }
 
-            // Orbidino Mascot Container occupying ~70% of available content height
+            // Orbidino Mascot Area with Floating Musical Notes, Sparkles & Pulsing Stage Shadow
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -361,9 +431,81 @@ fun DancePartyView(
                     .padding(vertical = 4.dp),
                 contentAlignment = Alignment.Center
             ) {
+                // Ground Dance Floor Shadow
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 6.dp)
+                        .width(180.dp)
+                        .height(24.dp)
+                        .scale(shadowScale)
+                        .clip(CircleShape)
+                        .background(Color.Black.copy(alpha = 0.22f))
+                )
+
+                // Floating Musical Notes & Sparkles around Orbidino
+                Text(
+                    text = "🎵",
+                    fontSize = 32.sp,
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(start = 28.dp, top = 16.dp)
+                        .offset(y = noteFloat1.dp)
+                        .scale(sparkleScale)
+                )
+
+                Text(
+                    text = "✨",
+                    fontSize = 28.sp,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(end = 36.dp, top = 24.dp)
+                        .offset(y = noteFloat2.dp)
+                        .scale(sparkleScale)
+                )
+
+                Text(
+                    text = "🎶",
+                    fontSize = 34.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 16.dp)
+                        .offset(y = noteFloat2.dp)
+                )
+
+                Text(
+                    text = "⭐",
+                    fontSize = 30.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 20.dp)
+                        .offset(y = noteFloat1.dp)
+                        .scale(sparkleScale)
+                )
+
+                Text(
+                    text = "🎵",
+                    fontSize = 28.sp,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 40.dp, bottom = 20.dp)
+                        .offset(y = noteFloat1.dp)
+                )
+
+                Text(
+                    text = "✨",
+                    fontSize = 32.sp,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 44.dp, bottom = 16.dp)
+                        .offset(y = noteFloat2.dp)
+                        .scale(sparkleScale)
+                )
+
+                // Main Dancing Orbidino Mascot
                 Crossfade(
                     targetState = orbidinoPoses[poseIndex],
-                    animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing),
+                    animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
                     label = "PoseCrossfade"
                 ) { poseDrawable ->
                     Image(
@@ -371,6 +513,7 @@ fun DancePartyView(
                         contentDescription = "Dancing Orbidino Mascot",
                         modifier = Modifier
                             .fillMaxHeight()
+                            .offset(y = danceYOffset.dp)
                             .scale(danceScale)
                             .rotate(danceRotation),
                         contentScale = ContentScale.Fit
