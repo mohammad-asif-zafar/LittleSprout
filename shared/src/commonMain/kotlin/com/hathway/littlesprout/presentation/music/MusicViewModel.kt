@@ -20,9 +20,10 @@ import littlesprout.shared.generated.resources.*
 
 class MusicViewModel(
     private val progressRepository: ProgressRepository? = null,
-    private val settingsRepository: SettingsRepository? = null
+    private val settingsRepository: SettingsRepository? = null,
+    injectedAudioPlayer: AudioPlayer? = null
 ) : ViewModel() {
-    private val audioPlayer = getAudioPlayer()
+    private val audioPlayer = injectedAudioPlayer ?: getAudioPlayer()
 
     private val _musicItems = MutableStateFlow(
         listOf(

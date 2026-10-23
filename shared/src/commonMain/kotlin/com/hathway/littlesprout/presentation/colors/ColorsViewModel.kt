@@ -6,6 +6,7 @@ import com.hathway.littlesprout.domain.model.AppSettings
 import com.hathway.littlesprout.domain.model.ColorItem
 import com.hathway.littlesprout.domain.repository.ProgressRepository
 import com.hathway.littlesprout.domain.repository.SettingsRepository
+import com.hathway.littlesprout.presentation.music.AudioPlayer
 import com.hathway.littlesprout.presentation.music.getAudioPlayer
 import com.hathway.littlesprout.presentation.util.CategoryConstants
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,9 +19,10 @@ import littlesprout.shared.generated.resources.*
 
 class ColorsViewModel(
     private val progressRepository: ProgressRepository? = null,
-    private val settingsRepository: SettingsRepository? = null
+    private val settingsRepository: SettingsRepository? = null,
+    injectedAudioPlayer: AudioPlayer? = null
 ) : ViewModel() {
-    private val audioPlayer = getAudioPlayer()
+    private val audioPlayer = injectedAudioPlayer ?: getAudioPlayer()
 
     private val _colors = MutableStateFlow(
         listOf(

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hathway.littlesprout.domain.model.NumberItem
 import com.hathway.littlesprout.domain.repository.ProgressRepository
+import com.hathway.littlesprout.presentation.music.AudioPlayer
 import com.hathway.littlesprout.presentation.music.getAudioPlayer
 import com.hathway.littlesprout.presentation.util.CategoryConstants
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,9 +13,10 @@ import kotlinx.coroutines.launch
 import littlesprout.shared.generated.resources.*
 
 class NumbersViewModel(
-    private val progressRepository: ProgressRepository? = null
+    private val progressRepository: ProgressRepository? = null,
+    injectedAudioPlayer: AudioPlayer? = null
 ) : ViewModel() {
-    private val audioPlayer = getAudioPlayer()
+    private val audioPlayer = injectedAudioPlayer ?: getAudioPlayer()
 
     private val _numbers = MutableStateFlow(
         listOf(

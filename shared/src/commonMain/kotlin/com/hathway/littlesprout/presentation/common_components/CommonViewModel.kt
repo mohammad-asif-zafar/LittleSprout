@@ -18,7 +18,8 @@ import littlesprout.shared.generated.resources.*
 
 class CommonViewModel(
     private val progressRepository: ProgressRepository? = null,
-    private val settingsRepository: SettingsRepository? = null
+    private val settingsRepository: SettingsRepository? = null,
+    injectedAudioPlayer: com.hathway.littlesprout.presentation.music.AudioPlayer? = null
 ) : ViewModel() {
 
     private val _birdList = MutableStateFlow(
@@ -339,7 +340,7 @@ class CommonViewModel(
         )
     )
 
-    private val audioPlayer = getAudioPlayer()
+    private val audioPlayer = injectedAudioPlayer ?: getAudioPlayer()
     private var playbackJob: Job? = null
 
     private val _isPlaying = MutableStateFlow(false)
