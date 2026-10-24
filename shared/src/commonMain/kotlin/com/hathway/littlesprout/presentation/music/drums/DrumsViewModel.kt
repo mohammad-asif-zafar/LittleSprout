@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hathway.littlesprout.domain.repository.ProgressRepository
 import com.hathway.littlesprout.domain.repository.SettingsRepository
+import com.hathway.littlesprout.presentation.music.AudioPlayer
 import com.hathway.littlesprout.presentation.music.getAudioPlayer
 import com.hathway.littlesprout.presentation.util.CategoryConstants
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,9 +13,10 @@ import kotlinx.coroutines.launch
 
 class DrumsViewModel(
     private val progressRepository: ProgressRepository? = null,
-    private val settingsRepository: SettingsRepository? = null
+    private val settingsRepository: SettingsRepository? = null,
+    injectedAudioPlayer: AudioPlayer? = null
 ) : ViewModel() {
-    private val audioPlayer = getAudioPlayer()
+    private val audioPlayer = injectedAudioPlayer ?: getAudioPlayer()
 
     private val _isMuted = MutableStateFlow(false)
     val isMuted = _isMuted.asStateFlow()

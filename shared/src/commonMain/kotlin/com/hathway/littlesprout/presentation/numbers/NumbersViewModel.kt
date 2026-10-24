@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hathway.littlesprout.domain.model.NumberItem
 import com.hathway.littlesprout.domain.repository.ProgressRepository
+import com.hathway.littlesprout.presentation.music.AudioPlayer
 import com.hathway.littlesprout.presentation.music.getAudioPlayer
 import com.hathway.littlesprout.presentation.util.CategoryConstants
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,9 +13,10 @@ import kotlinx.coroutines.launch
 import littlesprout.shared.generated.resources.*
 
 class NumbersViewModel(
-    private val progressRepository: ProgressRepository? = null
+    private val progressRepository: ProgressRepository? = null,
+    injectedAudioPlayer: AudioPlayer? = null
 ) : ViewModel() {
-    private val audioPlayer = getAudioPlayer()
+    private val audioPlayer = injectedAudioPlayer ?: getAudioPlayer()
 
     private val _numbers = MutableStateFlow(
         listOf(
@@ -34,6 +36,9 @@ class NumbersViewModel(
 
     private val _selectedNumberIndex = MutableStateFlow<Int?>(null)
     val selectedNumberIndex = _selectedNumberIndex.asStateFlow()
+
+    private val _isCompleted = MutableStateFlow(false)
+    val isCompleted = _isCompleted.asStateFlow()
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying = _isPlaying.asStateFlow()
@@ -67,9 +72,17 @@ class NumbersViewModel(
                 _selectedNumberIndex.value = current + 1
                 playCurrentAudio()
             } else {
+                _isCompleted.value = true
                 recordProgress("NUMBERS_COMPLETE", true)
             }
         }
+    }
+
+    fun restart() {
+        stopAudio()
+        _isCompleted.value = false
+        _selectedNumberIndex.value = 0
+        playCurrentAudio()
     }
 
     fun previousNumber() {
@@ -95,6 +108,7 @@ class NumbersViewModel(
 
     fun clearSelection() {
         stopAudio()
+        _isCompleted.value = false
         _selectedNumberIndex.value = null
     }
 

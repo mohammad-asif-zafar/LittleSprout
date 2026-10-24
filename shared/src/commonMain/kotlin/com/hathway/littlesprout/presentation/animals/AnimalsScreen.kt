@@ -3,6 +3,7 @@ package com.hathway.littlesprout.presentation.animals
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.hathway.littlesprout.presentation.common_components.CompletionDialog
 
 @Composable
 fun AnimalsScreen(
@@ -13,6 +14,7 @@ fun AnimalsScreen(
     val animals by viewModel.animals.collectAsState()
     val currentIndex by viewModel.currentIndex.collectAsState()
     val isPlaying by viewModel.isPlaying.collectAsState()
+    val isCompleted by viewModel.isCompleted.collectAsState()
     val currentItem = animals.getOrNull(currentIndex) ?: return
 
     AnimalsContent(
@@ -26,4 +28,16 @@ fun AnimalsScreen(
         onNextClick = { viewModel.nextAnimal() },
         onPlaySoundClick = { viewModel.playAnimalSound() }
     )
+
+    if (isCompleted) {
+        CompletionDialog(
+            categoryName = "animals",
+            totalCount = animals.size,
+            onPlayAgain = { viewModel.restart() },
+            onHome = {
+                viewModel.restart()
+                onHomeClick()
+            }
+        )
+    }
 }

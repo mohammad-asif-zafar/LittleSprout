@@ -120,7 +120,7 @@ fun NumberDetailContent(
                             onDragEnd = {
                                 if (swipeOffset > 150f && selectedIndex > 0) {
                                     onPreviousClick()
-                                } else if (swipeOffset < -150f && selectedIndex < totalItemsCount - 1) {
+                                } else if (swipeOffset < -150f) {
                                     onNextClick()
                                 }
                                 swipeOffset = 0f
@@ -262,14 +262,10 @@ fun NumberDetailContent(
                 }
 
                 // Right Arrow
-                if (selectedIndex < totalItemsCount - 1) {
-                    Image(
-                        painter = painterResource(Res.drawable.img_sweep_right),
-                        contentDescription = "Next",
-                        modifier = Modifier.size(72.dp).clickable { onNextClick() })
-                } else {
-                    Spacer(modifier = Modifier.size(72.dp))
-                }
+                Image(
+                    painter = painterResource(Res.drawable.img_sweep_right),
+                    contentDescription = "Next",
+                    modifier = Modifier.size(72.dp).clickable { onNextClick() })
             }
 
             Spacer(modifier = Modifier.height(24.dp))

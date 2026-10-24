@@ -18,7 +18,8 @@ import littlesprout.shared.generated.resources.*
 
 class CommonViewModel(
     private val progressRepository: ProgressRepository? = null,
-    private val settingsRepository: SettingsRepository? = null
+    private val settingsRepository: SettingsRepository? = null,
+    injectedAudioPlayer: com.hathway.littlesprout.presentation.music.AudioPlayer? = null
 ) : ViewModel() {
 
     private val _birdList = MutableStateFlow(
@@ -339,7 +340,7 @@ class CommonViewModel(
         )
     )
 
-    private val audioPlayer = getAudioPlayer()
+    private val audioPlayer = injectedAudioPlayer ?: getAudioPlayer()
     private var playbackJob: Job? = null
 
     private val _isPlaying = MutableStateFlow(false)
@@ -356,6 +357,9 @@ class CommonViewModel(
     val currentBirdIndex = _currentBirdIndex.asStateFlow()
     val currentFruitIndex = _currentFruitIndex.asStateFlow()
     val currentVehicleIndex = _currentVehicleIndex.asStateFlow()
+
+    private val _completedCategory = MutableStateFlow<String?>(null)
+    val completedCategory = _completedCategory.asStateFlow()
 
     private val appSettings: StateFlow<AppSettings> = settingsRepository?.settings
         ?.stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings())
@@ -404,10 +408,22 @@ class CommonViewModel(
         }
         
         if (completed) {
+            _completedCategory.value = category
             recordProgress("${category.uppercase()}_COMPLETE", category, true)
         } else {
             playCurrentItemAudio(category)
         }
+    }
+
+    fun restartCategory(category: String) {
+        stopAudio()
+        _completedCategory.value = null
+        when (category) {
+            CategoryConstants.BIRDS -> _currentBirdIndex.value = 0
+            CategoryConstants.FRUITS -> _currentFruitIndex.value = 0
+            CategoryConstants.VEHICLE -> _currentVehicleIndex.value = 0
+        }
+        playCurrentItemAudio(category)
     }
 
     fun previousItem(category: String) {

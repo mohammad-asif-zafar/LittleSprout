@@ -6,6 +6,7 @@ import com.hathway.littlesprout.domain.model.AppSettings
 import com.hathway.littlesprout.domain.model.ColorItem
 import com.hathway.littlesprout.domain.repository.ProgressRepository
 import com.hathway.littlesprout.domain.repository.SettingsRepository
+import com.hathway.littlesprout.presentation.music.AudioPlayer
 import com.hathway.littlesprout.presentation.music.getAudioPlayer
 import com.hathway.littlesprout.presentation.util.CategoryConstants
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,9 +19,10 @@ import littlesprout.shared.generated.resources.*
 
 class ColorsViewModel(
     private val progressRepository: ProgressRepository? = null,
-    private val settingsRepository: SettingsRepository? = null
+    private val settingsRepository: SettingsRepository? = null,
+    injectedAudioPlayer: AudioPlayer? = null
 ) : ViewModel() {
-    private val audioPlayer = getAudioPlayer()
+    private val audioPlayer = injectedAudioPlayer ?: getAudioPlayer()
 
     private val _colors = MutableStateFlow(
         listOf(
@@ -38,6 +40,9 @@ class ColorsViewModel(
 
     private val _currentIndex = MutableStateFlow(0)
     val currentIndex = _currentIndex.asStateFlow()
+
+    private val _isCompleted = MutableStateFlow(false)
+    val isCompleted = _isCompleted.asStateFlow()
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying = _isPlaying.asStateFlow()
@@ -72,8 +77,16 @@ class ColorsViewModel(
             _currentIndex.value++
             playCurrentAudio(isAutoPlay = true)
         } else {
+            _isCompleted.value = true
             recordProgress("COLORS_COMPLETE", true)
         }
+    }
+
+    fun restart() {
+        stopAudio()
+        _isCompleted.value = false
+        _currentIndex.value = 0
+        playCurrentAudio()
     }
 
     fun previousColor() {

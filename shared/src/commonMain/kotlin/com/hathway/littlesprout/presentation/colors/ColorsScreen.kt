@@ -6,10 +6,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.hathway.littlesprout.domain.model.ColorItem
+import com.hathway.littlesprout.presentation.common_components.CompletionDialog
 import littlesprout.shared.generated.resources.Res
 import littlesprout.shared.generated.resources.img_apple
 
-// 1. STATEFUL WRAPPER: Handles ViewModel architecture states
 @Composable
 fun ColorsScreen(
     viewModel: ColorsViewModel, onBackClick: () -> Unit, onHomeClick: () -> Unit
@@ -17,6 +17,7 @@ fun ColorsScreen(
     val colors by viewModel.colors.collectAsState()
     val currentIndex by viewModel.currentIndex.collectAsState()
     val isPlaying by viewModel.isPlaying.collectAsState()
+    val isCompleted by viewModel.isCompleted.collectAsState()
     val currentItem = colors.getOrNull(currentIndex) ?: return
 
     androidx.compose.runtime.LaunchedEffect(Unit) {
@@ -32,7 +33,20 @@ fun ColorsScreen(
         onHomeClick = onHomeClick,
         onPreviousClick = { viewModel.previousColor() },
         onNextClick = { viewModel.nextColor() },
-        onPlaySoundClick = { viewModel.playCurrentAudio() })
+        onPlaySoundClick = { viewModel.playCurrentAudio() }
+    )
+
+    if (isCompleted) {
+        CompletionDialog(
+            categoryName = "colors",
+            totalCount = colors.size,
+            onPlayAgain = { viewModel.restart() },
+            onHome = {
+                viewModel.restart()
+                onHomeClick()
+            }
+        )
+    }
 }
 
 // 3. THE PREVIEW FUNCTION
