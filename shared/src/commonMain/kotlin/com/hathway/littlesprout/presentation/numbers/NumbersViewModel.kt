@@ -37,6 +37,9 @@ class NumbersViewModel(
     private val _selectedNumberIndex = MutableStateFlow<Int?>(null)
     val selectedNumberIndex = _selectedNumberIndex.asStateFlow()
 
+    private val _isCompleted = MutableStateFlow(false)
+    val isCompleted = _isCompleted.asStateFlow()
+
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying = _isPlaying.asStateFlow()
 
@@ -69,9 +72,17 @@ class NumbersViewModel(
                 _selectedNumberIndex.value = current + 1
                 playCurrentAudio()
             } else {
+                _isCompleted.value = true
                 recordProgress("NUMBERS_COMPLETE", true)
             }
         }
+    }
+
+    fun restart() {
+        stopAudio()
+        _isCompleted.value = false
+        _selectedNumberIndex.value = 0
+        playCurrentAudio()
     }
 
     fun previousNumber() {
@@ -97,6 +108,7 @@ class NumbersViewModel(
 
     fun clearSelection() {
         stopAudio()
+        _isCompleted.value = false
         _selectedNumberIndex.value = null
     }
 

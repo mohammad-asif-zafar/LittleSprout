@@ -422,6 +422,8 @@ fun App(appContainer: AppContainer? = null) {
                         }
 
                         CommonItemScreen(
+                            viewModel = viewModelBirds,
+                            category = CategoryConstants.BIRDS,
                             items = items,
                             currentIndex = currentIndex,
                             isPlaying = isPlaying,
@@ -451,6 +453,8 @@ fun App(appContainer: AppContainer? = null) {
                         }
 
                         CommonItemScreen(
+                            viewModel = viewModelFruits,
+                            category = CategoryConstants.FRUITS,
                             items = items,
                             currentIndex = currentIndex,
                             isPlaying = isPlaying,
@@ -480,6 +484,8 @@ fun App(appContainer: AppContainer? = null) {
                         }
 
                         CommonItemScreen(
+                            viewModel = viewModelVehicle,
+                            category = CategoryConstants.VEHICLE,
                             items = items,
                             currentIndex = currentIndex,
                             isPlaying = isPlaying,

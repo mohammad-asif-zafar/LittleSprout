@@ -35,6 +35,9 @@ class AnimalsViewModel(
     private val _currentIndex = MutableStateFlow(0)
     val currentIndex = _currentIndex.asStateFlow()
 
+    private val _isCompleted = MutableStateFlow(false)
+    val isCompleted = _isCompleted.asStateFlow()
+
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying = _isPlaying.asStateFlow()
 
@@ -54,8 +57,16 @@ class AnimalsViewModel(
             _currentIndex.value++
             playAnimalSound()
         } else {
+            _isCompleted.value = true
             recordProgress("ANIMALS_COMPLETE", true)
         }
+    }
+
+    fun restart() {
+        stopAudio()
+        _isCompleted.value = false
+        _currentIndex.value = 0
+        playAnimalSound()
     }
 
     fun previousAnimal() {

@@ -120,7 +120,7 @@ fun ColorsContent(
                     detectHorizontalDragGestures(onDragEnd = {
                         if (swipeOffset > 150f && currentIndex > 0) {
                             onPreviousClick()
-                        } else if (swipeOffset < -150f && currentIndex < totalItemsCount - 1) {
+                        } else if (swipeOffset < -150f) {
                             onNextClick()
                         }
                         swipeOffset = 0f
@@ -206,14 +206,10 @@ fun ColorsContent(
                         Text("⭐", fontSize = 24.sp)
                     }
                 }
-                if (currentIndex < totalItemsCount - 1) {
-                    Image(
-                        painter = painterResource(Res.drawable.img_sweep_right),
-                        contentDescription = "Next",
-                        modifier = Modifier.size(72.dp).clickable { onNextClick() })
-                } else {
-                    Spacer(modifier = Modifier.size(72.dp))
-                }
+                Image(
+                    painter = painterResource(Res.drawable.img_sweep_right),
+                    contentDescription = "Next",
+                    modifier = Modifier.size(72.dp).clickable { onNextClick() })
             }
 
             Spacer(modifier = Modifier.height(24.dp))

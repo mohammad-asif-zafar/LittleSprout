@@ -358,6 +358,9 @@ class CommonViewModel(
     val currentFruitIndex = _currentFruitIndex.asStateFlow()
     val currentVehicleIndex = _currentVehicleIndex.asStateFlow()
 
+    private val _completedCategory = MutableStateFlow<String?>(null)
+    val completedCategory = _completedCategory.asStateFlow()
+
     private val appSettings: StateFlow<AppSettings> = settingsRepository?.settings
         ?.stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings())
         ?: MutableStateFlow(AppSettings())
@@ -405,10 +408,22 @@ class CommonViewModel(
         }
         
         if (completed) {
+            _completedCategory.value = category
             recordProgress("${category.uppercase()}_COMPLETE", category, true)
         } else {
             playCurrentItemAudio(category)
         }
+    }
+
+    fun restartCategory(category: String) {
+        stopAudio()
+        _completedCategory.value = null
+        when (category) {
+            CategoryConstants.BIRDS -> _currentBirdIndex.value = 0
+            CategoryConstants.FRUITS -> _currentFruitIndex.value = 0
+            CategoryConstants.VEHICLE -> _currentVehicleIndex.value = 0
+        }
+        playCurrentItemAudio(category)
     }
 
     fun previousItem(category: String) {

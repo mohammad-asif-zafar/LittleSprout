@@ -43,6 +43,9 @@ class ShapesViewModel(
     private val _currentIndex = MutableStateFlow(0)
     val currentIndex = _currentIndex.asStateFlow()
 
+    private val _isCompleted = MutableStateFlow(false)
+    val isCompleted = _isCompleted.asStateFlow()
+
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying = _isPlaying.asStateFlow()
 
@@ -76,8 +79,16 @@ class ShapesViewModel(
             _currentIndex.value++
             playCurrentAudio(isAutoPlay = true)
         } else {
+            _isCompleted.value = true
             recordProgress("SHAPES_COMPLETE", true)
         }
+    }
+
+    fun restart() {
+        stopAudio()
+        _isCompleted.value = false
+        _currentIndex.value = 0
+        playCurrentAudio()
     }
 
     fun previousShape() {

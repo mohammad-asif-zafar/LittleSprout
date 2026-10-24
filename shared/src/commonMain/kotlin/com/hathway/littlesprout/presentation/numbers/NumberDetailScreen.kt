@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.hathway.littlesprout.presentation.common_components.CompletionDialog
 
-// 1. STATEFUL WRAPPER: Resolves state logic safely from your ViewModel architecture
 @Composable
 fun NumberDetailScreen(
     viewModel: NumbersViewModel, 
@@ -15,6 +15,7 @@ fun NumberDetailScreen(
     val numbers by viewModel.numbers.collectAsState()
     val selectedIndex by viewModel.selectedNumberIndex.collectAsState()
     val isPlaying by viewModel.isPlaying.collectAsState()
+    val isCompleted by viewModel.isCompleted.collectAsState()
 
     val currentItem = selectedIndex?.let { numbers.getOrNull(it) } ?: return
 
@@ -31,5 +32,18 @@ fun NumberDetailScreen(
         onHomeClick = onHomeClick,
         onPreviousClick = { viewModel.previousNumber() },
         onNextClick = { viewModel.nextNumber() },
-        onPlaySoundClick = { viewModel.playCurrentAudio() })
+        onPlaySoundClick = { viewModel.playCurrentAudio() }
+    )
+
+    if (isCompleted) {
+        CompletionDialog(
+            categoryName = "numbers",
+            totalCount = numbers.size,
+            onPlayAgain = { viewModel.restart() },
+            onHome = {
+                viewModel.clearSelection()
+                onHomeClick()
+            }
+        )
+    }
 }
