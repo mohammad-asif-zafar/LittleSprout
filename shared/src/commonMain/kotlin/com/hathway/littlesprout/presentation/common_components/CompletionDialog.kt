@@ -3,14 +3,12 @@ package com.hathway.littlesprout.presentation.common_components
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.hathway.littlesprout.presentation.music.getAudioPlayer
 import littlesprout.shared.generated.resources.Orbidino_Cheerful_Jumping_Dino_Sticker
 import littlesprout.shared.generated.resources.Res
 import org.jetbrains.compose.resources.painterResource
@@ -39,16 +38,51 @@ fun CompletionDialog(
     onNextCategory: (() -> Unit)? = null,
     onDismiss: () -> Unit = onHome
 ) {
+    val audioPlayer = remember { getAudioPlayer() }
+
+    LaunchedEffect(Unit) {
+        try {
+            audioPlayer.preload("Fantastic! You did it!.mp3")
+            audioPlayer.play("Fantastic! You did it!.mp3", interruptCurrent = true)
+        } catch (e: Exception) {
+            // Ignore audio load/play errors gracefully
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            try {
+                audioPlayer.stop()
+            } catch (e: Exception) {
+                // Ignore
+            }
+        }
+    }
+
     Dialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            try { audioPlayer.stop() } catch (e: Exception) {}
+            onDismiss()
+        },
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         CompletionDialogContent(
             categoryName = categoryName,
             totalCount = totalCount,
-            onPlayAgain = onPlayAgain,
-            onHome = onHome,
-            onNextCategory = onNextCategory
+            onPlayAgain = {
+                try { audioPlayer.stop() } catch (e: Exception) {}
+                onPlayAgain()
+            },
+            onHome = {
+                try { audioPlayer.stop() } catch (e: Exception) {}
+                onHome()
+            },
+            onNextCategory = onNextCategory?.let { next ->
+                {
+                    try { audioPlayer.stop() } catch (e: Exception) {}
+                    next()
+                }
+            }
         )
     }
 }

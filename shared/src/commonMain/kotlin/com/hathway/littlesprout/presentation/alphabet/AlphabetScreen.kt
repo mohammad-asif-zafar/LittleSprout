@@ -39,7 +39,6 @@ fun AlphabetScreen(
             totalCount = items.size,
             onPlayAgain = { viewModel.restart() },
             onHome = {
-                viewModel.restart()
                 onHomeClick()
             }
         )

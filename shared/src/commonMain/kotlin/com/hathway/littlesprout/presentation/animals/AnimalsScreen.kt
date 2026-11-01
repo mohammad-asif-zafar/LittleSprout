@@ -35,7 +35,6 @@ fun AnimalsScreen(
             totalCount = animals.size,
             onPlayAgain = { viewModel.restart() },
             onHome = {
-                viewModel.restart()
                 onHomeClick()
             }
         )

@@ -37,7 +37,6 @@ fun ShapesScreen(
             totalCount = shapes.size,
             onPlayAgain = { viewModel.restart() },
             onHome = {
-                viewModel.restart()
                 onHomeClick()
             }
         )

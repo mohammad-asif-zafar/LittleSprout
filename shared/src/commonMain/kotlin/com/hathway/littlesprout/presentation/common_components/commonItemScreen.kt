@@ -38,7 +38,6 @@ fun CommonItemScreen(
             totalCount = items.size,
             onPlayAgain = { viewModel.restartCategory(category) },
             onHome = {
-                viewModel.restartCategory(category)
                 onHomeClick()
             }
         )

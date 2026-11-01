@@ -42,7 +42,6 @@ fun ColorsScreen(
             totalCount = colors.size,
             onPlayAgain = { viewModel.restart() },
             onHome = {
-                viewModel.restart()
                 onHomeClick()
             }
         )
