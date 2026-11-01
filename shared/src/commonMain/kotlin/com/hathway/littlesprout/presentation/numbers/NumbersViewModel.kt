@@ -109,7 +109,7 @@ class NumbersViewModel(
     fun clearSelection() {
         stopAudio()
         _isCompleted.value = false
-        _selectedNumberIndex.value = null
+        _selectedNumberIndex.value = 0
     }
 
     override fun onCleared() {

@@ -1,7 +1,7 @@
 package com.hathway.littlesprout.presentation.alphabet
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -31,6 +31,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.draw.scale
+import androidx.compose.foundation.layout.offset
 import com.hathway.littlesprout.domain.model.AlphabetItem
 import com.hathway.littlesprout.presentation.common_components.ColoredText
 import littlesprout.shared.generated.resources.Res
@@ -140,34 +143,76 @@ fun AlphabetContent(
                         ))
                     }, modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
                 ) { targetItem ->
-                    Column(
-                        modifier = Modifier.fillMaxSize().padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Image(
-                            painter = painterResource(targetItem.letterImage),
-                            contentDescription = "Letter ${targetItem.letter}",
-                            modifier = Modifier.height(120.dp).fillMaxWidth(),
-                            contentScale = ContentScale.Fit
+                    val infiniteTransition = rememberInfiniteTransition(label = "AlphabetAnimations")
+                    val bounceY by infiniteTransition.animateFloat(
+                        initialValue = -6f,
+                        targetValue = 6f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(900, easing = FastOutSlowInEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "ObjectBounce"
+                    )
+                    val sparkleScale by infiniteTransition.animateFloat(
+                        initialValue = 0.8f,
+                        targetValue = 1.2f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(700, easing = FastOutSlowInEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "SparkleScale"
+                    )
+
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        androidx.compose.material3.Text(
+                            text = "✨",
+                            fontSize = 24.sp,
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .padding(start = 16.dp, top = 16.dp)
+                                .scale(sparkleScale)
+                        )
+                        androidx.compose.material3.Text(
+                            text = "⭐",
+                            fontSize = 28.sp,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(end = 16.dp, top = 16.dp)
+                                .scale(sparkleScale)
                         )
 
-                        Image(
-                            painter = painterResource(targetItem.objectImage),
-                            contentDescription = targetItem.description,
-                            modifier = Modifier.height(180.dp).fillMaxWidth()
-                                .clip(RoundedCornerShape(16.dp)),
-                            contentScale = ContentScale.Fit
-                        )
-                        Box(
-                            modifier = Modifier.fillMaxWidth()
-                                .wrapContentHeight()
-                                .defaultMinSize(minHeight = 80.dp)
-                                .padding(bottom = 8.dp), contentAlignment = Alignment.Center
+                        Column(
+                            modifier = Modifier.fillMaxSize().padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            ColoredText(
-                                text = targetItem.description.uppercase()
+                            Image(
+                                painter = painterResource(targetItem.letterImage),
+                                contentDescription = "Letter ${targetItem.letter}",
+                                modifier = Modifier.height(110.dp).fillMaxWidth(),
+                                contentScale = ContentScale.Fit
                             )
+
+                            Image(
+                                painter = painterResource(targetItem.objectImage),
+                                contentDescription = targetItem.description,
+                                modifier = Modifier
+                                    .height(170.dp)
+                                    .fillMaxWidth()
+                                    .offset(y = bounceY.dp)
+                                    .clip(RoundedCornerShape(16.dp)),
+                                contentScale = ContentScale.Fit
+                            )
+                            Box(
+                                modifier = Modifier.fillMaxWidth()
+                                    .wrapContentHeight()
+                                    .defaultMinSize(minHeight = 80.dp)
+                                    .padding(bottom = 8.dp), contentAlignment = Alignment.Center
+                            ) {
+                                ColoredText(
+                                    text = targetItem.description.uppercase()
+                                )
+                            }
                         }
                     }
                 }

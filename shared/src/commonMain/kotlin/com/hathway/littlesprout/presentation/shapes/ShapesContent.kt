@@ -1,7 +1,7 @@
 package com.hathway.littlesprout.presentation.shapes
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -11,20 +11,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -38,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -151,30 +139,71 @@ fun ShapesContent(
                             ))
                         }, modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
                     ) { targetShape ->
-                        Column(
-                            modifier = Modifier.fillMaxSize().padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            // Shape Image
-                            Image(
-                                painter = painterResource(targetShape.shapeImage),
-                                contentDescription = targetShape.name,
-                                modifier = Modifier.size(260.dp),
-                                contentScale = ContentScale.Fit
+                        val infiniteTransition = rememberInfiniteTransition(label = "ShapeAnimations")
+                        val bounceY by infiniteTransition.animateFloat(
+                            initialValue = -6f,
+                            targetValue = 6f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(900, easing = FastOutSlowInEasing),
+                                repeatMode = RepeatMode.Reverse
+                            ),
+                            label = "ShapeBounce"
+                        )
+                        val sparkleScale by infiniteTransition.animateFloat(
+                            initialValue = 0.8f,
+                            targetValue = 1.2f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(700, easing = FastOutSlowInEasing),
+                                repeatMode = RepeatMode.Reverse
+                            ),
+                            label = "SparkleScale"
+                        )
+
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text(
+                                text = "✨",
+                                fontSize = 26.sp,
+                                modifier = Modifier
+                                    .align(Alignment.TopStart)
+                                    .padding(start = 24.dp, top = 20.dp)
+                                    .scale(sparkleScale)
+                            )
+                            Text(
+                                text = "⭐",
+                                fontSize = 30.sp,
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(end = 24.dp, top = 20.dp)
+                                    .scale(sparkleScale)
                             )
 
-                            Spacer(modifier = Modifier.height(32.dp))
-
-                            // Shape Name Bubble
-                            Box(
-                                modifier = Modifier.fillMaxWidth().wrapContentHeight()
-                                    .defaultMinSize(minHeight = 80.dp).padding(bottom = 8.dp),
-                                contentAlignment = Alignment.Center
+                            Column(
+                                modifier = Modifier.fillMaxSize().padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
                             ) {
-                                ColoredText(
-                                    text = targetShape.name.uppercase()
+                                // Shape Image
+                                Image(
+                                    painter = painterResource(targetShape.shapeImage),
+                                    contentDescription = targetShape.name,
+                                    modifier = Modifier
+                                        .size(240.dp)
+                                        .offset(y = bounceY.dp),
+                                    contentScale = ContentScale.Fit
                                 )
+
+                                Spacer(modifier = Modifier.height(32.dp))
+
+                                // Shape Name Bubble
+                                Box(
+                                    modifier = Modifier.fillMaxWidth().wrapContentHeight()
+                                        .defaultMinSize(minHeight = 80.dp).padding(bottom = 8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    ColoredText(
+                                        text = targetShape.name.uppercase()
+                                    )
+                                }
                             }
                         }
                     }
@@ -199,6 +228,16 @@ fun ShapesContent(
                 }
 
                 // Center Bottom Badge
+                val badgeStarScale by rememberInfiniteTransition(label = "BadgeStar").animateFloat(
+                    initialValue = 0.9f,
+                    targetValue = 1.2f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(700, easing = FastOutSlowInEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "StarScale"
+                )
+
                 Surface(
                     modifier = Modifier.height(56.dp),
                     shape = RoundedCornerShape(28.dp),
@@ -216,7 +255,11 @@ fun ShapesContent(
                             color = Color(0xFF1E88E5)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("⭐", fontSize = 24.sp)
+                        Text(
+                            text = "⭐",
+                            fontSize = 24.sp,
+                            modifier = Modifier.scale(badgeStarScale)
+                        )
                     }
                 }
 

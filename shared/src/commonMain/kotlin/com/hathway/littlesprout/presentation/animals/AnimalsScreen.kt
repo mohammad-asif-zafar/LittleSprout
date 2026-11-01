@@ -17,6 +17,10 @@ fun AnimalsScreen(
     val isCompleted by viewModel.isCompleted.collectAsState()
     val currentItem = animals.getOrNull(currentIndex) ?: return
 
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        viewModel.playAnimalSound()
+    }
+
     AnimalsContent(
         currentItem = currentItem,
         currentIndex = currentIndex,
