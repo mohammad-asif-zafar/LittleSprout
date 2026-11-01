@@ -25,8 +25,14 @@ fun AlphabetScreen(
         currentItem = currentItem,
         isPreviousEnabled = currentIndex > 0,
         isNextEnabled = true,
-        onBackClick = onBackClick,
-        onHomeClick = onHomeClick,
+        onBackClick = {
+            viewModel.clearCompletion()
+            onBackClick()
+        },
+        onHomeClick = {
+            viewModel.clearCompletion()
+            onHomeClick()
+        },
         onPreviousClick = { viewModel.previousItem() },
         onNextClick = { viewModel.nextItem() },
         isPlaying = isPlaying,
@@ -39,7 +45,7 @@ fun AlphabetScreen(
             totalCount = items.size,
             onPlayAgain = { viewModel.restart() },
             onHome = {
-                viewModel.restart()
+                viewModel.clearCompletion()
                 onHomeClick()
             }
         )

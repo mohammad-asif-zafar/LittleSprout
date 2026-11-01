@@ -1,7 +1,7 @@
 package com.hathway.littlesprout.presentation.numbers
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -36,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -160,7 +162,7 @@ fun NumberDetailContent(
                     )
                 }
 
-                // Core Card Content Layout
+                // Core Card Content Layout with Toddler Animations
                 AnimatedContent(
                     targetState = currentItem,
                     transitionSpec = {
@@ -173,50 +175,109 @@ fun NumberDetailContent(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) { targetItem ->
-                    Column(
-                        modifier = Modifier.fillMaxSize().padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                    val infiniteTransition = rememberInfiniteTransition(label = "DetailAnimations")
+
+                    val numberYOffset by infiniteTransition.animateFloat(
+                        initialValue = -8f,
+                        targetValue = 8f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(900, easing = FastOutSlowInEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "NumberBounce"
+                    )
+
+                    val handScale by infiniteTransition.animateFloat(
+                        initialValue = 0.94f,
+                        targetValue = 1.06f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(750, easing = FastOutSlowInEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "HandScale"
+                    )
+
+                    val sparkleScale by infiniteTransition.animateFloat(
+                        initialValue = 0.8f,
+                        targetValue = 1.2f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(600, easing = FastOutSlowInEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "SparkleScale"
+                    )
+
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        // 3D Number Card
-                        Image(
-                            painter = painterResource(targetItem.gridImage),
-                            contentDescription = null,
-                            modifier = Modifier.size(140.dp),
-                            contentScale = ContentScale.Fit
+                        // Floating Decorative Sparkles for Toddlers
+                        Text(
+                            text = "✨",
+                            fontSize = 28.sp,
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .padding(start = 24.dp, top = 20.dp)
+                                .scale(sparkleScale)
+                        )
+                        Text(
+                            text = "⭐",
+                            fontSize = 32.sp,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(end = 28.dp, top = 24.dp)
+                                .scale(sparkleScale)
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Column(
+                            modifier = Modifier.fillMaxSize().padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            // 3D Bouncy Number Card
+                            Image(
+                                painter = painterResource(targetItem.gridImage),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(140.dp)
+                                    .offset(y = numberYOffset.dp),
+                                contentScale = ContentScale.Fit
+                            )
 
-                        // Hand/Fingers Icon
-                        Image(
-                            painter = painterResource(targetItem.detailImage),
-                            contentDescription = null,
-                            modifier = Modifier.size(180.dp),
-                            contentScale = ContentScale.Fit
-                        )
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                            // Animated Hand / Counting Fingers Icon
+                            Image(
+                                painter = painterResource(targetItem.detailImage),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(180.dp)
+                                    .scale(handScale),
+                                contentScale = ContentScale.Fit
+                            )
 
-                        // Descriptive Text
-                        val annotatedString = buildAnnotatedString {
-                            withStyle(
-                                style = SpanStyle(
-                                    color = Color(0xFFFF5252), fontWeight = FontWeight.Bold
-                                )
-                            ) {
-                                append(targetItem.name)
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            // Descriptive Text
+                            val annotatedString = buildAnnotatedString {
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = Color(0xFFFF5252), fontWeight = FontWeight.Bold
+                                    )
+                                ) {
+                                    append(targetItem.name)
+                                }
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = Color(0xFF1565C0), fontWeight = FontWeight.Bold
+                                    )
+                                ) {
+                                    append(" finger")
+                                    if (targetItem.value != 1) append("s")
+                                }
                             }
-                            withStyle(
-                                style = SpanStyle(
-                                    color = Color(0xFF1565C0), fontWeight = FontWeight.Bold
-                                )
-                            ) {
-                                append(" finger")
-                                if (targetItem.value != 1) append("s")
-                            }
+                            Text(text = annotatedString, fontSize = 28.sp)
                         }
-                        Text(text = annotatedString, fontSize = 28.sp)
                     }
                 }
             }
@@ -240,6 +301,16 @@ fun NumberDetailContent(
                 }
 
                 // Center Bottom Badge
+                val badgeStarScale by rememberInfiniteTransition(label = "BadgeStar").animateFloat(
+                    initialValue = 0.9f,
+                    targetValue = 1.2f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(700, easing = FastOutSlowInEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "StarScale"
+                )
+
                 Surface(
                     modifier = Modifier.height(56.dp),
                     shape = RoundedCornerShape(28.dp),
@@ -257,7 +328,11 @@ fun NumberDetailContent(
                             color = Color(0xFF1E88E5)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("⭐", fontSize = 24.sp)
+                        Text(
+                            text = "⭐",
+                            fontSize = 24.sp,
+                            modifier = Modifier.scale(badgeStarScale)
+                        )
                     }
                 }
 

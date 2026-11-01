@@ -426,6 +426,16 @@ class CommonViewModel(
         playCurrentItemAudio(category)
     }
 
+    fun clearCompletion(category: String) {
+        stopAudio()
+        _completedCategory.value = null
+        when (category) {
+            CategoryConstants.BIRDS -> _currentBirdIndex.value = 0
+            CategoryConstants.FRUITS -> _currentFruitIndex.value = 0
+            CategoryConstants.VEHICLE -> _currentVehicleIndex.value = 0
+        }
+    }
+
     fun previousItem(category: String) {
         stopAudio()
         when (category) {

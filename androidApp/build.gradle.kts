@@ -49,25 +49,25 @@ android {
         // Version
         //
         // Local build:
-        //   versionCode = 3
-        //   versionName = 1.0.3
+        //   versionCode = 1000007
+        //   versionName = 1.0.7
         //
         // GitHub release:
         //   Values come from the Git tag.
         //
         // Example:
-        //   v1.0.3
+        //   v1.0.7
         //
         // becomes:
-        //   versionName = 1.0.3
-        //   versionCode = 1000003
+        //   versionName = 1.0.7
+        //   versionCode = 1000007
         // ----------------------------------------------------
 
         versionCode =
-            (System.getenv("ANDROID_VERSION_CODE") ?: "3").toInt()
+            (System.getenv("ANDROID_VERSION_CODE") ?: "1000007").toInt()
 
         versionName =
-            System.getenv("ANDROID_VERSION_NAME") ?: "1.0.3"
+            System.getenv("ANDROID_VERSION_NAME") ?: "1.0.7"
     }
 
     // ----------------------------------------------------------

@@ -263,6 +263,12 @@ class AlphabetViewModel(
         playCurrentAudio()
     }
 
+    fun clearCompletion() {
+        stopAudio()
+        _isCompleted.value = false
+        _currentIndex.value = 0
+    }
+
     fun previousItem() {
         stopAudio()
         if (_currentIndex.value > 0) {

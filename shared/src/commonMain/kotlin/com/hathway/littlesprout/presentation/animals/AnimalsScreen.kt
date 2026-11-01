@@ -17,13 +17,23 @@ fun AnimalsScreen(
     val isCompleted by viewModel.isCompleted.collectAsState()
     val currentItem = animals.getOrNull(currentIndex) ?: return
 
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        viewModel.playAnimalSound()
+    }
+
     AnimalsContent(
         currentItem = currentItem,
         currentIndex = currentIndex,
         totalItemsCount = animals.size,
         isPlaying = isPlaying,
-        onBackClick = onBackClick,
-        onHomeClick = onHomeClick,
+        onBackClick = {
+            viewModel.clearCompletion()
+            onBackClick()
+        },
+        onHomeClick = {
+            viewModel.clearCompletion()
+            onHomeClick()
+        },
         onPreviousClick = { viewModel.previousAnimal() },
         onNextClick = { viewModel.nextAnimal() },
         onPlaySoundClick = { viewModel.playAnimalSound() }
@@ -35,7 +45,7 @@ fun AnimalsScreen(
             totalCount = animals.size,
             onPlayAgain = { viewModel.restart() },
             onHome = {
-                viewModel.restart()
+                viewModel.clearCompletion()
                 onHomeClick()
             }
         )

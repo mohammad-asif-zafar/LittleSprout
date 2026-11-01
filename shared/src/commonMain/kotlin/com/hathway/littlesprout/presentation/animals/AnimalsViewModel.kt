@@ -69,6 +69,12 @@ class AnimalsViewModel(
         playAnimalSound()
     }
 
+    fun clearCompletion() {
+        stopAudio()
+        _isCompleted.value = false
+        _currentIndex.value = 0
+    }
+
     fun previousAnimal() {
         stopAudio()
         if (_currentIndex.value > 0) {

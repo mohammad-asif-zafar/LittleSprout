@@ -91,6 +91,12 @@ class ShapesViewModel(
         playCurrentAudio()
     }
 
+    fun clearCompletion() {
+        stopAudio()
+        _isCompleted.value = false
+        _currentIndex.value = 0
+    }
+
     fun previousShape() {
         stopAudio()
         if (_currentIndex.value > 0) {
