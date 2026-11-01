@@ -5,9 +5,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hathway.littlesprout.di.AppContainer
@@ -54,11 +60,32 @@ import com.hathway.littlesprout.util.Constants
 import com.hathway.littlesprout.util.getAppInfo
 import com.hathway.littlesprout.util.getLinkLauncher
 
+private val ltrTypography = Typography(
+    displayLarge = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left),
+    displayMedium = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left),
+    displaySmall = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left),
+    headlineLarge = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left),
+    headlineMedium = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left),
+    headlineSmall = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left),
+    titleLarge = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left),
+    titleMedium = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left),
+    titleSmall = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left),
+    bodyLarge = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left),
+    bodyMedium = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left),
+    bodySmall = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left),
+    labelLarge = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left),
+    labelMedium = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left),
+    labelSmall = TextStyle(textDirection = TextDirection.Ltr, textAlign = TextAlign.Left)
+)
+
 @Composable
 @Preview
 fun App(appContainer: AppContainer? = null) {
-    MaterialTheme {
-        var currentScreen by remember { mutableStateOf<Screen>(Screen.Splash) }
+    CompositionLocalProvider(
+        LocalLayoutDirection provides LayoutDirection.Ltr
+    ) {
+        MaterialTheme(typography = ltrTypography) {
+            var currentScreen by remember { mutableStateOf<Screen>(Screen.Splash) }
         var selectedNavItem by remember { mutableStateOf(NavItem.Home) }
         var showParentalGate by remember { mutableStateOf(false) }
         var pendingNavItem by remember { mutableStateOf<NavItem?>(null) }
@@ -532,4 +559,5 @@ fun App(appContainer: AppContainer? = null) {
             }
         }
     }
+}
 }
