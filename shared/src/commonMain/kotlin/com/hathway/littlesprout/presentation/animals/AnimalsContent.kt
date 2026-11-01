@@ -178,21 +178,28 @@ fun AnimalsContent(
                         Column(
                             modifier = Modifier.fillMaxSize().padding(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Image(
-                                painter = painterResource(targetAnimal.image),
-                                contentDescription = targetAnimal.name,
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Box(
                                 modifier = Modifier
-                                    .size(320.dp)
+                                    .weight(1f)
+                                    .fillMaxWidth()
                                     .offset(y = bounceY.dp),
-                                contentScale = ContentScale.Fit
-                            )
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(targetAnimal.image),
+                                    contentDescription = targetAnimal.name,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Fit
+                                )
+                            }
 
-                            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
                             Box(
                                 modifier = Modifier.fillMaxWidth().wrapContentHeight()
-                                    .defaultMinSize(minHeight = 80.dp).padding(bottom = 8.dp),
+                                    .padding(bottom = 8.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 ColoredText(
