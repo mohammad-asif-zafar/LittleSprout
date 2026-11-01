@@ -28,8 +28,14 @@ fun NumberDetailScreen(
         selectedIndex = selectedIndex ?: 0,
         totalItemsCount = numbers.size,
         isPlaying = isPlaying,
-        onBackClick = onBackClick,
-        onHomeClick = onHomeClick,
+        onBackClick = {
+            viewModel.clearSelection()
+            onBackClick()
+        },
+        onHomeClick = {
+            viewModel.clearSelection()
+            onHomeClick()
+        },
         onPreviousClick = { viewModel.previousNumber() },
         onNextClick = { viewModel.nextNumber() },
         onPlaySoundClick = { viewModel.playCurrentAudio() }

@@ -29,8 +29,14 @@ fun ColorsScreen(
         currentIndex = currentIndex,
         totalItemsCount = colors.size,
         isPlaying = isPlaying,
-        onBackClick = onBackClick,
-        onHomeClick = onHomeClick,
+        onBackClick = {
+            viewModel.clearCompletion()
+            onBackClick()
+        },
+        onHomeClick = {
+            viewModel.clearCompletion()
+            onHomeClick()
+        },
         onPreviousClick = { viewModel.previousColor() },
         onNextClick = { viewModel.nextColor() },
         onPlaySoundClick = { viewModel.playCurrentAudio() }
@@ -42,6 +48,7 @@ fun ColorsScreen(
             totalCount = colors.size,
             onPlayAgain = { viewModel.restart() },
             onHome = {
+                viewModel.clearCompletion()
                 onHomeClick()
             }
         )

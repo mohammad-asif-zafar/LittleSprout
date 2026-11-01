@@ -25,8 +25,14 @@ fun CommonItemScreen(
         isPreviousEnabled = currentIndex > 0,
         isNextEnabled = true,
         isPlaying = isPlaying,
-        onBackClick = onBackClick,
-        onHomeClick = onHomeClick,
+        onBackClick = {
+            viewModel.clearCompletion(category)
+            onBackClick()
+        },
+        onHomeClick = {
+            viewModel.clearCompletion(category)
+            onHomeClick()
+        },
         onPreviousClick = onPreviousClick,
         onNextClick = onNextClick,
         onPlaySoundClick = onPlaySoundClick
@@ -38,6 +44,7 @@ fun CommonItemScreen(
             totalCount = items.size,
             onPlayAgain = { viewModel.restartCategory(category) },
             onHome = {
+                viewModel.clearCompletion(category)
                 onHomeClick()
             }
         )

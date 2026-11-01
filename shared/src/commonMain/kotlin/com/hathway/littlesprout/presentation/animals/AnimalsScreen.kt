@@ -22,8 +22,14 @@ fun AnimalsScreen(
         currentIndex = currentIndex,
         totalItemsCount = animals.size,
         isPlaying = isPlaying,
-        onBackClick = onBackClick,
-        onHomeClick = onHomeClick,
+        onBackClick = {
+            viewModel.clearCompletion()
+            onBackClick()
+        },
+        onHomeClick = {
+            viewModel.clearCompletion()
+            onHomeClick()
+        },
         onPreviousClick = { viewModel.previousAnimal() },
         onNextClick = { viewModel.nextAnimal() },
         onPlaySoundClick = { viewModel.playAnimalSound() }
@@ -35,6 +41,7 @@ fun AnimalsScreen(
             totalCount = animals.size,
             onPlayAgain = { viewModel.restart() },
             onHome = {
+                viewModel.clearCompletion()
                 onHomeClick()
             }
         )

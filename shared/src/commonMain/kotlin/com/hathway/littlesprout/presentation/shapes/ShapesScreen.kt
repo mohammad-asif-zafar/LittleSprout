@@ -24,8 +24,14 @@ fun ShapesScreen(
         currentIndex = currentIndex,
         totalItemsCount = shapes.size,
         isPlaying = isPlaying,
-        onBackClick = onBackClick,
-        onHomeClick = onHomeClick,
+        onBackClick = {
+            viewModel.clearCompletion()
+            onBackClick()
+        },
+        onHomeClick = {
+            viewModel.clearCompletion()
+            onHomeClick()
+        },
         onPreviousClick = { viewModel.previousShape() },
         onNextClick = { viewModel.nextShape() },
         onPlaySoundClick = { viewModel.playCurrentAudio() }
@@ -37,6 +43,7 @@ fun ShapesScreen(
             totalCount = shapes.size,
             onPlayAgain = { viewModel.restart() },
             onHome = {
+                viewModel.clearCompletion()
                 onHomeClick()
             }
         )
